@@ -158,17 +158,8 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       <div className="flex h-full pt-16 lg:pt-0">
-        {/* Main Content Area */}
-        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4 lg:p-6 min-h-full">
-              {children}
-            </div>
-          </div>
-        </main>
-
         {/* Desktop Sidebar - FIXED */}
-        <aside className="hidden lg:flex lg:flex-col w-80 bg-white border-r border-gray-200 shadow-lg flex-shrink-0 overflow-hidden">
+        <aside className="hidden lg:flex lg:flex-col w-80 bg-white border-l border-gray-200 shadow-lg flex-shrink-0 overflow-hidden">
           <div className="flex flex-col h-full">
             {/* Sidebar Header - FIXED HEIGHT */}
             <div className="p-6 border-b border-gray-100 flex-shrink-0">

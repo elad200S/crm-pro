@@ -1,21 +1,21 @@
-import Dashboard from './pages/Dashboard';
-import Customers from './pages/Customers';
-import Payments from './pages/Payments';
 import Calendar from './pages/Calendar';
-import UserManagement from './pages/UserManagement';
-import Onboarding from './pages/Onboarding';
+import Customers from './pages/Customers';
+import Dashboard from './pages/Dashboard';
 import JobDescriptionManagement from './pages/JobDescriptionManagement';
+import Onboarding from './pages/Onboarding';
+import Payments from './pages/Payments';
+import UserManagement from './pages/UserManagement';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Dashboard": Dashboard,
-    "Customers": Customers,
-    "Payments": Payments,
     "Calendar": Calendar,
-    "UserManagement": UserManagement,
-    "Onboarding": Onboarding,
+    "Customers": Customers,
+    "Dashboard": Dashboard,
     "JobDescriptionManagement": JobDescriptionManagement,
+    "Onboarding": Onboarding,
+    "Payments": Payments,
+    "UserManagement": UserManagement,
 }
 
 export const pagesConfig = {
