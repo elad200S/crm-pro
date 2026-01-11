@@ -244,6 +244,15 @@ export default function Layout({ children, currentPageName }) {
             </div>
           </div>
         </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4 lg:p-6 min-h-full">
+              {children}
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
