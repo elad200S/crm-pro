@@ -43,14 +43,14 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead>שם מלא</TableHead>
-                <TableHead>תפקיד</TableHead>
-                <TableHead>מחלקה</TableHead>
-                <TableHead>קטגוריה</TableHead>
-                <TableHead>פרטי קשר</TableHead>
-                <TableHead>תאריך התחלה</TableHead>
-                <TableHead>סטטוס</TableHead>
-                <TableHead>פעולות</TableHead>
+                <TableHead className="text-right">שם מלא</TableHead>
+                <TableHead className="text-right">תפקיד</TableHead>
+                <TableHead className="text-right">מחלקה</TableHead>
+                <TableHead className="text-right">קטגוריה</TableHead>
+                <TableHead className="text-right">פרטי קשר</TableHead>
+                <TableHead className="text-right">תאריך התחלה</TableHead>
+                <TableHead className="text-right">סטטוס</TableHead>
+                <TableHead className="text-right">פעולות</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
