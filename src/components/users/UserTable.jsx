@@ -56,21 +56,21 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id} className="hover:bg-gray-50">
-                  <TableCell>
+                  <TableCell className="text-right">
                     <div className="font-semibold text-gray-900">{user.full_name}</div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <span className="text-sm">{user.job_title}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <span className="text-sm">{user.department}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <Badge className={categoryColors[user.user_category]}>
                       {user.user_category?.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-gray-400" />
@@ -82,17 +82,17 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <span className="text-sm">
                       {user.start_date ? format(new Date(user.start_date), "dd/MM/yyyy", { locale: he }) : "-"}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <Badge className={statusColors[user.status]}>
                       {user.status?.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
