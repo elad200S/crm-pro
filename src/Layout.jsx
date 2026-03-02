@@ -22,6 +22,11 @@ const navigationItems = [
     icon: BarChart3,
   },
   {
+    title: "לידים",
+    url: createPageUrl("Leads"),
+    icon: UserPlus,
+  },
+  {
     title: "לקוחות", 
     url: createPageUrl("Customers"),
     icon: Users,
