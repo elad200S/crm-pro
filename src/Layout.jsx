@@ -9,7 +9,8 @@ import {
   Calendar,
   Building2,
   Menu,
-  X
+  X,
+  UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./components/notifications/NotificationBell";
