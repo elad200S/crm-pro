@@ -256,13 +256,19 @@ export default function Leads() {
             </h1>
             <p className="text-gray-500 mt-1">{filtered.length} לידים מוצגים</p>
           </div>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700 shadow-md"
-            onClick={() => { setEditingLead(null); setShowForm(true); }}
-          >
-            <UserPlus className="w-4 h-4 ml-2" />
-            ליד חדש
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportToCSV}>
+              <Download className="w-4 h-4 ml-2" />
+              ייצוא לאקסל
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 shadow-md"
+              onClick={() => { setEditingLead(null); setShowForm(true); }}
+            >
+              <UserPlus className="w-4 h-4 ml-2" />
+              ליד חדש
+            </Button>
+          </div>
         </div>
       </div>
 
