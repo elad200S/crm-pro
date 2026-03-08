@@ -193,6 +193,7 @@ export default function Calendar() {
           <TaskList
             tasks={upcomingTasks}
             getCustomerName={getCustomerName}
+            getLeadName={getLeadName}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onStatusChange={handleStatusChange}
