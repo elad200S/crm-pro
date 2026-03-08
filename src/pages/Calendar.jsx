@@ -65,9 +65,9 @@ export default function Calendar() {
   const handleSubmit = async (taskData) => {
     try {
       if (editingTask) {
-        await Task.update(editingTask.id, taskData);
+        await base44.entities.Task.update(editingTask.id, taskData);
       } else {
-        await Task.create(taskData);
+        await base44.entities.Task.create(taskData);
       }
       setShowForm(false);
       setEditingTask(null);
