@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -15,7 +16,37 @@ const statusColors = {
   "נסגר בהצלחה (שולם)": "bg-green-100 text-green-800",
 };
 
-export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onConvert }) {
+const priorityColors = {
+  "נמוכה": "bg-blue-100 text-blue-800",
+  "בינונית": "bg-yellow-100 text-yellow-800",
+  "גבוהה": "bg-orange-100 text-orange-800",
+  "קריטית": "bg-red-100 text-red-800"
+};
+
+export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onConvert, onAddTask }) {
+  const [tasks, setTasks] = useState([]);
+  const [loadingTasks, setLoadingTasks] = useState(true);
+
+  useEffect(() => {
+    if (lead?.id) loadTasks();
+  }, [lead?.id]);
+
+  const loadTasks = async () => {
+    try {
+      const all = await base44.entities.Task.list("-created_date", 100);
+      setTasks(all.filter(t => t.lead_id === lead.id));
+    } catch (e) {
+      setTasks([]);
+    } finally {
+      setLoadingTasks(false);
+    }
+  };
+
+  const markDone = async (taskId) => {
+    await base44.entities.Task.update(taskId, { status: "הושלם" });
+    loadTasks();
+  };
+
   if (!lead) return null;
   const agentName = users?.find(u => u.id === lead.agent_id)?.full_name;
 
@@ -28,7 +59,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
             {lead.full_name || lead.phone || "ליד ללא שם"}
@@ -78,6 +109,51 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
               <p className="text-sm text-gray-700 whitespace-pre-wrap">{lead.notes}</p>
             </div>
           )}
+
+          {/* Tasks Section */}
+          <div className="border-t pt-3">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+                <Clock className="w-4 h-4" /> משימות ({tasks.length})
+              </h4>
+              {onAddTask && (
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => { onAddTask(lead); onClose(); }}>
+                  <Plus className="w-3 h-3 ml-1" /> הוסף
+                </Button>
+              )}
+            </div>
+
+            {loadingTasks ? (
+              <p className="text-xs text-gray-400">טוען...</p>
+            ) : tasks.length === 0 ? (
+              <p className="text-xs text-gray-400 text-center py-2">אין משימות לליד זה</p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {tasks.map(task => {
+                  const isOverdue = task.status !== "הושלם" && new Date(task.due_date) < new Date();
+                  return (
+                    <div key={task.id} className={`flex items-center justify-between p-2 rounded-lg text-xs border ${isOverdue ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-200"}`}>
+                      <div className="flex-1 min-w-0">
+                        <span className={`font-medium truncate block ${task.status === "הושלם" ? "line-through text-gray-400" : ""}`}>{task.title}</span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className={isOverdue ? "text-red-600 font-semibold" : "text-gray-400"}>
+                            {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}
+                            {isOverdue && " ⚠"}
+                          </span>
+                          <Badge className={`text-[10px] py-0 px-1 ${priorityColors[task.priority]}`}>{task.priority}</Badge>
+                        </div>
+                      </div>
+                      {task.status !== "הושלם" && (
+                        <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0 text-green-600" onClick={() => markDone(task.id)}>
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-wrap justify-between gap-2 pt-2 border-t">
