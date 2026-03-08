@@ -36,6 +36,21 @@ export default function Customers() {
   });
   const [customerToDelete, setCustomerToDelete] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+  const exportToCSV = () => {
+    const headers = ["שם פרטי", "שם משפחה", "טלפון", "אימייל", "חברה", "סטטוס", "מקור הגעה", "עיר", "תאריך רישום"];
+    const rows = filteredCustomers.map(c => [
+      c.first_name || "", c.last_name || "", c.phone || "", c.email || "",
+      c.company || "", c.status || "", c.source || "", c.city || "",
+      c.registration_date || c.created_date || ""
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "לקוחות.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
   
   const location = useLocation();
 

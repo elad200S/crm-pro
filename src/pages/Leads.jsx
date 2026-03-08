@@ -39,8 +39,24 @@ export default function Leads() {
   const [convertTarget, setConvertTarget] = useState(null);
   const [existingCustomerForConvert, setExistingCustomerForConvert] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [selectedLead, setSelectedLead] = useState(null);
 
   const accountId = currentUser?.id || "default";
+
+  const exportToCSV = () => {
+    const headers = ["שם מלא", "טלפון", "אימייל", "חברה", "סטטוס", "מקור", "סוכן", "מעקב הבא", "תאריך יצירה"];
+    const rows = filtered.map(l => [
+      l.full_name || "", l.phone || "", l.email || "", l.company_name || "",
+      l.status || "", l.lead_source || "",
+      users.find(u => u.id === l.agent_id)?.full_name || "",
+      l.next_followup_at || "", l.created_date || ""
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = "לידים.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
   const webhookUrl = currentUser?.make_webhook_url || null;
 
   useEffect(() => { init(); }, []);
