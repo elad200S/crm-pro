@@ -18,7 +18,7 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
 
   const handleSubmit = () => {
     if (!form.title || !form.due_at) return;
-    onSubmit({ ...form, related_lead_id: lead.id, account_id: accountId });
+    onSubmit({ ...form, lead_id: lead.id, account_id: accountId });
   };
 
   return (
