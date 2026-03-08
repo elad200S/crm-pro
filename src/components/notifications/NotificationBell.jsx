@@ -59,32 +59,41 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
 
   const checkAndCreateNotifications = async () => {
     try {
-      // בדיקת משימות שעבר זמנן
+      // בדיקת משימות שעבר זמנן או קרובות ל-24 שעות
       const tasks = await Task.list('-due_date', 100);
       const now = new Date();
       
       for (const task of tasks) {
-        if (task.status !== "הושלם" && new Date(task.due_date) < now) {
-          try {
-            // בדיקה אם כבר קיימת התראה למשימה זו
-            const existingNotifications = await Notification.filter({
-              related_id: task.id,
-              related_type: "task",
-              type: "task_overdue"
-            });
-            
-            if (existingNotifications.length === 0) {
-              await Notification.create({
-                title: "משימה עברה את המועד",
-                message: `המשימה "${task.title}" עברה את מועד הביצוע`,
-                type: "task_overdue",
+        if (task.status !== "הושלם") {
+          const dueDate = new Date(task.due_date);
+          const hoursUntilDue = (dueDate - now) / (1000 * 60 * 60);
+          const isOverdue = dueDate < now;
+          const isDueSoon = hoursUntilDue >= 0 && hoursUntilDue <= 24;
+
+          if (isOverdue || isDueSoon) {
+            try {
+              const notifType = isOverdue ? "task_overdue" : "reminder";
+              const existingNotifications = await Notification.filter({
                 related_id: task.id,
                 related_type: "task",
-                priority: task.priority === "קריטית" ? "urgent" : "high"
+                type: notifType
               });
+              
+              if (existingNotifications.length === 0) {
+                await Notification.create({
+                  title: isOverdue ? "משימה עברה את המועד" : "משימה מתקרבת למועד",
+                  message: isOverdue
+                    ? `המשימה "${task.title}" עברה את מועד הביצוע`
+                    : `המשימה "${task.title}" צריכה להסתיים בתוך פחות מ-24 שעות`,
+                  type: notifType,
+                  related_id: task.id,
+                  related_type: "task",
+                  priority: task.priority === "קריטית" ? "urgent" : isOverdue ? "high" : "medium"
+                });
+              }
+            } catch (err) {
+              // תעלם משגיאות ביצירת התראה בודדת
             }
-          } catch (err) {
-            // תעלם משגיאות ביצירת התראה בודדת
           }
         }
       }
