@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,11 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Save, Trash2 } from "lucide-react";
 
-export default function TaskForm({ task, customers, onSubmit, onCancel, onDelete }) {
+export default function TaskForm({ task, customers, leads = [], onSubmit, onCancel, onDelete }) {
   const [formData, setFormData] = useState({
     title: task?.title || "",
     description: task?.description || "",
     customer_id: task?.customer_id || "",
+    lead_id: task?.lead_id || "",
     due_date: task?.due_date || "",
     status: task?.status || "פתוח",
     priority: task?.priority || "בינונית",
@@ -26,6 +26,15 @@ export default function TaskForm({ task, customers, onSubmit, onCancel, onDelete
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // אם בחרנו לקוח, מנקים ליד ולהפך
+  const handleCustomerChange = (val) => {
+    setFormData(prev => ({ ...prev, customer_id: val, lead_id: "" }));
+  };
+
+  const handleLeadChange = (val) => {
+    setFormData(prev => ({ ...prev, lead_id: val, customer_id: "" }));
   };
 
   return (
@@ -62,18 +71,39 @@ export default function TaskForm({ task, customers, onSubmit, onCancel, onDelete
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="customer_id">לקוח קשור</Label>
-              <Select 
-                value={formData.customer_id} 
-                onValueChange={(value) => handleChange("customer_id", value)}
+              <Label>שיוך ללקוח</Label>
+              <Select
+                value={formData.customer_id}
+                onValueChange={handleCustomerChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="בחר לקוח (אופציונלי)" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value={null}>ללא</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.first_name} {customer.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>שיוך לליד</Label>
+              <Select
+                value={formData.lead_id}
+                onValueChange={handleLeadChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="בחר ליד (אופציונלי)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>ללא</SelectItem>
+                  {leads.map((lead) => (
+                    <SelectItem key={lead.id} value={lead.id}>
+                      {lead.full_name || lead.phone || lead.email}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -120,16 +150,16 @@ export default function TaskForm({ task, customers, onSubmit, onCancel, onDelete
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="assigned_to">מוקצה למשתמש</Label>
-            <Input
-              id="assigned_to"
-              value={formData.assigned_to}
-              onChange={(e) => handleChange("assigned_to", e.target.value)}
-              placeholder="שם המשתמש"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="assigned_to">מוקצה למשתמש</Label>
+              <Input
+                id="assigned_to"
+                value={formData.assigned_to}
+                onChange={(e) => handleChange("assigned_to", e.target.value)}
+                placeholder="שם המשתמש"
+              />
+            </div>
           </div>
 
           <div className="flex justify-between items-center gap-3 pt-4 border-t">
