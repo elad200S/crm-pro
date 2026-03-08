@@ -51,10 +51,10 @@ import Calendar from './pages/Calendar';
 import Customers from './pages/Customers';
 import Dashboard from './pages/Dashboard';
 import JobDescriptionManagement from './pages/JobDescriptionManagement';
+import Leads from './pages/Leads';
 import Onboarding from './pages/Onboarding';
 import Payments from './pages/Payments';
 import UserManagement from './pages/UserManagement';
-import Leads from './pages/Leads';
 import __Layout from './Layout.jsx';
 
 
@@ -63,10 +63,10 @@ export const PAGES = {
     "Customers": Customers,
     "Dashboard": Dashboard,
     "JobDescriptionManagement": JobDescriptionManagement,
+    "Leads": Leads,
     "Onboarding": Onboarding,
     "Payments": Payments,
     "UserManagement": UserManagement,
-    "Leads": Leads,
 }
 
 export const pagesConfig = {

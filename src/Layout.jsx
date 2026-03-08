@@ -170,15 +170,15 @@ export default function Layout({ children, currentPageName }) {
             {/* Sidebar Header - FIXED HEIGHT */}
             <div className="p-6 border-b border-gray-100 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                    <Building2 className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">CRM Pro</h2>
-                    <p className="text-sm text-gray-500">ניהול לקוחות מתקדם</p>
-                  </div>
+                <Link to={createPageUrl("Dashboard")} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                  <Building2 className="w-6 h-6 text-white" />
                 </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">CRM Pro</h2>
+                  <p className="text-sm text-gray-500">ניהול לקוחות מתקדם</p>
+                </div>
+                </Link>
                 <NotificationBell />
               </div>
             </div>
