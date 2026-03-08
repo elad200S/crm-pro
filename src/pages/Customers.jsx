@@ -247,8 +247,18 @@ export default function Customers() {
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           isAdmin={currentUser?.email === ADMIN_EMAIL}
+          onRowClick={setSelectedCustomer}
         />
       </div>
+
+      {selectedCustomer && (
+        <CustomerDetailModal
+          customer={selectedCustomer}
+          onClose={() => setSelectedCustomer(null)}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+        />
+      )}
 
       <AlertDialog open={!!customerToDelete} onOpenChange={() => setCustomerToDelete(null)}>
         <AlertDialogContent>

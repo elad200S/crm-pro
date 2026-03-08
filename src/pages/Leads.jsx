@@ -303,8 +303,22 @@ export default function Leads() {
           onQuote={setQuoteTarget}
           onTask={setTaskTarget}
           onConvert={handleConvertClick}
+          onRowClick={setSelectedLead}
         />
       </div>
+
+      {selectedLead && (
+        <LeadDetailModal
+          lead={selectedLead}
+          users={users}
+          onClose={() => setSelectedLead(null)}
+          onEdit={handleEdit}
+          onDelete={setDeleteTarget}
+          onWhatsApp={handleWhatsApp}
+          onQuote={setQuoteTarget}
+          onConvert={handleConvertClick}
+        />
+      )}
 
       {/* Modals */}
       {duplicateWarning && (
