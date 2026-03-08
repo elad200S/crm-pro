@@ -12,6 +12,7 @@ import QuoteModal from "../components/leads/QuoteModal";
 import AddTaskModal from "../components/leads/AddTaskModal";
 import DuplicateWarningModal from "../components/leads/DuplicateWarningModal";
 import ConvertToCustomerModal from "../components/leads/ConvertToCustomerModal";
+import LeadDetailModal from "../components/leads/LeadDetailModal";
 
 const OUTBOUND_EVENT = async (accountWebhook, payload) => {
   if (!accountWebhook) return;

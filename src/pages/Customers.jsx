@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from "react";
 import { Customer, User } from "@/entities/all";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import {
 import CustomerForm from "../components/customers/CustomerForm";
 import CustomerTable from "../components/customers/CustomerTable";
 import CustomerFilters from "../components/customers/CustomerFilters";
+import CustomerDetailModal from "../components/customers/CustomerDetailModal";
 
 // הגדרת המנהל הראשי - החלף בכתובת המייל שלך
 const ADMIN_EMAIL = "your-email@gmail.com"; // החלף בכתובת המייל שלך!
