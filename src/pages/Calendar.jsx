@@ -47,12 +47,14 @@ export default function Calendar() {
 
   const loadData = async () => {
     try {
-      const [tasksData, customersData] = await Promise.all([
-        Task.list('-created_date'),
-        Customer.list()
+      const [tasksData, customersData, leadsData] = await Promise.all([
+        base44.entities.Task.list('-created_date'),
+        base44.entities.Customer.list(),
+        base44.entities.Lead.list()
       ]);
       setTasks(tasksData);
       setCustomers(customersData);
+      setLeads(leadsData);
     } catch (error) {
       console.error("שגיאה בטעינת נתונים:", error);
     } finally {
