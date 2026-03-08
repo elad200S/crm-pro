@@ -88,7 +88,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, is
                      }
                    </span>
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-right" onClick={e => e.stopPropagation()}>
                    <div className="flex gap-1 justify-end">
                      <Button
                        variant="ghost"

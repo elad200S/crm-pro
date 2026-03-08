@@ -69,7 +69,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
               <TableCell className="text-right text-sm text-gray-500">
                 {lead.created_date ? format(new Date(lead.created_date), "dd/MM/yy", { locale: he }) : "—"}
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-right" onClick={e => e.stopPropagation()}>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon"><MoreVertical className="w-4 h-4" /></Button>
