@@ -10,14 +10,15 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
   const [form, setForm] = useState({
     title: "",
     description: "",
-    due_at: "",
+    due_date: "",
+    priority: "בינונית",
     status: "פתוח",
-    assigned_to_user_id: currentUser?.id || ""
+    assigned_to: currentUser?.full_name || ""
   });
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSubmit = () => {
-    if (!form.title || !form.due_at) return;
+    if (!form.title || !form.due_date) return;
     onSubmit({ ...form, lead_id: lead.id, account_id: accountId });
   };
 
