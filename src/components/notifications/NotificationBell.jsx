@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Notification, Task, Payment } from "@/entities/all";
+import { base44 } from "@/api/base44Client";
+const { Notification, Task, Payment } = base44.entities;
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
