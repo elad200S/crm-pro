@@ -15,7 +15,7 @@ const statusColors = {
   "סגור": "bg-gray-100 text-gray-800"
 };
 
-export default function CustomerTable({ customers, loading, onEdit, onDelete, isAdmin }) {
+export default function CustomerTable({ customers, loading, onEdit, onDelete, isAdmin, onRowClick }) {
   if (loading) {
     return (
       <Card>

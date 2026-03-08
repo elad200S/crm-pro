@@ -16,7 +16,7 @@ const statusColors = {
   "נסגר בהצלחה (שולם)": "bg-green-100 text-green-800",
 };
 
-export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, onQuote, onTask, onConvert, loading }) {
+export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, onQuote, onTask, onConvert, loading, onRowClick }) {
   const getUserName = (id) => users.find(u => u.id === id)?.full_name || "—";
 
   if (loading) return (
