@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { Task, Customer } from "@/entities/all";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Plus, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
