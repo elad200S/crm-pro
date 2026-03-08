@@ -35,14 +35,26 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
           </div>
           <div className="space-y-1">
             <Label>תאריך יעד *</Label>
-            <Input type="datetime-local" value={form.due_at} onChange={e => set("due_at", e.target.value)} required />
+            <Input type="date" value={form.due_date} onChange={e => set("due_date", e.target.value)} required />
+          </div>
+          <div className="space-y-1">
+            <Label>עדיפות</Label>
+            <Select value={form.priority} onValueChange={v => set("priority", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="נמוכה">נמוכה</SelectItem>
+                <SelectItem value="בינונית">בינונית</SelectItem>
+                <SelectItem value="גבוהה">גבוהה</SelectItem>
+                <SelectItem value="קריטית">קריטית</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
             <Label>מוקצה לסוכן</Label>
-            <Select value={form.assigned_to_user_id} onValueChange={v => set("assigned_to_user_id", v)}>
+            <Select value={form.assigned_to} onValueChange={v => set("assigned_to", v)}>
               <SelectTrigger><SelectValue placeholder="בחר" /></SelectTrigger>
               <SelectContent>
-                {users.map(u => <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>)}
+                {users.map(u => <SelectItem key={u.id} value={u.full_name}>{u.full_name}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
