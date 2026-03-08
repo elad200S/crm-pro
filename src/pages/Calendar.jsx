@@ -89,7 +89,7 @@ export default function Calendar() {
   const confirmDelete = async () => {
     if (taskToDelete) {
       try {
-        await Task.delete(taskToDelete.id);
+        await base44.entities.Task.delete(taskToDelete.id);
         
         // If the deleted task was being edited, close the form
         if (editingTask && editingTask.id === taskToDelete.id) {
@@ -108,7 +108,7 @@ export default function Calendar() {
 
   const handleStatusChange = async (taskId, newStatus) => {
     try {
-      await Task.update(taskId, { status: newStatus });
+      await base44.entities.Task.update(taskId, { status: newStatus });
       loadData();
     } catch (error) {
       console.error("שגיאה בעדכון סטטוס:", error);
@@ -118,6 +118,11 @@ export default function Calendar() {
   const getCustomerName = (customerId) => {
     const customer = customers.find(c => c.id === customerId);
     return customer ? `${customer.first_name} ${customer.last_name}` : "";
+  };
+
+  const getLeadName = (leadId) => {
+    const lead = leads.find(l => l.id === leadId);
+    return lead ? (lead.full_name || lead.phone || lead.email || "ליד") : "";
   };
 
   const todayTasks = tasks.filter(task => 
