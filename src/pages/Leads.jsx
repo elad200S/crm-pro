@@ -317,6 +317,7 @@ export default function Leads() {
           onWhatsApp={handleWhatsApp}
           onQuote={setQuoteTarget}
           onConvert={handleConvertClick}
+          onAddTask={setTaskTarget}
         />
       )}
 
