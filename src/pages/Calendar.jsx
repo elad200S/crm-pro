@@ -166,6 +166,7 @@ export default function Calendar() {
         <TaskForm
           task={editingTask}
           customers={customers}
+          leads={leads}
           onSubmit={handleSubmit}
           onCancel={() => {
             setShowForm(false);
