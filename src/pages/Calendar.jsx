@@ -22,6 +22,7 @@ import TaskList from "../components/calendar/TaskList";
 export default function Calendar() {
   const [tasks, setTasks] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
