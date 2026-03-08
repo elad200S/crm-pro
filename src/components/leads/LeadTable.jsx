@@ -46,7 +46,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
         </TableHeader>
         <TableBody>
           {leads.map(lead => (
-            <TableRow key={lead.id} className="hover:bg-gray-50">
+            <TableRow key={lead.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => onRowClick && onRowClick(lead)}>
               <TableCell className="text-right font-medium">
                 <div>
                   <p className="font-semibold text-gray-900">{lead.full_name || "—"}</p>
