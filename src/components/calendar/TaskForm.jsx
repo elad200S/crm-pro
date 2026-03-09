@@ -80,7 +80,7 @@ export default function TaskForm({ task, customers, leads = [], onSubmit, onCanc
                   <SelectValue placeholder="בחר לקוח (אופציונלי)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={null}>ללא</SelectItem>
+                  <SelectItem value="none">ללא</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.first_name} {customer.last_name}
