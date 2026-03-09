@@ -38,6 +38,11 @@ const navigationItems = [
     icon: CreditCard,
   },
   {
+    title: "הצעות מחיר",
+    url: createPageUrl("Quotes"),
+    icon: FileText,
+  },
+  {
     title: "יומן ומשימות",
     url: createPageUrl("Calendar"), 
     icon: Calendar,
