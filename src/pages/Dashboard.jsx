@@ -71,7 +71,7 @@ export default function Dashboard() {
     return { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks, openLeads };
   };
 
-  const { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks } = getStats();
+  const { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks, openLeads } = getStats();
 
   // פונקציה לטיפול בלחיצה על לקוח - מעבר לעמוד לקוחות עם מצב עריכה
   const handleCustomerClick = (customer) => {
