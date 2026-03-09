@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 const { Customer, Payment, Task, User, Lead } = base44.entities;
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CreditCard, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
+import { Users, CreditCard, DollarSign, AlertTriangle, TrendingUp, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
