@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [customers, setCustomers] = useState([]);
   const [payments, setPayments] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
