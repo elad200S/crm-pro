@@ -224,18 +224,16 @@ export default function Leads() {
     await base44.entities.Lead.update(lead.id, { is_converted: true, converted_customer_id: customer.id, status: "נסגר בהצלחה (שולם)" });
 
     // notifications to admin + agent
-    const adminUsers = users.filter(u => u.role === "admin");
-    const notifyIds = [...new Set([lead.agent_id, ...adminUsers.map(u => u.id)].filter(Boolean))];
-    for (const uid of notifyIds) {
-      await base44.entities.Notification.create({
-        user_id: uid,
-        type: "LEAD_CONVERTED",
-        title: "ליד הומר ללקוח",
-        body: `${lead.full_name || lead.phone} הומר ללקוח חדש`,
-        is_read: false,
-        account_id: accountId
-      }).catch(() => {});
-    }
+    await base44.entities.Notification.create({
+      type: "lead_converted",
+      title: "ליד הומר ללקוח",
+      message: `${lead.full_name || lead.phone} הומר ללקוח חדש`,
+      is_read: false,
+      related_id: lead.id,
+      related_type: "lead",
+      priority: "medium",
+      account_id: accountId
+    }).catch(() => {});
 
     await OUTBOUND_EVENT(webhookUrl, {
       event_name: "lead_converted_to_customer",
