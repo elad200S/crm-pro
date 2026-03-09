@@ -196,6 +196,7 @@ export default function Leads() {
       account_id: accountId
     }).catch(() => {});
     setQuoteTarget(null);
+    await reload();
   };
 
   const handleTaskSubmit = async (data) => {
