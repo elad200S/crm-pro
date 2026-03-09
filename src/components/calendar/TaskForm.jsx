@@ -30,11 +30,11 @@ export default function TaskForm({ task, customers, leads = [], onSubmit, onCanc
 
   // אם בחרנו לקוח, מנקים ליד ולהפך
   const handleCustomerChange = (val) => {
-    setFormData(prev => ({ ...prev, customer_id: val, lead_id: "" }));
+    setFormData(prev => ({ ...prev, customer_id: val === "none" ? "" : val, lead_id: "" }));
   };
 
   const handleLeadChange = (val) => {
-    setFormData(prev => ({ ...prev, lead_id: val, customer_id: "" }));
+    setFormData(prev => ({ ...prev, lead_id: val === "none" ? "" : val, customer_id: "" }));
   };
 
   return (
