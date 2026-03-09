@@ -99,6 +99,35 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
         }
       }
 
+      // בדיקת לידים עם מעקב שמגיע תוך 15 דקות
+      const leads = await base44.entities.Lead.list('-created_date', 100);
+      for (const lead of leads) {
+        if (lead.next_followup_at && lead.status !== "נסגר בהצלחה (שולם)" && lead.status !== "לא רלוונטי") {
+          const followupTime = new Date(lead.next_followup_at);
+          const minutesUntil = (followupTime - now) / (1000 * 60);
+          if (minutesUntil >= 0 && minutesUntil <= 15) {
+            try {
+              const existing = await Notification.filter({
+                related_id: lead.id,
+                related_type: "lead",
+                type: "follow_up"
+              });
+              if (existing.length === 0) {
+                await Notification.create({
+                  title: "תזכורת מעקב",
+                  message: `מעקב עם ${lead.full_name || lead.phone} בעוד ${Math.round(minutesUntil)} דקות`,
+                  type: "follow_up",
+                  related_id: lead.id,
+                  related_type: "lead",
+                  priority: "high",
+                  is_read: false
+                });
+              }
+            } catch (err) {}
+          }
+        }
+      }
+
       // בדיקת תשלומים שמתקרבים למועד או עברו אותו
       const payments = await Payment.list('-due_date', 100);
       
