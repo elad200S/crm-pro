@@ -67,7 +67,8 @@ export default function Dashboard() {
       t.status !== "הושלם" && new Date(t.due_date) < new Date()
     ).length;
 
-    return { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks };
+    const openLeads = leads.filter(l => l.status !== "נסגר בהצלחה (שולם)" && l.status !== "לא רלוונטי").length;
+    return { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks, openLeads };
   };
 
   const { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks } = getStats();
