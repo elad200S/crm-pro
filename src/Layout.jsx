@@ -10,7 +10,8 @@ import {
   Building2,
   Menu,
   X,
-  UserPlus
+  UserPlus,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./components/notifications/NotificationBell";
