@@ -180,11 +180,13 @@ export default function Leads() {
     });
     // notify
     await base44.entities.Notification.create({
-      user_id: currentUser.id,
-      type: "QUOTE_SENT",
+      type: "quote_created",
       title: "הצעת מחיר נוצרה",
-      body: `הצעת מחיר נוצרה עבור ${quoteTarget.full_name || quoteTarget.phone}`,
+      message: `הצעת מחיר נוצרה עבור ${quoteTarget.full_name || quoteTarget.phone}`,
       is_read: false,
+      related_id: quote.id,
+      related_type: "quote",
+      priority: "low",
       account_id: accountId
     }).catch(() => {});
     setQuoteTarget(null);
