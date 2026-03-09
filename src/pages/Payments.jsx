@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Payment, Customer, User } from "@/entities/all";
+import { base44 } from "@/api/base44Client";
+const { Payment, Customer, User } = base44.entities;
 import { SendEmail } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
