@@ -7,7 +7,8 @@ const colorClasses = {
   blue: "bg-blue-500 text-blue-600",
   green: "bg-green-500 text-green-600", 
   orange: "bg-orange-500 text-orange-600",
-  red: "bg-red-500 text-red-600"
+  red: "bg-red-500 text-red-600",
+  purple: "bg-purple-500 text-purple-600"
 };
 
 export default function StatsCard({ title, value, icon: Icon, color, trend, linkTo }) {
