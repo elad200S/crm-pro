@@ -135,11 +135,13 @@ export default function Leads() {
       // notify assigned agent
       if (saved.agent_id) {
         await base44.entities.Notification.create({
-          user_id: saved.agent_id,
-          type: "LEAD_ASSIGNED",
+          type: "lead_assigned",
           title: "ליד חדש הוקצה אליך",
-          body: `ליד חדש: ${saved.full_name || saved.phone}`,
+          message: `ליד חדש: ${saved.full_name || saved.phone}`,
           is_read: false,
+          related_id: saved.id,
+          related_type: "lead",
+          priority: "medium",
           account_id: accountId
         }).catch(() => {});
       }
