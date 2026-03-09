@@ -171,6 +171,12 @@ export default function Leads() {
 
   const handleQuoteSubmit = async (data) => {
     const quote = await base44.entities.Quote.create(data);
+    // עדכן סטטוס הליד ל"נשלחה הצעת מחיר" אם עדיין בשלב קודם
+    const currentLead = leads.find(l => l.id === quoteTarget.id);
+    const leadStatusesToUpgrade = ["התקבל", "שיחה חוזרת", "בוצע איפיון"];
+    if (currentLead && leadStatusesToUpgrade.includes(currentLead.status)) {
+      await base44.entities.Lead.update(quoteTarget.id, { status: "נשלחה הצעת מחיר" });
+    }
     await OUTBOUND_EVENT(webhookUrl, {
       event_name: "quote_created",
       account_id: accountId,
