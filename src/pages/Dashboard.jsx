@@ -98,7 +98,15 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards - WITH LINKS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <StatsCard
+          title="לידים פעילים"
+          value={openLeads}
+          icon={UserPlus}
+          color="purple"
+          trend="לידים פתוחים"
+          linkTo={createPageUrl("Leads")}
+        />
         <StatsCard
           title="לקוחות פעילים"
           value={activeCustomers}
