@@ -205,15 +205,21 @@ export default function Leads() {
 
   const handleConvertConfirm = async () => {
     const lead = convertTarget;
+    // Split full_name into first/last
+    const nameParts = (lead.full_name || "").trim().split(" ");
+    const firstName = nameParts[0] || "ליד";
+    const lastName = nameParts.slice(1).join(" ") || "מומר";
     const customer = await base44.entities.Customer.create({
-      full_name: lead.full_name,
-      phone: lead.phone,
-      email: lead.email,
-      company_name: lead.company_name,
-      notes: lead.notes,
-      agent_id: lead.agent_id,
+      first_name: firstName,
+      last_name: lastName,
+      phone: lead.phone || "",
+      email: lead.email || "",
+      company: lead.company_name || "",
+      notes: lead.notes || "",
+      source: "הפניה",
+      status: "חדש",
       source_from_lead_id: lead.id,
-      account_id: accountId
+      registration_date: new Date().toISOString().split("T")[0]
     });
     await base44.entities.Lead.update(lead.id, { is_converted: true, converted_customer_id: customer.id, status: "נסגר בהצלחה (שולם)" });
 
