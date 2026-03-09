@@ -40,14 +40,16 @@ export default function Dashboard() {
         paymentsData = await Payment.filter({ created_by: user.email }, '-created_date', 500);
       }
 
-      const [customersData, tasksData] = await Promise.all([
+      const [customersData, tasksData, leadsData] = await Promise.all([
         Customer.list('-created_date', 50),
-        Task.list('-created_date', 20)
+        Task.list('-created_date', 20),
+        Lead.list('-created_date', 100)
       ]);
       
       setCustomers(customersData);
       setPayments(paymentsData);
       setTasks(tasksData);
+      setLeads(leadsData);
     } catch (error) {
       console.error("שגיאה בטעינת נתונים:", error);
     } finally {
