@@ -1,0 +1,71 @@
+{
+  "name": "Quote",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05dc\u05d9\u05d3"
+    },
+    "customer_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05dc\u05e7\u05d5\u05d7"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "\u05d8\u05d9\u05d5\u05d8\u05d4",
+        "\u05e0\u05e9\u05dc\u05d7",
+        "\u05e9\u05d5\u05dc\u05dd",
+        "\u05d1\u05d5\u05d8\u05dc"
+      ],
+      "default": "\u05d8\u05d9\u05d5\u05d8\u05d4",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05e6\u05e2\u05ea \u05de\u05d7\u05d9\u05e8"
+    },
+    "amount": {
+      "type": "number",
+      "description": "\u05e1\u05db\u05d5\u05dd"
+    },
+    "currency": {
+      "type": "string",
+      "default": "ILS",
+      "description": "\u05de\u05d8\u05d1\u05e2"
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea"
+    },
+    "account_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d7\u05e9\u05d1\u05d5\u05df"
+    }
+  },
+  "required": [
+    "account_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "\u05db\u05d5\u05ea\u05e8\u05ea \u05d4\u05d4\u05ea\u05e8\u05d0\u05d4"
+    },
+    "message": {
+      "type": "string",
+      "description": "\u05ea\u05d5\u05db\u05df \u05d4\u05d4\u05ea\u05e8\u05d0\u05d4"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "task_overdue",
+        "payment_due",
+        "new_customer",
+        "reminder",
+        "system",
+        "lead_assigned",
+        "lead_converted",
+        "quote_created",
+        "follow_up"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05d4\u05ea\u05e8\u05d0\u05d4"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d0\u05dd \u05d4\u05d4\u05ea\u05e8\u05d0\u05d4 \u05e0\u05e7\u05e8\u05d0\u05d4"
+    },
+    "related_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05e8\u05e9\u05d5\u05de\u05d4 \u05d4\u05e7\u05e9\u05d5\u05e8\u05d4"
+    },
+    "related_type": {
+      "type": "string",
+      "enum": [
+        "task",
+        "payment",
+        "customer",
+        "lead",
+        "quote"
+      ],
+      "description": "\u05e1\u05d5\u05d2 \u05d4\u05e8\u05e9\u05d5\u05de\u05d4 \u05d4\u05e7\u05e9\u05d5\u05e8\u05d4"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium",
+      "description": "\u05e8\u05de\u05ea \u05e2\u05d3\u05d9\u05e4\u05d5\u05ea"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d4\u05de\u05e9\u05ea\u05de\u05e9 \u05d4\u05de\u05d9\u05d5\u05e2\u05d3"
+    },
+    "account_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d7\u05e9\u05d1\u05d5\u05df"
+    }
+  },
+  "required": [
+    "title",
+    "message",
+    "type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

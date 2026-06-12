@@ -1,0 +1,125 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05de\u05dc\u05d0"
+    },
+    "phone": {
+      "type": "string",
+      "description": "\u05d8\u05dc\u05e4\u05d5\u05df"
+    },
+    "email": {
+      "type": "string",
+      "description": "\u05d0\u05d9\u05de\u05d9\u05d9\u05dc"
+    },
+    "company_name": {
+      "type": "string",
+      "description": "\u05e9\u05dd \u05d7\u05d1\u05e8\u05d4"
+    },
+    "service_requested": {
+      "type": "string",
+      "description": "\u05e9\u05d9\u05e8\u05d5\u05ea \u05de\u05d1\u05d5\u05e7\u05e9"
+    },
+    "lead_source": {
+      "type": "string",
+      "enum": [
+        "\u05d8\u05d5\u05e4\u05e1 \u05d1\u05d0\u05ea\u05e8",
+        "Facebook",
+        "Google",
+        "WhatsApp",
+        "\u05d8\u05dc\u05e4\u05d5\u05df",
+        "\u05d9\u05d3\u05e0\u05d9",
+        "\u05d4\u05e4\u05e0\u05d9\u05d4",
+        "\u05d0\u05d7\u05e8"
+      ],
+      "description": "\u05de\u05e7\u05d5\u05e8 \u05dc\u05d9\u05d3"
+    },
+    "source_details": {
+      "type": "string",
+      "description": "\u05e4\u05e8\u05d8\u05d9 \u05de\u05e7\u05d5\u05e8"
+    },
+    "notes": {
+      "type": "string",
+      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "\u05d4\u05ea\u05e7\u05d1\u05dc",
+        "\u05e9\u05d9\u05d7\u05d4 \u05d7\u05d5\u05d6\u05e8\u05ea",
+        "\u05d1\u05d5\u05e6\u05e2 \u05d0\u05d9\u05e4\u05d9\u05d5\u05df",
+        "\u05e0\u05e9\u05dc\u05d7\u05d4 \u05d4\u05e6\u05e2\u05ea \u05de\u05d7\u05d9\u05e8",
+        "\u05dc\u05d0 \u05e8\u05dc\u05d5\u05d5\u05e0\u05d8\u05d9",
+        "\u05e0\u05e1\u05d2\u05e8 \u05d1\u05d4\u05e6\u05dc\u05d7\u05d4 (\u05e9\u05d5\u05dc\u05dd)"
+      ],
+      "default": "\u05d4\u05ea\u05e7\u05d1\u05dc",
+      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05dc\u05d9\u05d3"
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "\u05e1\u05d5\u05db\u05df \u05de\u05d8\u05e4\u05dc"
+    },
+    "last_contact_at": {
+      "type": "string",
+      "format": "datetime-local",
+      "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e7\u05e9\u05e8 \u05d0\u05d7\u05e8\u05d5\u05df"
+    },
+    "next_followup_at": {
+      "type": "string",
+      "format": "datetime-local",
+      "description": "\u05de\u05d5\u05e2\u05d3 \u05de\u05e2\u05e7\u05d1 \u05d4\u05d1\u05d0"
+    },
+    "external_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d7\u05d9\u05e6\u05d5\u05e0\u05d9"
+    },
+    "raw_payload": {
+      "type": "string",
+      "description": "payload \u05d2\u05d5\u05dc\u05de\u05d9"
+    },
+    "account_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05d7\u05e9\u05d1\u05d5\u05df"
+    },
+    "is_converted": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u05d4\u05d5\u05de\u05e8 \u05dc\u05dc\u05e7\u05d5\u05d7"
+    },
+    "converted_customer_id": {
+      "type": "string",
+      "description": "\u05de\u05d6\u05d4\u05d4 \u05dc\u05e7\u05d5\u05d7 \u05e9\u05e0\u05d5\u05e6\u05e8"
+    }
+  },
+  "required": [
+    "lead_source"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
