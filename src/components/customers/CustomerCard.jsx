@@ -266,6 +266,22 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
 
               {/* Tasks Tab */}
               <TabsContent value="tasks" className="m-0 p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm text-gray-500">{tasks.length} משימות</span>
+                  <button
+                    onClick={async () => {
+                      const title = prompt("כותרת המשימה:");
+                      if (!title) return;
+                      try {
+                        await Task.create({ title, customer_id: customer.id, status: "לביצוע", due_date: new Date(Date.now() + 86400000).toISOString().split("T")[0] });
+                        loadRelatedData();
+                      } catch(e) { console.error(e); }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> משימה חדשה
+                  </button>
+                </div>
                 {loading ? (
                   <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
                 ) : tasks.length === 0 ? (

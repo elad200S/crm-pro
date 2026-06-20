@@ -8,7 +8,7 @@ import { createPageUrl } from "@/utils";
 
 import LeadStatsCards from "../components/leads/LeadStatsCards";
 import LeadFilters from "../components/leads/LeadFilters";
-import LeadTable from "../components/leads/LeadTable";
+import LeadCards from "../components/leads/LeadCards";
 import LeadForm from "../components/leads/LeadForm";
 import QuoteModal from "../components/leads/QuoteModal";
 import AddTaskModal from "../components/leads/AddTaskModal";
@@ -262,38 +262,34 @@ export default function Leads() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="bg-white rounded-lg border p-6 shadow-sm">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <UserPlus className="w-8 h-8 text-blue-600" />
-              ניהול לידים
-            </h1>
-            <p className="text-gray-500 mt-1">{filtered.length} לידים מוצגים</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={exportToCSV}>
-              <Download className="w-4 h-4 ml-2" />
-              ייצוא לאקסל
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">לידים</h1>
+          <p className="text-sm text-gray-400 mt-0.5">{filtered.length} מוצגים מתוך {leads.length}</p>
+        </div>
+        <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={exportToCSV}>
+              <Download className="w-4 h-4 ml-1.5" />
+              ייצוא
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 shadow-md"
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700"
               onClick={() => { setEditingLead(null); setShowForm(true); }}
             >
-              <UserPlus className="w-4 h-4 ml-2" />
+              <UserPlus className="w-4 h-4 ml-1.5" />
               ליד חדש
             </Button>
           </div>
-        </div>
       </div>
 
       {/* Stats */}
       <LeadStatsCards leads={leads} />
 
       {/* Filters */}
-      <div className="bg-white rounded-lg border p-4 shadow-sm">
+      <div className="bg-white rounded-xl border p-3 shadow-sm">
         <LeadFilters filters={filters} setFilters={setFilters} users={users} />
       </div>
 
@@ -308,21 +304,19 @@ export default function Leads() {
         />
       )}
 
-      {/* Table */}
-      <div className="bg-white rounded-lg border shadow-sm">
-        <LeadTable
-          leads={filtered}
-          users={users}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={setDeleteTarget}
-          onWhatsApp={handleWhatsApp}
-          onQuote={setQuoteTarget}
-          onTask={setTaskTarget}
-          onConvert={handleConvertClick}
-          onRowClick={setSelectedLead}
-        />
-      </div>
+      {/* Cards */}
+      <LeadCards
+        leads={filtered}
+        users={users}
+        loading={loading}
+        onEdit={handleEdit}
+        onDelete={setDeleteTarget}
+        onWhatsApp={handleWhatsApp}
+        onQuote={setQuoteTarget}
+        onTask={setTaskTarget}
+        onConvert={handleConvertClick}
+        onRowClick={setSelectedLead}
+      />
 
       {selectedLead && (
         <LeadDetailModal
