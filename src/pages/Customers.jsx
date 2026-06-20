@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-const { Customer, User } = base44.entities;
+const { Customer } = base44.entities;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Download } from "lucide-react";
@@ -19,10 +19,7 @@ import {
 import CustomerForm from "../components/customers/CustomerForm";
 import CustomerTable from "../components/customers/CustomerTable";
 import CustomerFilters from "../components/customers/CustomerFilters";
-import CustomerDetailModal from "../components/customers/CustomerDetailModal";
-
-// הגדרת המנהל הראשי - החלף בכתובת המייל שלך
-const ADMIN_EMAIL = "your-email@gmail.com"; // החלף בכתובת המייל שלך!
+import CustomerCard from "../components/customers/CustomerCard";
 
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -78,18 +75,9 @@ export default function Customers() {
     setFilteredCustomers(filtered);
   }, [customers, searchTerm, filters]);
 
-  const loadCustomers = useCallback(async (user) => {
+  const loadCustomers = useCallback(async () => {
     try {
-      let data;
-      
-      // אם זה המנהל הראשי - הצג הכל, אחרת רק של המשתמש
-      if (user.email === ADMIN_EMAIL) {
-        data = await Customer.list('-created_date');
-      } else {
-        // רק לקוחות שהמשתמש הנוכחי יצר
-        data = await Customer.filter({created_by: user.email}, '-created_date');
-      }
-      
+      const data = await Customer.list('-created_date');
       setCustomers(data);
     } catch (error) {
       console.error("שגיאה בטעינת לקוחות:", error);
@@ -100,12 +88,9 @@ export default function Customers() {
 
   const initializeData = useCallback(async () => {
     try {
-      // קבלת המשתמש הנוכחי
-      const user = await User.me();
+      const user = await base44.auth.me();
       setCurrentUser(user);
-      
-      // טעינת לקוחות עם הגנה על פרטיות
-      await loadCustomers(user);
+      await loadCustomers();
     } catch (error) {
       console.error("שגיאה באתחול:", error);
       setLoading(false);
@@ -134,7 +119,7 @@ export default function Customers() {
     try {
       if (editingCustomer) {
         // בדיקת הרשאה לעריכה
-        if (editingCustomer.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+        if (editingCustomer.created_by !== currentUser.email && currentUser?.role !== 'admin') {
           alert("אין לך הרשאה לערוך לקוח זה");
           return;
         }
@@ -142,20 +127,19 @@ export default function Customers() {
       } else {
         await Customer.create({
           ...customerData,
-          registration_date: new Date().toISOString().split('T')[0]
+          registration_date: customerData.registration_date || new Date().toISOString().split('T')[0]
         });
       }
       setShowForm(false);
       setEditingCustomer(null);
-      loadCustomers(currentUser);
+      loadCustomers();
     } catch (error) {
       console.error("שגיאה בשמירת לקוח:", error);
     }
   };
 
   const handleEdit = (customer) => {
-    // בדיקת הרשאה לעריכה
-    if (customer.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+    if (customer.created_by !== currentUser.email && currentUser?.role !== 'admin') {
       alert("אין לך הרשאה לערוך לקוח זה");
       return;
     }
@@ -164,8 +148,7 @@ export default function Customers() {
   };
 
   const handleDeleteClick = (customer) => {
-    // בדיקת הרשאה למחיקה
-    if (customer.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+    if (customer.created_by !== currentUser.email && currentUser?.role !== 'admin') {
       alert("אין לך הרשאה למחוק לקוח זה");
       return;
     }
@@ -177,7 +160,7 @@ export default function Customers() {
       try {
         await Customer.delete(customerToDelete.id);
         setCustomerToDelete(null);
-        loadCustomers(currentUser);
+        loadCustomers();
       } catch (error) {
         console.error("שגיאה במחיקת לקוח:", error);
       }
@@ -193,7 +176,7 @@ export default function Customers() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">ניהול לקוחות</h1>
             <p className="text-gray-600">
               {filteredCustomers.length} לקוחות מתוך {customers.length} סה"כ
-              {currentUser?.email !== ADMIN_EMAIL && " (הלקוחות שלך בלבד)"}
+              {currentUser?.role !== 'admin' && " (הלקוחות שלך בלבד)"}
             </p>
           </div>
           <div className="flex gap-2">
@@ -247,17 +230,19 @@ export default function Customers() {
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
-          isAdmin={currentUser?.email === ADMIN_EMAIL}
+          isAdmin={currentUser?.role === 'admin'}
           onRowClick={setSelectedCustomer}
         />
       </div>
 
       {selectedCustomer && (
-        <CustomerDetailModal
+        <CustomerCard
           customer={selectedCustomer}
           onClose={() => setSelectedCustomer(null)}
-          onEdit={handleEdit}
-          onDelete={handleDeleteClick}
+          onEdit={(c) => { handleEdit(c); setSelectedCustomer(null); }}
+          onDelete={(c) => { handleDeleteClick(c); setSelectedCustomer(null); }}
+          currentUser={currentUser}
+          onUpdate={loadCustomers}
         />
       )}
 
