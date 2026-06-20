@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 const { Payment, Customer, User } = base44.entities;
-import { SendEmail } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
@@ -19,8 +18,7 @@ import PaymentForm from "../components/payments/PaymentForm";
 import PaymentTable from "../components/payments/PaymentTable";
 import PaymentFilters from "../components/payments/PaymentFilters";
 
-// הגדרת המנהל הראשי - החלף בכתובת המייל שלך
-const ADMIN_EMAIL = "your-email@gmail.com"; // החלף בכתובת המייל שלך!
+const isAdmin = (user) => user?.role === 'admin';
 
 export default function Payments() {
   const [payments, setPayments] = useState([]);
@@ -65,21 +63,19 @@ export default function Payments() {
   const loadData = useCallback(async (user) => {
     try {
       let paymentsData, customersData;
-      
-      // אם זה המנהל הראשי - הצג הכל, אחרת רק של המשתמש
-      if (user.email === ADMIN_EMAIL) {
+
+      if (isAdmin(user)) {
         [paymentsData, customersData] = await Promise.all([
           Payment.list('-created_date'),
           Customer.list()
         ]);
       } else {
-        // רק תשלומים ולקוחות שהמשתמש הנוכחי יצר
         [paymentsData, customersData] = await Promise.all([
-          Payment.filter({created_by: user.email}, '-created_date'),
-          Customer.filter({created_by: user.email})
+          Payment.filter({ created_by: user.email }, '-created_date'),
+          Customer.filter({ created_by: user.email })
         ]);
       }
-      
+
       setPayments(paymentsData);
       setCustomers(customersData);
     } catch (error) {
@@ -92,7 +88,7 @@ export default function Payments() {
   const initializeData = useCallback(async () => {
     try {
       // קבלת המשתמש הנוכחי
-      const user = await User.me();
+      const user = await base44.auth.me();
       setCurrentUser(user);
       
       // טעינת נתונים עם הגנה על פרטיות
@@ -111,11 +107,13 @@ export default function Payments() {
     filterPayments();
   }, [filterPayments]);
 
+  const canEdit = (payment) =>
+    isAdmin(currentUser) || payment.created_by === currentUser?.email;
+
   const handleSubmit = async (paymentData) => {
     try {
       if (editingPayment) {
-        // בדיקת הרשאה לעריכה
-        if (editingPayment.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+        if (!canEdit(editingPayment)) {
           alert("אין לך הרשאה לערוך תשלום זה");
           return;
         }
@@ -137,8 +135,7 @@ export default function Payments() {
   };
 
   const handleEdit = (payment) => {
-    // בדיקת הרשאה לעריכה
-    if (payment.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+    if (!canEdit(payment)) {
       alert("אין לך הרשאה לערוך תשלום זה");
       return;
     }
@@ -147,8 +144,7 @@ export default function Payments() {
   };
 
   const handleDeleteClick = (payment) => {
-    // בדיקת הרשאה למחיקה
-    if (payment.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+    if (!canEdit(payment)) {
       alert("אין לך הרשאה למחוק תשלום זה");
       return;
     }
@@ -169,8 +165,7 @@ export default function Payments() {
 
   const sendReminder = async (payment) => {
     try {
-      // בדיקת הרשאה לשליחת תזכורת
-      if (payment.created_by !== currentUser.email && currentUser.email !== ADMIN_EMAIL) {
+      if (!canEdit(payment)) {
         alert("אין לך הרשאה לשלוח תזכורת לתשלום זה");
         return;
       }
@@ -178,23 +173,10 @@ export default function Payments() {
       const customer = customers.find(c => c.id === payment.customer_id);
       if (!customer) return;
 
-      await SendEmail({
+      await base44.integrations.Core.SendEmail({
         to: customer.email,
         subject: `תזכורת לתשלום - חשבונית ${payment.invoice_number}`,
-        body: `
-שלום ${customer.first_name},
-
-זוהי תזכורת לתשלום חשבונית מספר: ${payment.invoice_number}
-סכום לתשלום: ₪${payment.amount}
-מועד אחרון לתשלום: ${payment.due_date}
-
-תיאור השירות: ${payment.service_description}
-
-אנא בצע את התשלום בהקדם האפשרי.
-
-תודה,
-צוות החברה
-        `
+        body: `שלום ${customer.first_name},\n\nזוהי תזכורת לתשלום חשבונית מספר: ${payment.invoice_number}\nסכום לתשלום: ₪${payment.amount}\nמועד אחרון לתשלום: ${payment.due_date}\n\nתיאור השירות: ${payment.service_description}\n\nאנא בצע את התשלום בהקדם האפשרי.\n\nתודה,\nצוות החברה`
       });
 
       await Payment.update(payment.id, {
@@ -221,7 +203,7 @@ export default function Payments() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">ניהול תשלומים</h1>
             <p className="text-gray-600">
               {filteredPayments.length} תשלומים מתוך {payments.length} סה"כ
-              {currentUser?.email !== ADMIN_EMAIL && " (התשלומים שלך בלבד)"}
+              {!isAdmin(currentUser) && " (התשלומים שלך בלבד)"}
             </p>
           </div>
           <Button 
@@ -261,7 +243,7 @@ export default function Payments() {
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           onSendReminder={sendReminder}
-          isAdmin={currentUser?.email === ADMIN_EMAIL}
+          isAdmin={isAdmin(currentUser)}
         />
       </div>
 

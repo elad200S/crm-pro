@@ -67,20 +67,41 @@ export default function Layout({ children, currentPageName }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [visibleNavItems, setVisibleNavItems] = useState(navigationItems);
+  const [sidebarStats, setSidebarStats] = useState({ activeCustomers: null, pendingPayments: null, monthlyRevenue: null });
 
   useEffect(() => {
     checkUserOnboarding();
   }, []);
+
+  useEffect(() => {
+    if (currentUser) loadSidebarStats();
+  }, [currentUser]);
+
+  const loadSidebarStats = async () => {
+    try {
+      const now = new Date();
+      const [customers, payments] = await Promise.all([
+        base44.entities.Customer.list('-created_date', 200),
+        base44.entities.Payment.list('-created_date', 200)
+      ]);
+      const activeCustomers = customers.filter(c => c.status === "פעיל").length;
+      const pendingPayments = payments.filter(p => p.status !== "שולם" && p.status !== "מבוטל").length;
+      const monthlyRevenue = payments
+        .filter(p => p.status === "שולם" && p.paid_date && new Date(p.paid_date).getMonth() === now.getMonth() && new Date(p.paid_date).getFullYear() === now.getFullYear())
+        .reduce((s, p) => s + (p.amount || 0), 0);
+      setSidebarStats({ activeCustomers, pendingPayments, monthlyRevenue });
+    } catch {}
+  };
 
   const checkUserOnboarding = async () => {
     try {
       const user = await base44.auth.me();
       setCurrentUser(user);
 
-      // הסתרת "ניהול משתמשים" ממשתמשים שאינם admin
       const isAdmin = user.role === 'admin';
+      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד"];
       setVisibleNavItems(navigationItems.filter(item =>
-        item.title !== "ניהול משתמשים" || isAdmin
+        !adminOnlyPages.includes(item.title) || isAdmin
       ));
 
       const needsOnboarding = !user.phone || !user.job_title || !user.department || !user.user_category;
@@ -229,15 +250,21 @@ export default function Layout({ children, currentPageName }) {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">לקוחות פעילים</span>
-                    <span className="text-lg font-bold text-blue-600">--</span>
+                    <span className="text-lg font-bold text-blue-600">
+                      {sidebarStats.activeCustomers !== null ? sidebarStats.activeCustomers : "—"}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">תשלומים פתוחים</span>
-                    <span className="text-lg font-bold text-orange-600">--</span>
+                    <span className="text-lg font-bold text-orange-600">
+                      {sidebarStats.pendingPayments !== null ? sidebarStats.pendingPayments : "—"}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">הכנסות החודש</span>
-                    <span className="text-lg font-bold text-green-600">₪--</span>
+                    <span className="text-lg font-bold text-green-600">
+                      {sidebarStats.monthlyRevenue !== null ? `₪${sidebarStats.monthlyRevenue.toLocaleString()}` : "—"}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -318,18 +318,31 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
                   <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
                 ) : (
                   <>
-                    {payments.length > 0 && (
-                      <div className="grid grid-cols-2 gap-3 mb-5">
-                        <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center">
-                          <p className="text-xl font-bold text-green-700">₪{totalPaid.toLocaleString()}</p>
-                          <p className="text-xs text-green-600 mt-0.5">סה"כ שולם</p>
-                        </div>
-                        <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
-                          <p className="text-xl font-bold text-orange-700">₪{pendingAmount.toLocaleString()}</p>
-                          <p className="text-xs text-orange-600 mt-0.5">ממתין לתשלום</p>
-                        </div>
+                    {/* Payment summary */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center">
+                        <p className="text-xl font-bold text-green-700">₪{totalPaid.toLocaleString()}</p>
+                        <p className="text-xs text-green-600 mt-0.5">סה"כ שולם</p>
                       </div>
-                    )}
+                      <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
+                        <p className="text-xl font-bold text-orange-700">₪{pendingAmount.toLocaleString()}</p>
+                        <p className="text-xs text-orange-600 mt-0.5">ממתין לתשלום</p>
+                      </div>
+                    </div>
+
+                    {/* Payment link infrastructure */}
+                    <div className="border-2 border-dashed border-blue-200 rounded-xl p-4 bg-blue-50/50 text-center mb-4">
+                      <CreditCard className="w-7 h-7 mx-auto text-blue-400 mb-1.5" />
+                      <p className="text-sm font-medium text-blue-700 mb-0.5">קישור לסליקה עצמאית</p>
+                      <p className="text-xs text-blue-400 mb-3">שלח ללקוח קישור לתשלום ישיר (Grow / Cardcom / iCredit)</p>
+                      <button
+                        onClick={() => alert("תשתית סליקה — תוטמע בקרוב")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-300 text-blue-600 text-xs rounded-lg hover:bg-blue-50 transition-colors font-medium"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        שלח קישור תשלום
+                      </button>
+                    </div>
                     {payments.length === 0 ? (
                       <div className="text-center py-12 text-gray-400">
                         <CreditCard className="w-12 h-12 mx-auto mb-3 opacity-30" />

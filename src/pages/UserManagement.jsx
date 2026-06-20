@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, FileAttachment } from "@/entities/all";
+import { User, JobDescriptionTemplate } from "@/entities/all";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Plus, Users as UsersIcon } from "lucide-react";
@@ -143,31 +143,27 @@ export default function UserManagement() {
 
   const sendWelcomeEmail = async (user) => {
     try {
-      // חיפוש קובץ תיאור תפקיד ב-FileAttachment
+      // חיפוש תבנית תיאור תפקיד לפי קטגוריית המשתמש
       let fileUrl = null;
       let fileName = "";
-      
+
       try {
-        const files = await FileAttachment.filter({
-          related_type: "task",
-          related_id: user.user_category
+        const templates = await JobDescriptionTemplate.filter({
+          user_category: user.user_category,
+          is_active: true
         });
-        
-        if (files && files.length > 0) {
-          fileUrl = files[0].file_url;
-          fileName = files[0].filename || "";
-          console.log(`נמצא קובץ תיאור תפקיד למשתמש: ${fileName}`);
+
+        if (templates && templates.length > 0) {
+          fileUrl = templates[0].file_url;
+          fileName = templates[0].title || "";
         } else {
-          console.log(`לא נמצא קובץ תיאור תפקיד לקטגוריה: ${user.user_category}`);
-          // לא נשלח מייל אם אין קובץ
           return false;
         }
       } catch (fileError) {
-        console.error("שגיאה בחיפוש קובץ:", fileError);
+        console.error("שגיאה בחיפוש תבנית:", fileError);
         return false;
       }
-      
-      // אם לא נמצא קובץ - לא נשלח מייל
+
       if (!fileUrl) {
         return false;
       }

@@ -2,41 +2,82 @@
   "name": "Quote",
   "type": "object",
   "properties": {
+    "quote_number": {
+      "type": "string",
+      "description": "מספר הצעת מחיר"
+    },
+    "title": {
+      "type": "string",
+      "description": "כותרת ההצעה"
+    },
     "lead_id": {
       "type": "string",
-      "description": "\u05de\u05d6\u05d4\u05d4 \u05dc\u05d9\u05d3"
+      "description": "מזהה ליד"
     },
     "customer_id": {
       "type": "string",
-      "description": "\u05de\u05d6\u05d4\u05d4 \u05dc\u05e7\u05d5\u05d7"
+      "description": "מזהה לקוח"
     },
     "status": {
       "type": "string",
       "enum": [
-        "\u05d8\u05d9\u05d5\u05d8\u05d4",
-        "\u05e0\u05e9\u05dc\u05d7",
-        "\u05e9\u05d5\u05dc\u05dd",
-        "\u05d1\u05d5\u05d8\u05dc"
+        "טיוטה",
+        "נשלח",
+        "אושר",
+        "בוטל"
       ],
-      "default": "\u05d8\u05d9\u05d5\u05d8\u05d4",
-      "description": "\u05e1\u05d8\u05d8\u05d5\u05e1 \u05d4\u05e6\u05e2\u05ea \u05de\u05d7\u05d9\u05e8"
+      "default": "טיוטה",
+      "description": "סטטוס הצעת מחיר"
+    },
+    "items": {
+      "type": "array",
+      "description": "פריטים בהצעת המחיר",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "quantity": { "type": "number" },
+          "unit_price": { "type": "number" },
+          "total": { "type": "number" }
+        }
+      }
     },
     "amount": {
       "type": "number",
-      "description": "\u05e1\u05db\u05d5\u05dd"
+      "description": "סכום כולל"
+    },
+    "vat_included": {
+      "type": "boolean",
+      "default": false,
+      "description": "כולל מע\"מ"
+    },
+    "discount": {
+      "type": "number",
+      "default": 0,
+      "description": "הנחה באחוזים"
     },
     "currency": {
       "type": "string",
       "default": "ILS",
-      "description": "\u05de\u05d8\u05d1\u05e2"
+      "description": "מטבע"
     },
     "notes": {
       "type": "string",
-      "description": "\u05d4\u05e2\u05e8\u05d5\u05ea"
+      "description": "הערות"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "תוקף ההצעה עד"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "datetime-local",
+      "description": "תאריך שליחה"
     },
     "account_id": {
       "type": "string",
-      "description": "\u05de\u05d6\u05d4\u05d4 \u05d7\u05e9\u05d1\u05d5\u05df"
+      "description": "מזהה חשבון"
     }
   },
   "required": [
@@ -45,26 +86,14 @@
   "rls": {
     "read": {
       "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
+        { "created_by": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } }
       ]
     },
     "write": {
       "$or": [
-        {
-          "created_by": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
+        { "created_by": "{{user.email}}" },
+        { "user_condition": { "role": "admin" } }
       ]
     }
   }
