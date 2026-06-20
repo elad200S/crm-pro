@@ -22,7 +22,7 @@ const statusColors = {
   "דחוי": "bg-gray-100 text-gray-800"
 };
 
-export default function TaskList({ tasks, onTaskClick }) {
+export default function TaskList({ tasks, onTaskClick, isPersonal }) {
   const navigate = useNavigate();
 
   const isOverdue = (dueDate) => {
@@ -43,7 +43,7 @@ export default function TaskList({ tasks, onTaskClick }) {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2">
           <Calendar className="w-5 h-5" />
-          משימות קרובות
+          {isPersonal ? "המשימות שלי" : "משימות קרובות"}
         </CardTitle>
         <Link to={createPageUrl("Calendar")}>
           <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">

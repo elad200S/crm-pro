@@ -39,9 +39,14 @@ export default function Dashboard() {
         paymentsData = await Payment.filter({ created_by: user.email }, '-created_date', 500);
       }
 
+      // משימות: admin רואה הכל, נציג רואה רק משימות שהוקצו לו
+      const tasksQuery = user.role === 'admin'
+        ? Task.list('-due_date', 50)
+        : Task.filter({ assigned_to: user.id }, '-due_date', 50);
+
       const [customersData, tasksData, leadsData] = await Promise.all([
         Customer.list('-created_date', 50),
-        Task.list('-created_date', 20),
+        tasksQuery,
         Lead.list('-created_date', 200)
       ]);
       
@@ -158,6 +163,7 @@ export default function Dashboard() {
         <TaskList 
           tasks={tasks.slice(0, 6)} 
           onTaskClick={handleTaskClick}
+          isPersonal={currentUser?.role !== 'admin'}
         />
         
         <LeadsByStatus
