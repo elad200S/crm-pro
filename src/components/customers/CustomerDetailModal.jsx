@@ -108,9 +108,6 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
             </div>
 
             <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
-              <Field label="עיר" value={customer.city} />
-              <Field label="רחוב" value={customer.street} />
-              <Field label="מיקוד" value={customer.postal_code} />
               <Field label="תאריך רישום" value={
                 customer.registration_date
                   ? format(new Date(customer.registration_date), "dd/MM/yyyy", { locale: he })

@@ -13,9 +13,6 @@ export default function CustomerForm({ customer, onSubmit, onCancel }) {
     last_name: customer?.last_name || "",
     phone: customer?.phone || "",
     email: customer?.email || "",
-    street: customer?.street || "",
-    city: customer?.city || "",
-    postal_code: customer?.postal_code || "",
     status: customer?.status || "חדש",
     company: customer?.company || "",
     source: customer?.source || "אתר",
@@ -103,33 +100,6 @@ export default function CustomerForm({ customer, onSubmit, onCancel }) {
                   <SelectItem value="סגור">סגור</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="street">רחוב</Label>
-              <Input
-                id="street"
-                value={formData.street}
-                onChange={(e) => handleChange("street", e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="city">עיר</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) => handleChange("city", e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="postal_code">מיקוד</Label>
-              <Input
-                id="postal_code"
-                value={formData.postal_code}
-                onChange={(e) => handleChange("postal_code", e.target.value)}
-              />
             </div>
           </div>
 

@@ -37,10 +37,10 @@ export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const exportToCSV = () => {
-    const headers = ["שם פרטי", "שם משפחה", "טלפון", "אימייל", "חברה", "סטטוס", "מקור הגעה", "עיר", "תאריך רישום"];
+    const headers = ["שם פרטי", "שם משפחה", "טלפון", "אימייל", "חברה", "סטטוס", "מקור הגעה", "תאריך רישום"];
     const rows = filteredCustomers.map(c => [
       c.first_name || "", c.last_name || "", c.phone || "", c.email || "",
-      c.company || "", c.status || "", c.source || "", c.city || "",
+      c.company || "", c.status || "", c.source || "",
       c.registration_date || c.created_date || ""
     ]);
     const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");

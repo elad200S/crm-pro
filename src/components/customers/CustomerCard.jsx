@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  X, Phone, Mail, MapPin, Building2, Edit, Trash2,
+  X, Phone, Mail, Building2, Edit, Trash2,
   Calendar, CreditCard, MessageSquare, User, ExternalLink,
   CheckCircle2, Clock, AlertCircle, Plus, ChevronRight
 } from "lucide-react";
@@ -235,13 +235,6 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
                   <InfoRow icon={Phone} label="טלפון" value={customer.phone} href={`tel:${customer.phone}`} />
                   <InfoRow icon={Mail} label="אימייל" value={customer.email} href={`mailto:${customer.email}`} />
                   <InfoRow icon={Building2} label="חברה" value={customer.company} />
-                </div>
-
-                <div className="bg-gray-50 rounded-xl p-4 space-y-1 mt-4">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">כתובת</h3>
-                  <InfoRow icon={MapPin} label="רחוב" value={customer.street} />
-                  <InfoRow icon={MapPin} label="עיר" value={customer.city} />
-                  <InfoRow icon={MapPin} label="מיקוד" value={customer.postal_code} />
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4 mt-4">
