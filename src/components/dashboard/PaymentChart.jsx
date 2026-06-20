@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
-export default function PaymentChart({ payments }) {
+export default function PaymentChart({ payments, isPersonal }) {
   const getMonthlyData = () => {
     const monthlyData = {};
     const months = [
@@ -61,7 +61,7 @@ export default function PaymentChart({ payments }) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-600" />
-            הכנסות חודשיות
+            {isPersonal ? "ההכנסות שלי" : "הכנסות חודשיות"}
           </CardTitle>
           <div className="flex items-center gap-2 text-sm">
             {trend >= 0 ? (

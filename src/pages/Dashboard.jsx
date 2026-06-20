@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 const { Customer, Payment, Task, User, Lead } = base44.entities;
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, CreditCard, DollarSign, AlertTriangle, UserPlus } from "lucide-react";
+import { Users, CreditCard, DollarSign, AlertTriangle, Target } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
@@ -36,7 +36,7 @@ export default function Dashboard() {
       if (user.role === 'admin') {
         paymentsData = await Payment.list('-created_date', 500);
       } else {
-        paymentsData = await Payment.filter({ created_by: user.email }, '-created_date', 500);
+        paymentsData = await Payment.filter({ created_by_id: user.id }, '-created_date', 500);
       }
 
       // משימות: admin רואה הכל, נציג רואה רק משימות שהוקצו לו
@@ -62,20 +62,31 @@ export default function Dashboard() {
   };
 
   const getStats = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
     const activeCustomers = customers.filter(c => c.status === "פעיל").length;
-    const pendingPayments = payments.filter(p => p.status === "מחכה לתשלום").length;
+
+    // עסקאות החודש: חשבוניות שנוצרו החודש (סטטוס כלשהו חוץ מ"מבוטל")
+    const monthlyDeals = payments.filter(p => {
+      const d = new Date(p.created_date);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear && p.status !== "מבוטל";
+    }).length;
+
     const monthlyRevenue = payments
-      .filter(p => p.status === "שולם" && p.paid_date && new Date(p.paid_date).getMonth() === new Date().getMonth())
+      .filter(p => p.status === "שולם" && p.paid_date && new Date(p.paid_date).getMonth() === currentMonth && new Date(p.paid_date).getFullYear() === currentYear)
       .reduce((sum, p) => sum + (p.amount || 0), 0);
-    const overdueTasks = tasks.filter(t => 
-      t.status !== "הושלם" && new Date(t.due_date) < new Date()
+
+    const overdueTasks = tasks.filter(t =>
+      t.status !== "הושלם" && new Date(t.due_date) < now
     ).length;
 
-    const openLeads = leads.filter(l => l.status !== "נסגר בהצלחה (שולם)" && l.status !== "לא רלוונטי").length;
-    return { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks, openLeads };
+    return { activeCustomers, monthlyDeals, monthlyRevenue, overdueTasks };
   };
 
-  const { activeCustomers, pendingPayments, monthlyRevenue, overdueTasks, openLeads } = getStats();
+  const { activeCustomers, monthlyDeals, monthlyRevenue, overdueTasks } = getStats();
+  const MONTHLY_DEALS_TARGET = 10;
 
   // פונקציה לטיפול בלחיצה על לקוח - מעבר לעמוד לקוחות עם מצב עריכה
   const handleCustomerClick = (customer) => {
@@ -101,38 +112,30 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Cards - WITH LINKS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatsCard
-          title="לידים פעילים"
-          value={openLeads}
-          icon={UserPlus}
-          color="purple"
-          trend="לידים פתוחים"
-          linkTo={createPageUrl("Leads")}
-        />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title="לקוחות פעילים"
           value={activeCustomers}
           icon={Users}
           color="blue"
-          trend="+12% מהחודש שעבר"
+          trend="לקוחות במערכת"
           linkTo={createPageUrl("Customers")}
         />
         <StatsCard
-          title="תשלומים פתוחים"
-          value={pendingPayments}
-          icon={CreditCard}
+          title="עסקאות החודש"
+          value={`${monthlyDeals} / ${MONTHLY_DEALS_TARGET}`}
+          icon={Target}
           color="orange"
-          trend={`${pendingPayments} חשבוניות`}
+          trend={`${MONTHLY_DEALS_TARGET - monthlyDeals > 0 ? MONTHLY_DEALS_TARGET - monthlyDeals + ' נותרו ליעד' : 'יעד הושג! 🎉'}`}
           linkTo={createPageUrl("Payments")}
         />
         <StatsCard
-          title="הכנסות החודש"
+          title={currentUser?.role !== 'admin' ? "ההכנסות שלי החודש" : "הכנסות החודש"}
           value={`₪${monthlyRevenue.toLocaleString()}`}
           icon={DollarSign}
           color="green"
-          trend="+8% מהחודש שעבר"
+          trend="הכנסות ששולמו"
           linkTo={createPageUrl("Payments")}
         />
         <StatsCard
@@ -148,7 +151,7 @@ export default function Dashboard() {
       {/* Charts and Recent Data */}
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <PaymentChart payments={payments} />
+          <PaymentChart payments={payments} isPersonal={currentUser?.role !== 'admin'} />
         </div>
         <div>
           <RecentCustomers 
@@ -161,11 +164,10 @@ export default function Dashboard() {
       {/* Bottom Section */}
       <div className="grid lg:grid-cols-2 gap-8">
         <TaskList 
-          tasks={tasks.slice(0, 6)} 
+          tasks={tasks.slice(0, 8)} 
           onTaskClick={handleTaskClick}
           isPersonal={currentUser?.role !== 'admin'}
         />
-        
         <LeadsByStatus
           leads={leads}
           isAdmin={currentUser?.role === 'admin'}
