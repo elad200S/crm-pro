@@ -66,6 +66,7 @@ export default function Layout({ children, currentPageName }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [visibleNavItems, setVisibleNavItems] = useState(navigationItems);
 
   useEffect(() => {
     checkUserOnboarding();
@@ -75,6 +76,12 @@ export default function Layout({ children, currentPageName }) {
     try {
       const user = await base44.auth.me();
       setCurrentUser(user);
+
+      // הסתרת "ניהול משתמשים" ממשתמשים שאינם admin
+      const isAdmin = user.role === 'admin';
+      setVisibleNavItems(navigationItems.filter(item =>
+        item.title !== "ניהול משתמשים" || isAdmin
+      ));
 
       const needsOnboarding = !user.phone || !user.job_title || !user.department || !user.user_category;
       
@@ -150,7 +157,7 @@ export default function Layout({ children, currentPageName }) {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-gray-200 shadow-lg fixed top-16 left-0 right-0 z-[99] max-h-[calc(100vh-4rem)] overflow-y-auto">
           <nav className="px-4 py-2">
-            {navigationItems.map((item) => (
+            {visibleNavItems.map((item) => (
               <Link
                 key={item.title}
                 to={item.url}
@@ -196,7 +203,7 @@ export default function Layout({ children, currentPageName }) {
                   תפריט ראשי
                 </h3>
                 <nav className="space-y-2">
-                  {navigationItems.map((item) => (
+                  {visibleNavItems.map((item) => (
                     <Link
                       key={item.title}
                       to={item.url}

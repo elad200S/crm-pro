@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 const { Customer, Payment, Task, User, Lead } = base44.entities;
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CreditCard, DollarSign, AlertTriangle, TrendingUp, UserPlus } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, CreditCard, DollarSign, AlertTriangle, UserPlus } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
@@ -12,15 +12,14 @@ import StatsCard from "../components/dashboard/StatsCard";
 import RecentCustomers from "../components/dashboard/RecentCustomers";
 import PaymentChart from "../components/dashboard/PaymentChart";
 import TaskList from "../components/dashboard/TaskList";
-
-// הגדרת המנהל הראשי - החלף בכתובת המייל שלך
-const ADMIN_EMAIL = "your-email@gmail.com"; // החלף בכתובת המייל שלך!
+import LeadsByStatus from "../components/dashboard/LeadsByStatus";
 
 export default function Dashboard() {
   const [customers, setCustomers] = useState([]);
   const [payments, setPayments] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -30,11 +29,11 @@ export default function Dashboard() {
 
   const loadData = async () => {
     try {
-      const user = await User.me();
+      const user = await base44.auth.me();
+      setCurrentUser(user);
       
       let paymentsData;
-      // Admin should see all payments for the chart
-      if (user.email === ADMIN_EMAIL) {
+      if (user.role === 'admin') {
         paymentsData = await Payment.list('-created_date', 500);
       } else {
         paymentsData = await Payment.filter({ created_by: user.email }, '-created_date', 500);
@@ -43,7 +42,7 @@ export default function Dashboard() {
       const [customersData, tasksData, leadsData] = await Promise.all([
         Customer.list('-created_date', 50),
         Task.list('-created_date', 20),
-        Lead.list('-created_date', 100)
+        Lead.list('-created_date', 200)
       ]);
       
       setCustomers(customersData);
@@ -161,36 +160,11 @@ export default function Dashboard() {
           onTaskClick={handleTaskClick}
         />
         
-        <Card className="shadow-md">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              התפלגות סטטוס לקוחות
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {["חדש", "פוטנציאלי", "פעיל", "לא פעיל"].map((status, index) => {
-                const count = customers.filter(c => c.status === status).length;
-                const percentage = customers.length > 0 ? (count / customers.length * 100).toFixed(1) : 0;
-                const colors = ["bg-gray-400", "bg-yellow-400", "bg-green-400", "bg-red-400"];
-                
-                return (
-                  <div key={status} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-4 h-4 rounded-full ${colors[index]}`} />
-                      <span className="text-sm font-medium text-gray-700">{status}</span>
-                    </div>
-                    <div className="text-left">
-                      <span className="text-lg font-bold text-gray-900">{count}</span>
-                      <span className="text-sm text-gray-500 mr-2">({percentage}%)</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <LeadsByStatus
+          leads={leads}
+          isAdmin={currentUser?.role === 'admin'}
+          currentUserId={currentUser?.id}
+        />
       </div>
     </div>
   );
