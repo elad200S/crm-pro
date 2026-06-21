@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { X, Printer } from "lucide-react";
+import { X, Printer, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -24,6 +24,15 @@ export default function QuoteDocument({ quote, lead, onClose }) {
   const printRef = useRef();
   const body = substituteVars(quote?.notes || "", lead, quote?.amount);
   const price = parseFloat(quote?.amount) || 0;
+
+  const handleEmail = () => {
+    const to = lead?.email || "";
+    const subject = encodeURIComponent(quote?.title || "הסכם עבודה");
+    const bodyText = encodeURIComponent(
+      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו:\n\n${body}\n\nבברכה,\nEH Automation — אלעד חנינה\n054-710-8219`
+    );
+    window.open(`mailto:${to}?subject=${subject}&body=${bodyText}`, "_blank");
+  };
 
   const handlePrint = () => {
     const content = printRef.current.innerHTML;
@@ -67,10 +76,18 @@ export default function QuoteDocument({ quote, lead, onClose }) {
 
         {/* Toolbar */}
         <div className="flex items-center justify-between px-6 py-3 border-b bg-gray-50 rounded-t-2xl">
-          <button onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
-            <Printer className="w-4 h-4" /> הדפסה / PDF
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={handlePrint}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+              <Printer className="w-4 h-4" /> הדפסה / PDF
+            </button>
+            {lead?.email && (
+              <button onClick={handleEmail}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors">
+                <Mail className="w-4 h-4" /> שלח במייל
+              </button>
+            )}
+          </div>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors">
             <X className="w-4 h-4 text-gray-500" />
           </button>

@@ -14,6 +14,7 @@ import LeadTable from "../components/leads/LeadTable";
 import LeadForm from "../components/leads/LeadForm";
 import QuoteModal from "../components/leads/QuoteModal";
 import DocumentModal from "../components/quotes/DocumentModal";
+import QuoteDocument from "../components/quotes/QuoteDocument";
 import AddTaskModal from "../components/leads/AddTaskModal";
 import DuplicateWarningModal from "../components/leads/DuplicateWarningModal";
 import ConvertToCustomerModal from "../components/leads/ConvertToCustomerModal";
@@ -39,8 +40,9 @@ export default function Leads() {
   const [showForm, setShowForm] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
   const [duplicateWarning, setDuplicateWarning] = useState(null); // { existingLead, pendingData }
-  const [quoteTarget, setQuoteTarget] = useState(null); // { lead, template }
+  const [quoteTarget, setQuoteTarget] = useState(null);
   const [quoteTemplate, setQuoteTemplate] = useState(null);
+  const [previewDoc, setPreviewDoc] = useState(null); // { quote, lead }
   const [taskTarget, setTaskTarget] = useState(null);
   const [convertTarget, setConvertTarget] = useState(null);
   const [existingCustomerForConvert, setExistingCustomerForConvert] = useState(null);
@@ -223,8 +225,12 @@ export default function Leads() {
       priority: "low",
       account_id: accountId
     }).catch(() => {});
+    const lead = leads.find(l => l.id === quoteTarget?.id) || quoteTarget;
     setQuoteTarget(null);
+    setQuoteTemplate(null);
     await reload();
+    // פתח מיד תצוגת מסמך
+    setPreviewDoc({ quote, lead });
   };
 
   const handleTaskSubmit = async (data) => {
@@ -452,6 +458,14 @@ export default function Leads() {
           existingCustomer={existingCustomerForConvert}
           onConfirm={handleConvertConfirm}
           onClose={() => { setConvertTarget(null); setExistingCustomerForConvert(null); }}
+        />
+      )}
+
+      {previewDoc && (
+        <QuoteDocument
+          quote={previewDoc.quote}
+          lead={previewDoc.lead}
+          onClose={() => setPreviewDoc(null)}
         />
       )}
 
