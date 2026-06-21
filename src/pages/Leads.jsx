@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { UserPlus, Download, LayoutGrid, Kanban, List } from "lucide-react";
+import { UserPlus, Download, LayoutGrid, Kanban, List, ChevronDown, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -295,35 +295,33 @@ export default function Leads() {
           <p className="text-sm text-gray-400 mt-0.5">{filtered.length} מוצגים מתוך {leads.length}</p>
         </div>
         <div className="flex items-center gap-2">
-          {/* View toggle */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
-            <button
-              onClick={() => switchView("cards")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                viewMode === "cards" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              כרטיסים
+          {/* View dropdown */}
+          <div className="relative group">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+              {viewMode === "cards" && <><LayoutGrid className="w-3.5 h-3.5" /> כרטיסים</>}
+              {viewMode === "kanban" && <><Kanban className="w-3.5 h-3.5" /> קנבן</>}
+              {viewMode === "table" && <><List className="w-3.5 h-3.5" /> רשימה</>}
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400 mr-0.5" />
             </button>
-            <button
-              onClick={() => switchView("kanban")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                viewMode === "kanban" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Kanban className="w-3.5 h-3.5" />
-              קנבן
-            </button>
-            <button
-              onClick={() => switchView("table")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                viewMode === "table" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <List className="w-3.5 h-3.5" />
-              רשימה
-            </button>
+            <div className="absolute top-full mt-1 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 min-w-[130px] py-1 hidden group-focus-within:block group-hover:block">
+              {[
+                { id: "cards",  label: "כרטיסים", Icon: LayoutGrid },
+                { id: "kanban", label: "קנבן",     Icon: Kanban     },
+                { id: "table",  label: "רשימה",    Icon: List       },
+              ].map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => switchView(id)}
+                  className="w-full flex items-center justify-between gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors text-gray-700"
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon className="w-3.5 h-3.5 text-gray-400" />
+                    {label}
+                  </span>
+                  {viewMode === id && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                </button>
+              ))}
+            </div>
           </div>
           <Button variant="outline" size="sm" onClick={exportToCSV}>
             <Download className="w-4 h-4 ml-1.5" />
