@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { X, Printer, Mail, MessageCircle, CheckCircle } from "lucide-react";
+import { X, Printer, Mail, MessageCircle, CheckCircle, Link2 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
@@ -100,6 +100,44 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
   };
 
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const generateSignLink = () => {
+    const data = {
+      id: quote?.id,
+      title: quote?.title,
+      rawBody: quote?.notes,
+      amount: quote?.amount,
+      valid_until: quote?.valid_until,
+      lead: {
+        name: lead?.full_name,
+        phone: lead?.phone,
+        email: lead?.email,
+        company: lead?.company_name,
+      }
+    };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    return `${window.location.origin}/ClientSign?q=${encoded}`;
+  };
+
+  const handleCopyLink = () => {
+    const link = generateSignLink();
+    navigator.clipboard.writeText(link).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2500);
+    });
+  };
+
+  const handleSendLinkWhatsApp = () => {
+    const link = generateSignLink();
+    const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
+    const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
+    const msg = encodeURIComponent(
+      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_EH Automation — אלעד חנינה_`
+    );
+    window.open(`https://wa.me/${intlPhone}?text=${msg}`, "_blank");
+  };
+
   const handleEmail = () => {
     const to = lead?.email || "";
     const subject = encodeURIComponent(quote?.title || "הסכם עבודה");
@@ -170,15 +208,19 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
               <Printer className="w-4 h-4" /> הדפסה / PDF
             </button>
             {lead?.phone && (
-              <button onClick={handleWhatsApp}
+              <button onClick={handleSendLinkWhatsApp}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">
-                <MessageCircle className="w-4 h-4" /> שלח בוואטסאפ
+                <MessageCircle className="w-4 h-4" /> שלח קישור לחתימה
               </button>
             )}
+            <button onClick={handleCopyLink}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors">
+              <Link2 className="w-4 h-4" /> {linkCopied ? "✓ הועתק!" : "העתק קישור"}
+            </button>
             {lead?.email && (
               <button onClick={handleEmail}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors">
-                <Mail className="w-4 h-4" /> שלח במייל
+                <Mail className="w-4 h-4" /> מייל
               </button>
             )}
           </div>

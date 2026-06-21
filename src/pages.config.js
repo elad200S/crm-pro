@@ -56,6 +56,7 @@ import Onboarding from './pages/Onboarding';
 import Payments from './pages/Payments';
 import UserManagement from './pages/UserManagement';
 import Quotes from './pages/Quotes';
+import ClientSign from './pages/ClientSign';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +70,7 @@ export const PAGES = {
     "Payments": Payments,
     "UserManagement": UserManagement,
     "Quotes": Quotes,
+    "ClientSign": ClientSign,
 }
 
 export const pagesConfig = {

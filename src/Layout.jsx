@@ -143,7 +143,7 @@ export default function Layout({ children, currentPageName }) {
     }
   };
 
-  if (currentPageName === "Onboarding" || loading) {
+  if (currentPageName === "Onboarding" || currentPageName === "ClientSign" || loading) {
     return children;
   }
 
