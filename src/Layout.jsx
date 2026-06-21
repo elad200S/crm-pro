@@ -209,8 +209,8 @@ export default function Layout({ children, currentPageName }) {
               <NotificationBell />
             </div>
 
-            {/* Nav Items */}
-            <div className="flex-1 overflow-y-auto py-3 flex flex-col items-center gap-0.5">
+            {/* Nav Items — distributed evenly, no scroll */}
+            <nav className="flex-1 flex flex-col items-center justify-evenly py-2">
               {visibleNavItems.map((item) => {
                 const active = location.pathname === item.url;
                 return (
@@ -218,23 +218,23 @@ export default function Layout({ children, currentPageName }) {
                     key={item.title}
                     to={item.url}
                     title={item.title}
-                    className={`flex flex-col items-center gap-1 w-full px-1 py-2.5 transition-all duration-150 relative group
+                    className={`flex flex-col items-center gap-0.5 w-full px-1 py-1.5 transition-all duration-150 relative group
                       ${active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-700'}`}
                   >
                     {active && (
-                      <span className="absolute right-0 top-2 bottom-2 w-0.5 bg-blue-600 rounded-l-full" />
+                      <span className="absolute right-0 top-1 bottom-1 w-0.5 bg-blue-600 rounded-l-full" />
                     )}
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors
                       ${active ? 'bg-blue-50' : 'group-hover:bg-gray-50'}`}>
-                      <item.icon className="w-5 h-5" />
+                      <item.icon className="w-4.5 h-4.5 w-[18px] h-[18px]" />
                     </div>
-                    <span className="text-[10px] font-medium leading-tight text-center line-clamp-1 w-full px-0.5">
+                    <span className="text-[9px] font-medium leading-tight text-center line-clamp-1 w-full px-0.5">
                       {item.title}
                     </span>
                   </Link>
                 );
               })}
-            </div>
+            </nav>
 
             {/* User avatar */}
             <div className="flex flex-col items-center py-3 border-t border-gray-100 flex-shrink-0">
