@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import QuoteEditModal from "../components/quotes/QuoteEditModal";
 import QuoteDocument from "../components/quotes/QuoteDocument";
+import DocumentModal from "../components/quotes/DocumentModal";
 
 const STATUS_CONFIG = {
   "טיוטה":  { label: "טיוטה",  color: "bg-gray-100 text-gray-700",    icon: FileText },
@@ -28,6 +29,7 @@ export default function Quotes() {
   const [editingQuote, setEditingQuote] = useState(null);
   const [previewQuote, setPreviewQuote] = useState(null);
   const [creatingDoc, setCreatingDoc] = useState(false);
+  const [editingDoc, setEditingDoc] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("הכל");
 
@@ -260,7 +262,7 @@ export default function Quotes() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingQuote(quote)}
+                          onClick={() => setEditingDoc(quote)}
                           className="text-blue-600 hover:text-blue-800 border-blue-200"
                         >
                           <Edit className="w-3.5 h-3.5 ml-1" />
@@ -302,11 +304,22 @@ export default function Quotes() {
       )}
 
       {creatingDoc && (
-        <QuoteEditModal
-          quote={{}}
-          isNew
+        <DocumentModal
           onSubmit={handleCreateSubmit}
           onClose={() => setCreatingDoc(false)}
+        />
+      )}
+
+      {editingDoc && (
+        <DocumentModal
+          doc={editingDoc}
+          lead={leads.find(l => l.id === editingDoc.lead_id) || null}
+          onSubmit={async (data) => {
+            await base44.entities.Quote.update(editingDoc.id, data);
+            setEditingDoc(null);
+            await loadData();
+          }}
+          onClose={() => setEditingDoc(null)}
         />
       )}
     </div>

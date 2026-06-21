@@ -13,6 +13,7 @@ import LeadKanban from "../components/leads/LeadKanban";
 import LeadTable from "../components/leads/LeadTable";
 import LeadForm from "../components/leads/LeadForm";
 import QuoteModal from "../components/leads/QuoteModal";
+import DocumentModal from "../components/quotes/DocumentModal";
 import AddTaskModal from "../components/leads/AddTaskModal";
 import DuplicateWarningModal from "../components/leads/DuplicateWarningModal";
 import ConvertToCustomerModal from "../components/leads/ConvertToCustomerModal";
@@ -197,7 +198,7 @@ export default function Leads() {
   };
 
   const handleQuoteSubmit = async (data) => {
-    const quote = await base44.entities.Quote.create(data);
+    const quote = await base44.entities.Quote.create({ ...data, lead_id: quoteTarget?.id });
     // עדכן סטטוס הליד ל"נשלחה הצעת מחיר" אם עדיין בשלב קודם
     const currentLead = leads.find(l => l.id === quoteTarget.id);
     const leadStatusesToUpgrade = ["התקבל", "שיחה חוזרת", "בוצע איפיון"];
@@ -426,10 +427,9 @@ export default function Leads() {
       )}
 
       {quoteTarget && (
-        <QuoteModal
+        <DocumentModal
+          doc={quoteTemplate ? { ...quoteTemplate, id: undefined } : undefined}
           lead={quoteTarget}
-          accountId={accountId}
-          template={quoteTemplate}
           onSubmit={handleQuoteSubmit}
           onClose={() => { setQuoteTarget(null); setQuoteTemplate(null); }}
         />
