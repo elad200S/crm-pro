@@ -38,7 +38,7 @@ const navigationItems = [
     icon: CreditCard,
   },
   {
-    title: "הצעות מחיר",
+    title: "מסמכים",
     url: createPageUrl("Quotes"),
     icon: FileText,
   },

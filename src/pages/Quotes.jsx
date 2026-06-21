@@ -93,9 +93,9 @@ export default function Quotes() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <FileText className="w-8 h-8 text-blue-600" />
-              הצעות מחיר
+              מסמכים
             </h1>
-            <p className="text-gray-500 mt-1">{filtered.length} הצעות מוצגות</p>
+            <p className="text-gray-500 mt-1">{filtered.length} מסמכים מוצגים</p>
           </div>
         </div>
       </div>
@@ -169,8 +169,8 @@ export default function Quotes() {
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border p-16 text-center shadow-sm">
           <FileText className="w-14 h-14 mx-auto text-gray-300 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-1">אין הצעות מחיר</h3>
-          <p className="text-gray-500 text-sm">צור הצעה מדף הלידים</p>
+          <h3 className="text-lg font-semibold text-gray-700 mb-1">אין מסמכים</h3>
+          <p className="text-gray-500 text-sm">צור מסמך מדף הלידים</p>
         </div>
       ) : (
         <div className="grid gap-4">
