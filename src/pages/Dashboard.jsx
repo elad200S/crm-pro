@@ -31,25 +31,15 @@ export default function Dashboard() {
     try {
       const user = await base44.auth.me();
       setCurrentUser(user);
-      
-      let paymentsData;
-      if (user.role === 'admin') {
-        paymentsData = await Payment.list('-created_date', 500);
-      } else {
-        paymentsData = await Payment.filter({ created_by_id: user.id }, '-created_date', 500);
-      }
+      const isAdmin = user.role === 'admin';
 
-      // משימות: admin רואה הכל, נציג רואה רק משימות שהוקצו לו
-      const tasksQuery = user.role === 'admin'
-        ? Task.list('-due_date', 50)
-        : Task.filter({ assigned_to: user.id }, '-due_date', 50);
-
-      const [customersData, tasksData, leadsData] = await Promise.all([
-        Customer.list('-created_date', 50),
-        tasksQuery,
+      const [customersData, paymentsData, tasksData, leadsData] = await Promise.all([
+        isAdmin ? Customer.list('-created_date', 50) : Customer.filter({ created_by: user.email }, '-created_date', 50),
+        isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by: user.email }, '-created_date', 500),
+        isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
         Lead.list('-created_date', 200)
       ]);
-      
+
       setCustomers(customersData);
       setPayments(paymentsData);
       setTasks(tasksData);
@@ -88,10 +78,16 @@ export default function Dashboard() {
   const { activeCustomers, monthlyDeals, monthlyRevenue, overdueTasks } = getStats();
   const MONTHLY_DEALS_TARGET = 10;
 
-  // פונקציה לטיפול בלחיצה על לקוח - מעבר לעמוד לקוחות עם מצב עריכה
   const handleCustomerClick = (customer) => {
-    // נווט לעמוד הלקוחות ושמור את ה-ID בסטייט או ב-URL
-    navigate(createPageUrl("Customers"), { state: { editCustomer: customer } });
+    navigate(createPageUrl("Customers"), { state: { viewCustomer: customer } });
+  };
+
+  const getGreeting = () => {
+    const h = parseInt(new Date().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', hour: 'numeric', hour12: false }));
+    if (h >= 5 && h < 12) return 'בוקר טוב';
+    if (h >= 12 && h < 17) return 'צהריים טובים';
+    if (h >= 17 && h < 21) return 'ערב טוב';
+    return 'לילה טוב';
   };
 
   // פונקציה לטיפול בלחיצה על משימה - מעבר לעמוד יומן עם מצב עריכה
@@ -102,13 +98,15 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">דשבורד ראשי</h1>
-          <p className="text-gray-600">סקירה כללית של מערכת ה-CRM שלך</p>
+          <p className="text-sm text-gray-400 font-medium">{format(new Date(), "EEEE, dd MMMM yyyy", { locale: he })}</p>
+          <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
+            {getGreeting()}{currentUser?.full_name ? `, ${currentUser.full_name.split(' ')[0]}` : ''} 👋
+          </h1>
         </div>
-        <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-lg border">
-          עודכן: {format(new Date(), "dd/MM/yyyy HH:mm", { locale: he })}
+        <div className="text-xs text-gray-400 bg-white px-3 py-1.5 rounded-lg border">
+          {format(new Date(), "HH:mm", { locale: he })}
         </div>
       </div>
 

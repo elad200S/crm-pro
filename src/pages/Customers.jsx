@@ -105,12 +105,13 @@ export default function Customers() {
     filterCustomers();
   }, [filterCustomers]);
 
-  // בדיקה אם הגענו מהדשבורד עם לקוח לעריכה
   useEffect(() => {
-    if (location.state?.editCustomer) {
+    if (location.state?.viewCustomer) {
+      setSelectedCustomer(location.state.viewCustomer);
+      window.history.replaceState({}, document.title);
+    } else if (location.state?.editCustomer) {
       setEditingCustomer(location.state.editCustomer);
       setShowForm(true);
-      // נקה את ה-state כדי שלא יפתח שוב
       window.history.replaceState({}, document.title);
     }
   }, [location]);

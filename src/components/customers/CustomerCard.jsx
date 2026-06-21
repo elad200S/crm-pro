@@ -106,7 +106,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
       />
 
       {/* Slide-in Panel */}
-      <div className="fixed inset-y-0 left-0 w-full max-w-2xl bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
+      <div className="fixed inset-0 sm:inset-y-0 sm:left-0 sm:w-full sm:max-w-2xl bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
         
         {/* Header */}
         <div className="bg-gradient-to-l from-blue-600 to-blue-700 px-6 py-5 flex-shrink-0">

@@ -152,12 +152,12 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Header - FIXED */}
       <header className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 shadow-sm fixed top-0 left-0 right-0 z-[100] h-16">
         <div className="flex items-center justify-between h-full">
-          <div className="flex items-center gap-3">
+          <Link to={createPageUrl("Dashboard")} className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
               <Building2 className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-lg font-semibold text-gray-900">CRM Pro</h1>
-          </div>
+          </Link>
           <div className="flex items-center gap-2">
             <NotificationBell 
               onOpenChange={handleNotificationsToggle}
