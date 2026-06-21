@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { X, Printer, Mail } from "lucide-react";
+import { X, Printer, Mail, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -24,6 +24,15 @@ export default function QuoteDocument({ quote, lead, onClose }) {
   const printRef = useRef();
   const body = substituteVars(quote?.notes || "", lead, quote?.amount);
   const price = parseFloat(quote?.amount) || 0;
+
+  const handleWhatsApp = () => {
+    const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
+    const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
+    const text = encodeURIComponent(
+      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_EH Automation — אלעד חנינה | 054-710-8219_`
+    );
+    window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
+  };
 
   const handleEmail = () => {
     const to = lead?.email || "";
@@ -81,6 +90,12 @@ export default function QuoteDocument({ quote, lead, onClose }) {
               className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
               <Printer className="w-4 h-4" /> הדפסה / PDF
             </button>
+            {lead?.phone && (
+              <button onClick={handleWhatsApp}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">
+                <MessageCircle className="w-4 h-4" /> שלח בוואטסאפ
+              </button>
+            )}
             {lead?.email && (
               <button onClick={handleEmail}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors">
