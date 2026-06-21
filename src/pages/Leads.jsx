@@ -2,13 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { UserPlus, Download, FileText } from "lucide-react";
+import { UserPlus, Download, LayoutGrid, Kanban } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 import LeadStatsCards from "../components/leads/LeadStatsCards";
 import LeadFilters from "../components/leads/LeadFilters";
 import LeadCards from "../components/leads/LeadCards";
+import LeadKanban from "../components/leads/LeadKanban";
 import LeadForm from "../components/leads/LeadForm";
 import QuoteModal from "../components/leads/QuoteModal";
 import AddTaskModal from "../components/leads/AddTaskModal";
@@ -42,6 +43,7 @@ export default function Leads() {
   const [existingCustomerForConvert, setExistingCustomerForConvert] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [selectedLead, setSelectedLead] = useState(null);
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem("leads_view") || "cards");
 
   const accountId = currentUser?.id || "default";
 
@@ -78,6 +80,27 @@ export default function Leads() {
   const reload = async () => {
     const data = await base44.entities.Lead.list("-created_date", 200);
     setLeads(data);
+  };
+
+  const switchView = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem("leads_view", mode);
+  };
+
+  const handleStatusChange = async (leadId, newStatus) => {
+    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus } : l));
+    try {
+      await base44.entities.Lead.update(leadId, { status: newStatus });
+      await OUTBOUND_EVENT(webhookUrl, {
+        event_name: "lead_updated",
+        account_id: accountId,
+        lead_id: leadId,
+        changed_fields: ["status"],
+        timestamp: new Date().toISOString()
+      });
+    } catch {
+      await reload();
+    }
   };
 
   // filtered leads
@@ -269,20 +292,41 @@ export default function Leads() {
           <h1 className="text-2xl font-bold text-gray-900">לידים</h1>
           <p className="text-sm text-gray-400 mt-0.5">{filtered.length} מוצגים מתוך {leads.length}</p>
         </div>
-        <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={exportToCSV}>
-              <Download className="w-4 h-4 ml-1.5" />
-              ייצוא
-            </Button>
-            <Button
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => { setEditingLead(null); setShowForm(true); }}
+        <div className="flex items-center gap-2">
+          {/* View toggle */}
+          <div className="flex items-center bg-gray-100 rounded-lg p-0.5">
+            <button
+              onClick={() => switchView("cards")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                viewMode === "cards" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+              }`}
             >
-              <UserPlus className="w-4 h-4 ml-1.5" />
-              ליד חדש
-            </Button>
+              <LayoutGrid className="w-3.5 h-3.5" />
+              כרטיסים
+            </button>
+            <button
+              onClick={() => switchView("kanban")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                viewMode === "kanban" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <Kanban className="w-3.5 h-3.5" />
+              קנבן
+            </button>
           </div>
+          <Button variant="outline" size="sm" onClick={exportToCSV}>
+            <Download className="w-4 h-4 ml-1.5" />
+            ייצוא
+          </Button>
+          <Button
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={() => { setEditingLead(null); setShowForm(true); }}
+          >
+            <UserPlus className="w-4 h-4 ml-1.5" />
+            ליד חדש
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -304,19 +348,35 @@ export default function Leads() {
         />
       )}
 
-      {/* Cards */}
-      <LeadCards
-        leads={filtered}
-        users={users}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={setDeleteTarget}
-        onWhatsApp={handleWhatsApp}
-        onQuote={setQuoteTarget}
-        onTask={setTaskTarget}
-        onConvert={handleConvertClick}
-        onRowClick={setSelectedLead}
-      />
+      {/* Cards / Kanban */}
+      {viewMode === "kanban" ? (
+        <LeadKanban
+          leads={filtered}
+          users={users}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={setDeleteTarget}
+          onWhatsApp={handleWhatsApp}
+          onQuote={setQuoteTarget}
+          onTask={setTaskTarget}
+          onConvert={handleConvertClick}
+          onRowClick={setSelectedLead}
+          onStatusChange={handleStatusChange}
+        />
+      ) : (
+        <LeadCards
+          leads={filtered}
+          users={users}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={setDeleteTarget}
+          onWhatsApp={handleWhatsApp}
+          onQuote={setQuoteTarget}
+          onTask={setTaskTarget}
+          onConvert={handleConvertClick}
+          onRowClick={setSelectedLead}
+        />
+      )}
 
       {selectedLead && (
         <LeadDetailModal
