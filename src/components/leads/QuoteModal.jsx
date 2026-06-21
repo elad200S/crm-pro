@@ -11,16 +11,16 @@ import { Plus, Trash2 } from "lucide-react";
 const VAT_RATE = 0.17;
 const emptyItem = () => ({ description: "", quantity: 1, unit_price: 0, total: 0 });
 
-export default function QuoteModal({ lead, accountId, onSubmit, onClose }) {
+export default function QuoteModal({ lead, accountId, template, onSubmit, onClose }) {
   const [form, setForm] = useState({
-    title: "",
-    currency: "ILS",
+    title: template?.title || "",
+    currency: template?.currency || "ILS",
     status: "טיוטה",
-    notes: "",
+    notes: template?.notes || "",
     valid_until: "",
-    discount: 0,
-    vat_included: false,
-    items: [emptyItem()]
+    discount: template?.discount || 0,
+    vat_included: template?.vat_included || false,
+    items: template?.items?.length ? template.items.map(i => ({ ...i })) : [emptyItem()]
   });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));

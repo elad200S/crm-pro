@@ -5,10 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import QuoteEditModal from "../components/quotes/QuoteEditModal";
+import QuoteDocument from "../components/quotes/QuoteDocument";
 
 const STATUS_CONFIG = {
   "טיוטה":  { label: "טיוטה",  color: "bg-gray-100 text-gray-700",    icon: FileText },
@@ -25,6 +26,7 @@ export default function Quotes() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingQuote, setEditingQuote] = useState(null);
+  const [previewQuote, setPreviewQuote] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("הכל");
 
@@ -236,6 +238,15 @@ export default function Quotes() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => setPreviewQuote(quote)}
+                          className="text-gray-600 hover:text-gray-800"
+                        >
+                          <Eye className="w-3.5 h-3.5 ml-1" />
+                          צפה
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => setEditingQuote(quote)}
                           className="text-blue-600 hover:text-blue-800 border-blue-200"
                         >
@@ -266,6 +277,14 @@ export default function Quotes() {
           customerName={editingQuote.customer_id ? (() => { const c = customers.find(c => c.id === editingQuote.customer_id); return c ? `${c.first_name} ${c.last_name}` : null; })() : null}
           onSubmit={handleEditSubmit}
           onClose={() => setEditingQuote(null)}
+        />
+      )}
+
+      {previewQuote && (
+        <QuoteDocument
+          quote={previewQuote}
+          lead={leads.find(l => l.id === previewQuote.lead_id) || null}
+          onClose={() => setPreviewQuote(null)}
         />
       )}
     </div>

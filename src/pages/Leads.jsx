@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { UserPlus, Download, LayoutGrid, Kanban } from "lucide-react";
+import { UserPlus, Download, LayoutGrid, Kanban, List } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -37,7 +37,8 @@ export default function Leads() {
   const [showForm, setShowForm] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
   const [duplicateWarning, setDuplicateWarning] = useState(null); // { existingLead, pendingData }
-  const [quoteTarget, setQuoteTarget] = useState(null);
+  const [quoteTarget, setQuoteTarget] = useState(null); // { lead, template }
+  const [quoteTemplate, setQuoteTemplate] = useState(null);
   const [taskTarget, setTaskTarget] = useState(null);
   const [convertTarget, setConvertTarget] = useState(null);
   const [existingCustomerForConvert, setExistingCustomerForConvert] = useState(null);
@@ -371,7 +372,7 @@ export default function Leads() {
           onEdit={handleEdit}
           onDelete={setDeleteTarget}
           onWhatsApp={handleWhatsApp}
-          onQuote={setQuoteTarget}
+          onQuote={(lead, template) => { setQuoteTarget(lead); setQuoteTemplate(template || null); }}
           onTask={setTaskTarget}
           onConvert={handleConvertClick}
           onRowClick={setSelectedLead}
@@ -406,8 +407,9 @@ export default function Leads() {
         <QuoteModal
           lead={quoteTarget}
           accountId={accountId}
+          template={quoteTemplate}
           onSubmit={handleQuoteSubmit}
-          onClose={() => setQuoteTarget(null)}
+          onClose={() => { setQuoteTarget(null); setQuoteTemplate(null); }}
         />
       )}
 
