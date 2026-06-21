@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -22,6 +22,63 @@ const priorityColors = {
   "גבוהה": "bg-orange-100 text-orange-800",
   "קריטית": "bg-red-100 text-red-800"
 };
+
+function DocDropdown({ lead, onQuote, onClose: closeModal }) {
+  const [open, setOpen] = useState(false);
+  const [templates, setTemplates] = useState([]);
+  const ref = useRef();
+
+  useEffect(() => {
+    base44.entities.Quote.list('-created_date', 50)
+      .then(all => setTemplates(all.filter(q => !q.lead_id && !q.customer_id)))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const pick = (template) => {
+    onQuote(lead, template || null);
+    closeModal();
+    setOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={ref}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen(o => !o)}
+        className="text-purple-600 border-purple-200 hover:bg-purple-50 flex items-center gap-1"
+      >
+        <FileText className="w-4 h-4" />
+        מסמך
+        <ChevronDown className="w-3.5 h-3.5" />
+      </Button>
+      {open && (
+        <div className="absolute bottom-full mb-1 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px]">
+          {templates.length === 0 ? (
+            <p className="text-xs text-gray-400 px-3 py-2">אין תבניות</p>
+          ) : templates.map(t => (
+            <button key={t.id} onClick={() => pick(t)}
+              className="w-full text-right px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
+              {t.title || "מסמך ללא כותרת"}
+            </button>
+          ))}
+          <div className="border-t border-gray-100 mt-1 pt-1">
+            <button onClick={() => pick(null)}
+              className="w-full text-right px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
+              + מסמך חדש (ריק)
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onConvert, onAddTask }) {
   const [tasks, setTasks] = useState([]);
@@ -165,10 +222,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                 <MessageCircle className="w-4 h-4 ml-1" /> וואטסאפ
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={() => { onQuote(lead); onClose(); }}
-              className="text-purple-600 border-purple-200 hover:bg-purple-50">
-              <FileText className="w-4 h-4 ml-1" /> הצעת מחיר
-            </Button>
+            <DocDropdown lead={lead} onQuote={onQuote} onClose={onClose} />
             {!lead.is_converted && (
               <Button variant="outline" size="sm" onClick={() => { onConvert(lead); onClose(); }}
                 className="text-teal-600 border-teal-200 hover:bg-teal-50">

@@ -12,7 +12,7 @@ const VAT_RATE = 0.17;
 
 const emptyItem = () => ({ description: "", quantity: 1, unit_price: 0, total: 0 });
 
-export default function QuoteEditModal({ quote, leadName, customerName, onSubmit, onClose }) {
+export default function QuoteEditModal({ quote, leadName, customerName, isNew, onSubmit, onClose }) {
   const [form, setForm] = useState({
     title: quote.title || "",
     status: quote.status || "טיוטה",
@@ -79,7 +79,7 @@ export default function QuoteEditModal({ quote, leadName, customerName, onSubmit
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">
-            עריכת הצעת מחיר — {entityName}
+            {isNew ? "מסמך חדש" : `עריכת מסמך — ${entityName}`}
           </DialogTitle>
         </DialogHeader>
 
@@ -252,7 +252,7 @@ export default function QuoteEditModal({ quote, leadName, customerName, onSubmit
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>ביטול</Button>
           <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSubmit}>
-            שמור הצעת מחיר
+            {isNew ? "צור מסמך" : "שמור מסמך"}
           </Button>
         </DialogFooter>
       </DialogContent>

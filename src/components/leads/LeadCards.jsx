@@ -59,7 +59,7 @@ function QuoteDropdown({ lead, onQuote }) {
         className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-blue-600 hover:bg-blue-50 transition-colors font-medium"
       >
         <FileText className="w-3.5 h-3.5" />
-        <span className="hidden sm:inline">מסמך</span>
+        <span>מסמך</span>
         <ChevronDown className="w-3 h-3" />
       </button>
       {open && (

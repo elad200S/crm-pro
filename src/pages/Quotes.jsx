@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import QuoteEditModal from "../components/quotes/QuoteEditModal";
@@ -27,6 +27,7 @@ export default function Quotes() {
   const [loading, setLoading] = useState(true);
   const [editingQuote, setEditingQuote] = useState(null);
   const [previewQuote, setPreviewQuote] = useState(null);
+  const [creatingDoc, setCreatingDoc] = useState(false);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("הכל");
 
@@ -59,6 +60,12 @@ export default function Quotes() {
   const handleEditSubmit = async (data) => {
     await base44.entities.Quote.update(editingQuote.id, data);
     setEditingQuote(null);
+    await loadData();
+  };
+
+  const handleCreateSubmit = async (data) => {
+    await base44.entities.Quote.create(data);
+    setCreatingDoc(false);
     await loadData();
   };
 
@@ -99,6 +106,12 @@ export default function Quotes() {
             </h1>
             <p className="text-gray-500 mt-1">{filtered.length} מסמכים מוצגים</p>
           </div>
+          <Button
+            onClick={() => setCreatingDoc(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> צור מסמך חדש
+          </Button>
         </div>
       </div>
 
@@ -285,6 +298,15 @@ export default function Quotes() {
           quote={previewQuote}
           lead={leads.find(l => l.id === previewQuote.lead_id) || null}
           onClose={() => setPreviewQuote(null)}
+        />
+      )}
+
+      {creatingDoc && (
+        <QuoteEditModal
+          quote={{}}
+          isNew
+          onSubmit={handleCreateSubmit}
+          onClose={() => setCreatingDoc(false)}
         />
       )}
     </div>
