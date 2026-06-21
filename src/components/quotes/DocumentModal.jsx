@@ -1,39 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText } from "lucide-react";
+import { FileText, Tag } from "lucide-react";
 
-const DEFAULT_BODY = `תיאור השירות:
-[תאר כאן את השירות המוצע]
+const VARIABLES = [
+  { key: "{customer-name}",     label: "שם לקוח" },
+  { key: "{customer-id}",       label: 'ח"פ / ת"ז' },
+  { key: "{customer-email}",    label: "מייל" },
+  { key: "{customer-phone}",    label: "טלפון" },
+  { key: "{customer-business}", label: "שם העסק" },
+  { key: "{customer-address}",  label: "כתובת" },
+  { key: "{current-date}",      label: "תאריך היום" },
+  { key: "{price}",             label: "מחיר" },
+  { key: "{signature}",         label: "חתימה" },
+];
 
-תהליך העבודה:
-1.
-2.
-3.
+const DEFAULT_BODY = `{customer-name}
+ח"פ/ת"ז: {customer-id}
+מייל: {customer-email}
+טלפון: {customer-phone}
+שם העסק: {customer-business}
+
+הח"מ {customer-name} (להלן: "המזמין"), מזמין בזה את שירותיה של EH Automation (להלן: "החברה"), על פי תנאי הסכם התקשרות זה.
+
+תיאור השירותים:
+
+
+תמורה:
+סכום הסכם: {price}
 
 תנאי תשלום:
-[תנאי תשלום]
 
-הערות:
-`;
 
-export default function DocumentModal({ doc, lead, customer, onSubmit, onClose }) {
+{current-date}
+
+חתימת המזמין: {signature}`;
+
+export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
   const isNew = !doc?.id;
-  const entityName = lead?.full_name || (customer ? `${customer.first_name} ${customer.last_name}` : null);
+  const entityName = lead?.full_name || null;
+  const textareaRef = useRef();
 
   const [form, setForm] = useState({
     title: doc?.title || "",
     body: doc?.notes || (isNew ? DEFAULT_BODY : ""),
     price: doc?.amount || "",
     valid_until: doc?.valid_until || "",
-    status: doc?.status || "טיוטה",
   });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // מוסיף משתנה לתוך הטקסט במיקום הסמן
+  const insertVar = (varKey) => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const newBody = form.body.slice(0, start) + varKey + form.body.slice(end);
+    set("body", newBody);
+    setTimeout(() => {
+      ta.focus();
+      ta.setSelectionRange(start + varKey.length, start + varKey.length);
+    }, 0);
+  };
 
   const handleSubmit = () => {
     if (!form.title.trim()) return;
@@ -42,8 +74,7 @@ export default function DocumentModal({ doc, lead, customer, onSubmit, onClose }
       notes: form.body,
       amount: parseFloat(form.price) || 0,
       valid_until: form.valid_until,
-      status: form.status,
-      // שדות ריקים כדי לא לבלבל עם הצעת מחיר רגילה
+      status: "טיוטה",
       items: [],
       discount: 0,
       vat_included: false,
@@ -53,7 +84,7 @@ export default function DocumentModal({ doc, lead, customer, onSubmit, onClose }
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <FileText className="w-5 h-5 text-blue-600" />
@@ -63,42 +94,49 @@ export default function DocumentModal({ doc, lead, customer, onSubmit, onClose }
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          {/* כותרת + סטטוס */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>כותרת המסמך *</Label>
-              <Input
-                autoFocus
-                value={form.title}
-                onChange={e => set("title", e.target.value)}
-                placeholder="לדוגמה: הסכם שירות אוטומציה"
-              />
+          {/* כותרת */}
+          <div className="space-y-1.5">
+            <Label>כותרת המסמך *</Label>
+            <Input
+              autoFocus
+              value={form.title}
+              onChange={e => set("title", e.target.value)}
+              placeholder="לדוגמה: הסכם שירות — אוטומציה"
+            />
+          </div>
+
+          {/* משתנים */}
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
+            <p className="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-2">
+              <Tag className="w-3.5 h-3.5" /> משתנים — לחץ להוספה בטקסט
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {VARIABLES.map(v => (
+                <button
+                  key={v.key}
+                  type="button"
+                  onClick={() => insertVar(v.key)}
+                  className="px-2 py-1 text-xs bg-white border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-mono"
+                >
+                  {v.key} <span className="text-gray-400 font-sans">({v.label})</span>
+                </button>
+              ))}
             </div>
-            <div className="space-y-1.5">
-              <Label>סטטוס</Label>
-              <Select value={form.status} onValueChange={v => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="טיוטה">טיוטה</SelectItem>
-                  <SelectItem value="נשלח">נשלח</SelectItem>
-                  <SelectItem value="אושר">אושר</SelectItem>
-                  <SelectItem value="בוטל">בוטל</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <p className="text-[10px] text-blue-400 mt-2">ערכים אלו יתמלאו אוטומטית מנתוני הליד בעת יצירת המסמך</p>
           </div>
 
           {/* תוכן חופשי */}
           <div className="space-y-1.5">
             <Label>תוכן המסמך</Label>
             <Textarea
-              rows={12}
+              ref={textareaRef}
+              rows={16}
               value={form.body}
               onChange={e => set("body", e.target.value)}
               placeholder="כתוב כאן את תוכן הסכם העבודה..."
               className="resize-y font-mono text-sm leading-relaxed"
+              dir="rtl"
             />
-            <p className="text-xs text-gray-400">מלל חופשי — תיאור השירות, תהליך עבודה, תנאים</p>
           </div>
 
           {/* מחיר + תוקף */}

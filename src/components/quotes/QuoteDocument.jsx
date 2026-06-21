@@ -3,11 +3,27 @@ import { X, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
+const today = () => format(new Date(), "dd/MM/yyyy", { locale: he });
+
+const substituteVars = (text, lead, price) => {
+  if (!text) return "";
+  const blank = "_______________";
+  return text
+    .replace(/\{customer-name\}/g,     lead?.full_name     || blank)
+    .replace(/\{customer-id\}/g,       blank)
+    .replace(/\{customer-email\}/g,    lead?.email         || blank)
+    .replace(/\{customer-phone\}/g,    lead?.phone         || blank)
+    .replace(/\{customer-business\}/g, lead?.company_name  || blank)
+    .replace(/\{customer-address\}/g,  blank)
+    .replace(/\{current-date\}/g,      today())
+    .replace(/\{price\}/g,             price ? `₪${parseFloat(price).toLocaleString()}` : blank)
+    .replace(/\{signature\}/g,         "________________________");
+};
+
 export default function QuoteDocument({ quote, lead, onClose }) {
   const printRef = useRef();
-  const today = format(new Date(), "dd/MM/yyyy", { locale: he });
+  const body = substituteVars(quote?.notes || "", lead, quote?.amount);
   const price = parseFloat(quote?.amount) || 0;
-  const body = quote?.notes || "";
 
   const handlePrint = () => {
     const content = printRef.current.innerHTML;
@@ -20,26 +36,21 @@ export default function QuoteDocument({ quote, lead, onClose }) {
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
             body { font-family: 'Segoe UI', Arial, sans-serif; direction: rtl; color: #111; background: white; }
-            .page { max-width: 800px; margin: 0 auto; padding: 50px 50px 60px; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; padding-bottom: 24px; border-bottom: 3px solid #2563eb; }
-            .brand h1 { font-size: 28px; font-weight: 900; color: #2563eb; letter-spacing: -0.5px; }
-            .brand p { font-size: 13px; color: #9ca3af; margin-top: 3px; }
-            .doc-info { text-align: left; }
-            .doc-info h2 { font-size: 18px; font-weight: 700; color: #111; }
-            .doc-info p { font-size: 12px; color: #9ca3af; margin-top: 4px; }
-            .recipient-box { background: #f8fafc; border-radius: 10px; padding: 16px 20px; margin-bottom: 28px; }
-            .recipient-box .lbl { font-size: 10px; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-            .recipient-box .name { font-size: 16px; font-weight: 700; color: #1e293b; }
-            .recipient-box .sub { font-size: 13px; color: #64748b; margin-top: 2px; }
-            .body-text { font-size: 14.5px; line-height: 2; color: #1e293b; white-space: pre-wrap; margin-bottom: 32px; }
-            .price-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-            .price-box .lbl { font-size: 14px; color: #3b82f6; font-weight: 600; }
-            .price-box .amount { font-size: 26px; font-weight: 900; color: #1d4ed8; }
-            .validity { font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 40px; }
-            .sig-row { display: flex; gap: 60px; margin-top: 20px; }
-            .sig-line { flex: 1; border-top: 1px solid #cbd5e1; padding-top: 8px; font-size: 12px; color: #94a3b8; text-align: center; }
-            .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; font-size: 11px; color: #9ca3af; }
-            @media print { .page { padding: 30px; } }
+            .page { max-width: 820px; margin: 0 auto; padding: 54px 60px 70px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 3px solid #2563eb; }
+            .brand h1 { font-size: 26px; font-weight: 900; color: #2563eb; }
+            .brand p { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+            .doc-meta { text-align: left; }
+            .doc-meta h2 { font-size: 17px; font-weight: 700; color: #1e293b; }
+            .doc-meta p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+            .body-text { font-size: 14px; line-height: 2.1; color: #1e293b; white-space: pre-wrap; margin-bottom: 36px; }
+            .price-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 44px; }
+            .price-box .lbl { font-size: 13px; color: #3b82f6; font-weight: 600; }
+            .price-box .amt { font-size: 24px; font-weight: 900; color: #1d4ed8; }
+            .sig-row { display: flex; gap: 60px; margin-top: 10px; }
+            .sig-line { flex: 1; border-top: 1px solid #94a3b8; padding-top: 8px; font-size: 11px; color: #94a3b8; text-align: center; }
+            .footer { margin-top: 50px; padding-top: 14px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
+            @media print { .page { padding: 30px 40px; } }
           </style>
         </head>
         <body><div class="page">${content}</div></body>
@@ -65,62 +76,57 @@ export default function QuoteDocument({ quote, lead, onClose }) {
           </button>
         </div>
 
-        {/* Document body */}
-        <div ref={printRef} className="px-12 py-10" dir="rtl" style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
+        {/* Document */}
+        <div ref={printRef} className="px-14 py-10" dir="rtl"
+          style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
 
           {/* Header */}
-          <div className="flex justify-between items-start mb-9 pb-6 border-b-4 border-blue-600">
+          <div className="flex justify-between items-start mb-8 pb-5 border-b-[3px] border-blue-600">
             <div>
-              <h1 className="text-3xl font-black text-blue-600 tracking-tight">EH Automation</h1>
-              <p className="text-gray-400 text-sm mt-1">אלעד חנינה • 054-710-8219</p>
+              <h1 className="text-2xl font-black text-blue-600">EH Automation</h1>
+              <p className="text-gray-400 text-xs mt-1">אלעד חנינה • 054-710-8219</p>
             </div>
             <div className="text-left">
-              <h2 className="text-xl font-bold text-gray-800">{quote?.title || "מסמך"}</h2>
-              <p className="text-sm text-gray-400 mt-1">תאריך: {today}</p>
+              <h2 className="text-lg font-bold text-gray-800">{quote?.title || "הסכם עבודה"}</h2>
+              <p className="text-xs text-gray-400 mt-1">תאריך: {today()}</p>
               {quote?.valid_until && (
-                <p className="text-sm text-gray-400">
+                <p className="text-xs text-gray-400">
                   בתוקף עד: {format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Recipient */}
-          {(lead?.full_name || lead?.company_name) && (
-            <div className="bg-slate-50 rounded-xl p-5 mb-8">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-2">מוגש עבור</p>
-              <p className="text-lg font-bold text-gray-800">{lead.full_name}</p>
-              {lead.company_name && <p className="text-sm text-gray-500 mt-0.5">{lead.company_name}</p>}
-              {lead.phone && <p className="text-sm text-gray-500">{lead.phone}</p>}
-              {lead.email && <p className="text-sm text-gray-500">{lead.email}</p>}
-            </div>
-          )}
-
-          {/* Body — free text */}
+          {/* Body */}
           {body && (
-            <div className="text-[14.5px] leading-loose text-gray-800 whitespace-pre-wrap mb-8" style={{ lineHeight: "2" }}>
+            <div className="text-sm text-gray-800 whitespace-pre-wrap mb-8"
+              style={{ lineHeight: "2.1" }}>
               {body}
             </div>
           )}
 
           {/* Price */}
           {price > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl px-6 py-4 flex justify-between items-center mb-8">
-              <span className="text-base font-semibold text-blue-600">סכום הסכם</span>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 flex justify-between items-center mb-10">
+              <span className="text-sm font-semibold text-blue-600">סכום הסכם</span>
               <span className="text-2xl font-black text-blue-700">₪{price.toLocaleString()}</span>
             </div>
           )}
 
-          {/* Signature lines */}
+          {/* Signature */}
           <div className="flex gap-16 mt-14">
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">חתימת הלקוח ותאריך</div>
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">EH Automation — אלעד חנינה</div>
+            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
+              חתימת הלקוח ותאריך
+            </div>
+            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
+              EH Automation — אלעד חנינה
+            </div>
           </div>
 
           {/* Footer */}
-          <div className="mt-10 pt-4 border-t border-gray-100 flex justify-between text-xs text-gray-400">
+          <div className="mt-10 pt-4 border-t border-gray-100 flex justify-between text-[11px] text-gray-400">
             <span>EH Automation • אלעד חנינה • 054-710-8219</span>
-            <span>הופק: {today}</span>
+            <span>הופק: {today()}</span>
           </div>
         </div>
       </div>
