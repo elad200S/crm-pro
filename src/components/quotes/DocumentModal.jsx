@@ -1,21 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Tag } from "lucide-react";
+import { FileText, Tag, User } from "lucide-react";
 
 const VARIABLES = [
-  { key: "{customer-name}",     label: "שם לקוח" },
-  { key: "{customer-id}",       label: 'ח"פ / ת"ז' },
-  { key: "{customer-email}",    label: "מייל" },
-  { key: "{customer-phone}",    label: "טלפון" },
-  { key: "{customer-business}", label: "שם העסק" },
-  { key: "{customer-address}",  label: "כתובת" },
-  { key: "{current-date}",      label: "תאריך היום" },
-  { key: "{price}",             label: "מחיר" },
-  { key: "{signature}",         label: "חתימה" },
+  { key: "{customer-name}",     label: "שם לקוח",   autoField: "full_name" },
+  { key: "{customer-id}",       label: 'ח"פ / ת"ז', autoField: null },
+  { key: "{customer-email}",    label: "מייל",       autoField: "email" },
+  { key: "{customer-phone}",    label: "טלפון",      autoField: "phone" },
+  { key: "{customer-business}", label: "שם העסק",   autoField: "company_name" },
+  { key: "{customer-address}",  label: "כתובת העסק", autoField: null },
+  { key: "{current-date}",      label: "תאריך היום", autoField: "__date__" },
+  { key: "{price}",             label: "מחיר",       autoField: "__price__" },
+  { key: "{signature}",         label: "חתימה",      autoField: "__sig__" },
 ];
 
 const DEFAULT_BODY = `{customer-name}
@@ -39,8 +39,21 @@ const DEFAULT_BODY = `{customer-name}
 
 חתימת המזמין: {signature}`;
 
+// מזהה אילו משתנים קיימים בטקסט ואין להם ערך אוטומטי מהליד
+const detectMissingVars = (body, lead) => {
+  return VARIABLES.filter(v => {
+    if (!body.includes(v.key)) return false;          // לא בשימוש בטקסט
+    if (v.autoField === "__date__") return false;     // תאריך — אוטומטי
+    if (v.autoField === "__price__") return false;    // מחיר — בשדה נפרד
+    if (v.autoField === "__sig__") return false;      // חתימה — placeholder
+    if (v.autoField && lead?.[v.autoField]) return false; // יש ערך בליד
+    return true;                                       // חסר
+  });
+};
+
 export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
   const isNew = !doc?.id;
+  const hasLead = !!lead;
   const entityName = lead?.full_name || null;
   const textareaRef = useRef();
 
@@ -51,7 +64,17 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
     valid_until: doc?.valid_until || "",
   });
 
+  // שדות ידניים שהמשתמש ימלא
+  const [manualVars, setManualVars] = useState({});
+
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const setVar = (k, v) => setManualVars(m => ({ ...m, [k]: v }));
+
+  // משתנים חסרים (לא ממולאים מהליד)
+  const missingVars = useMemo(
+    () => hasLead ? detectMissingVars(form.body, lead) : [],
+    [form.body, lead]
+  );
 
   // מוסיף משתנה לתוך הטקסט במיקום הסמן
   const insertVar = (varKey) => {
@@ -69,9 +92,14 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
 
   const handleSubmit = () => {
     if (!form.title.trim()) return;
+    // שמור את הערכים הידניים בתוך הטקסט לפני שמירה
+    let finalBody = form.body;
+    Object.entries(manualVars).forEach(([key, val]) => {
+      if (val) finalBody = finalBody.replaceAll(key, val);
+    });
     onSubmit({
       title: form.title,
-      notes: form.body,
+      notes: finalBody,
       amount: parseFloat(form.price) || 0,
       valid_until: form.valid_until,
       status: "טיוטה",
@@ -105,27 +133,52 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
             />
           </div>
 
-          {/* משתנים */}
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
-            <p className="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-2">
-              <Tag className="w-3.5 h-3.5" /> משתנים — לחץ להוספה בטקסט
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {VARIABLES.map(v => (
-                <button
-                  key={v.key}
-                  type="button"
-                  onClick={() => insertVar(v.key)}
-                  className="px-2 py-1 text-xs bg-white border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-mono"
-                >
-                  {v.key} <span className="text-gray-400 font-sans">({v.label})</span>
-                </button>
-              ))}
+          {/* שדות ידניים — רק כשיש ליד ויש משתנים חסרים */}
+          {hasLead && missingVars.length > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <p className="text-xs font-semibold text-amber-700 flex items-center gap-1.5 mb-3">
+                <User className="w-3.5 h-3.5" />
+                פרטי לקוח חסרים — מלא לפני שליחה
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {missingVars.map(v => (
+                  <div key={v.key} className="space-y-1">
+                    <Label className="text-xs text-amber-800">{v.label}</Label>
+                    <Input
+                      value={manualVars[v.key] || ""}
+                      onChange={e => setVar(v.key, e.target.value)}
+                      placeholder={v.label}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <p className="text-[10px] text-blue-400 mt-2">ערכים אלו יתמלאו אוטומטית מנתוני הליד בעת יצירת המסמך</p>
-          </div>
+          )}
 
-          {/* תוכן חופשי */}
+          {/* משתנים זמינים (כשלא יש ליד — עורכים תבנית) */}
+          {!hasLead && (
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
+              <p className="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-2">
+                <Tag className="w-3.5 h-3.5" /> משתנים — לחץ להוספה בטקסט
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {VARIABLES.map(v => (
+                  <button
+                    key={v.key}
+                    type="button"
+                    onClick={() => insertVar(v.key)}
+                    className="px-2 py-1 text-xs bg-white border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-mono"
+                  >
+                    {v.key} <span className="text-gray-400 font-sans">({v.label})</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-blue-400 mt-2">ערכים אלו יתמלאו אוטומטית מנתוני הליד בעת יצירת מסמך ללקוח</p>
+            </div>
+          )}
+
+          {/* תוכן */}
           <div className="space-y-1.5">
             <Label>תוכן המסמך</Label>
             <Textarea
