@@ -1,46 +1,58 @@
-import React, { useRef } from "react";
-import { X, Printer, Mail, MessageCircle } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { X, Printer, Mail, MessageCircle, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 
-const today = () => format(new Date(), "dd/MM/yyyy", { locale: he });
+const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
-const substituteVars = (text, lead, price) => {
+// משתנים שהלקוח חייב למלא (לא ניתן לאחזר מהליד)
+const CLIENT_FILL_VARS = [
+  { key: "{customer-id}",      label: 'ח"פ / ת"ז' },
+  { key: "{customer-address}", label: "כתובת העסק" },
+];
+
+const substituteAll = (text, lead, price, clientData = {}) => {
   if (!text) return "";
   const blank = "_______________";
   return text
     .replace(/\{customer-name\}/g,     lead?.full_name     || blank)
-    .replace(/\{customer-id\}/g,       blank)
     .replace(/\{customer-email\}/g,    lead?.email         || blank)
     .replace(/\{customer-phone\}/g,    lead?.phone         || blank)
     .replace(/\{customer-business\}/g, lead?.company_name  || blank)
-    .replace(/\{customer-address\}/g,  blank)
-    .replace(/\{current-date\}/g,      today())
+    .replace(/\{customer-id\}/g,       clientData["{customer-id}"]      || blank)
+    .replace(/\{customer-address\}/g,  clientData["{customer-address}"] || blank)
+    .replace(/\{current-date\}/g,      todayStr())
     .replace(/\{price\}/g,             price ? `₪${parseFloat(price).toLocaleString()}` : blank)
     .replace(/\{signature\}/g,         "________________________");
 };
 
-export default function QuoteDocument({ quote, lead, onClose }) {
+export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   const printRef = useRef();
-  const body = substituteVars(quote?.notes || "", lead, quote?.amount);
-  const price = parseFloat(quote?.amount) || 0;
+  const rawBody  = quote?.notes || "";
+  const price    = parseFloat(quote?.amount) || 0;
 
-  const handleWhatsApp = () => {
-    const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
-    const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
-    const text = encodeURIComponent(
-      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_EH Automation — אלעד חנינה | 054-710-8219_`
-    );
-    window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
-  };
+  // זיהוי אילו משתנים של לקוח קיימים בטקסט ועדיין לא מולאו
+  const neededVars = CLIENT_FILL_VARS.filter(v => rawBody.includes(v.key));
+  const [clientData, setClientData] = useState({});
+  const [gateSubmitted, setGateSubmitted] = useState(neededVars.length === 0);
+  const [approved, setApproved] = useState(false);
 
-  const handleEmail = () => {
-    const to = lead?.email || "";
-    const subject = encodeURIComponent(quote?.title || "הסכם עבודה");
-    const bodyText = encodeURIComponent(
-      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו:\n\n${body}\n\nבברכה,\nEH Automation — אלעד חנינה\n054-710-8219`
-    );
-    window.open(`mailto:${to}?subject=${subject}&body=${bodyText}`, "_blank");
+  const body = substituteAll(rawBody, lead, quote?.amount, clientData);
+
+  const allFilled = neededVars.every(v => (clientData[v.key] || "").trim() !== "");
+
+  const handleApprove = async () => {
+    try {
+      if (quote?.id) {
+        await base44.entities.Quote.update(quote.id, { status: "אושר" });
+      }
+    } catch {}
+    setApproved(true);
+    if (onApprove) onApprove();
   };
 
   const handlePrint = () => {
@@ -79,13 +91,80 @@ export default function QuoteDocument({ quote, lead, onClose }) {
     setTimeout(() => { win.print(); win.close(); }, 300);
   };
 
+  const handleWhatsApp = () => {
+    const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
+    const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
+    const text = encodeURIComponent(
+      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_EH Automation — אלעד חנינה | 054-710-8219_`
+    );
+    window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
+  };
+
+  const handleEmail = () => {
+    const to = lead?.email || "";
+    const subject = encodeURIComponent(quote?.title || "הסכם עבודה");
+    const bodyText = encodeURIComponent(
+      `שלום ${lead?.full_name || ""},\n\n${body}\n\nבברכה,\nEH Automation — אלעד חנינה\n054-710-8219`
+    );
+    window.open(`mailto:${to}?subject=${subject}&body=${bodyText}`, "_blank");
+  };
+
+  // ── שלב 1: טופס פרטי לקוח ──────────────────────────────────────────────
+  if (!gateSubmitted) {
+    return (
+      <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8" dir="rtl">
+          <div className="text-center mb-6">
+            <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">📋</span>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">{quote?.title || "הסכם עבודה"}</h2>
+            <p className="text-sm text-gray-500 mt-1">מאת EH Automation — אלעד חנינה</p>
+          </div>
+
+          <div className="bg-blue-50 rounded-xl p-4 mb-6">
+            <p className="text-sm text-blue-700 font-medium mb-1">לפני הצפייה במסמך</p>
+            <p className="text-xs text-blue-500">יש למלא את הפרטים הבאים — הם יופיעו בהסכם</p>
+          </div>
+
+          <div className="space-y-4">
+            {neededVars.map(v => (
+              <div key={v.key} className="space-y-1.5">
+                <Label className="text-sm font-medium">{v.label} *</Label>
+                <Input
+                  value={clientData[v.key] || ""}
+                  onChange={e => setClientData(d => ({ ...d, [v.key]: e.target.value }))}
+                  placeholder={`הזן ${v.label}`}
+                  className="h-10"
+                />
+              </div>
+            ))}
+          </div>
+
+          <Button
+            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 h-11 text-base"
+            disabled={!allFilled}
+            onClick={() => setGateSubmitted(true)}
+          >
+            צפה בהסכם ←
+          </Button>
+
+          <p className="text-xs text-gray-400 text-center mt-3">
+            הפרטים ישמשו לצורך הסכם זה בלבד
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── שלב 2: המסמך ───────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-start justify-center overflow-y-auto py-8">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4">
 
         {/* Toolbar */}
-        <div className="flex items-center justify-between px-6 py-3 border-b bg-gray-50 rounded-t-2xl">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between px-6 py-3 border-b bg-gray-50 rounded-t-2xl flex-wrap gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button onClick={handlePrint}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
               <Printer className="w-4 h-4" /> הדפסה / PDF
@@ -112,7 +191,6 @@ export default function QuoteDocument({ quote, lead, onClose }) {
         <div ref={printRef} className="px-14 py-10" dir="rtl"
           style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
 
-          {/* Header */}
           <div className="flex justify-between items-start mb-8 pb-5 border-b-[3px] border-blue-600">
             <div>
               <h1 className="text-2xl font-black text-blue-600">EH Automation</h1>
@@ -120,7 +198,7 @@ export default function QuoteDocument({ quote, lead, onClose }) {
             </div>
             <div className="text-left">
               <h2 className="text-lg font-bold text-gray-800">{quote?.title || "הסכם עבודה"}</h2>
-              <p className="text-xs text-gray-400 mt-1">תאריך: {today()}</p>
+              <p className="text-xs text-gray-400 mt-1">תאריך: {todayStr()}</p>
               {quote?.valid_until && (
                 <p className="text-xs text-gray-400">
                   בתוקף עד: {format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}
@@ -129,7 +207,6 @@ export default function QuoteDocument({ quote, lead, onClose }) {
             </div>
           </div>
 
-          {/* Body */}
           {body && (
             <div className="text-sm text-gray-800 whitespace-pre-wrap mb-8"
               style={{ lineHeight: "2.1" }}>
@@ -137,7 +214,6 @@ export default function QuoteDocument({ quote, lead, onClose }) {
             </div>
           )}
 
-          {/* Price */}
           {price > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 flex justify-between items-center mb-10">
               <span className="text-sm font-semibold text-blue-600">סכום הסכם</span>
@@ -145,21 +221,34 @@ export default function QuoteDocument({ quote, lead, onClose }) {
             </div>
           )}
 
-          {/* Signature */}
           <div className="flex gap-16 mt-14">
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
-              חתימת הלקוח ותאריך
-            </div>
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
-              EH Automation — אלעד חנינה
-            </div>
+            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">חתימת הלקוח ותאריך</div>
+            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">EH Automation — אלעד חנינה</div>
           </div>
 
-          {/* Footer */}
           <div className="mt-10 pt-4 border-t border-gray-100 flex justify-between text-[11px] text-gray-400">
             <span>EH Automation • אלעד חנינה • 054-710-8219</span>
-            <span>הופק: {today()}</span>
+            <span>הופק: {todayStr()}</span>
           </div>
+        </div>
+
+        {/* אישור הסכם */}
+        <div className="px-8 pb-8">
+          {approved ? (
+            <div className="flex items-center justify-center gap-2 bg-green-50 border border-green-200 rounded-xl p-4 text-green-700 font-semibold">
+              <CheckCircle className="w-5 h-5" /> ההסכם אושר ונחתם — {todayStr()}
+            </div>
+          ) : (
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+              <p className="text-sm text-gray-600 mb-3">קראתי את ההסכם ואני מסכים לתנאיו</p>
+              <Button
+                onClick={handleApprove}
+                className="bg-green-600 hover:bg-green-700 text-white px-8"
+              >
+                <CheckCircle className="w-4 h-4 ml-2" /> אישור וחתימה
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
