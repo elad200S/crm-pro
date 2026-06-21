@@ -1,6 +1,5 @@
-import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Phone, MessageCircle, FileText, Plus, Edit, Trash2, UserCheck, Clock, AlertTriangle } from "lucide-react";
+import { MessageCircle, FileText, Plus, Edit, Trash2, UserCheck, Clock, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -45,11 +44,11 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex gap-3 overflow-x-auto pb-4 pt-1 px-1" style={{ minHeight: "60vh" }}>
+      <div className="grid grid-cols-6 gap-2 pb-4 pt-1" style={{ minHeight: "60vh" }}>
         {COLUMNS.map(col => {
           const colLeads = leads.filter(l => l.status === col.id);
           return (
-            <div key={col.id} className="flex-shrink-0 w-60 flex flex-col">
+            <div key={col.id} className="min-w-0 flex flex-col">
               {/* Header */}
               <div className={`flex items-center justify-between px-3 py-2.5 rounded-t-xl border ${col.headerBg} ${col.border}`}>
                 <div className="flex items-center gap-2">
