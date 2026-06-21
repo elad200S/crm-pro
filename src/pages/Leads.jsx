@@ -10,6 +10,7 @@ import LeadStatsCards from "../components/leads/LeadStatsCards";
 import LeadFilters from "../components/leads/LeadFilters";
 import LeadCards from "../components/leads/LeadCards";
 import LeadKanban from "../components/leads/LeadKanban";
+import LeadTable from "../components/leads/LeadTable";
 import LeadForm from "../components/leads/LeadForm";
 import QuoteModal from "../components/leads/QuoteModal";
 import AddTaskModal from "../components/leads/AddTaskModal";
@@ -314,6 +315,15 @@ export default function Leads() {
               <Kanban className="w-3.5 h-3.5" />
               קנבן
             </button>
+            <button
+              onClick={() => switchView("table")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                viewMode === "table" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              רשימה
+            </button>
           </div>
           <Button variant="outline" size="sm" onClick={exportToCSV}>
             <Download className="w-4 h-4 ml-1.5" />
@@ -349,9 +359,23 @@ export default function Leads() {
         />
       )}
 
-      {/* Cards / Kanban */}
+      {/* Cards / Kanban / Table */}
       {viewMode === "kanban" ? (
         <LeadKanban
+          leads={filtered}
+          users={users}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={setDeleteTarget}
+          onWhatsApp={handleWhatsApp}
+          onQuote={setQuoteTarget}
+          onTask={setTaskTarget}
+          onConvert={handleConvertClick}
+          onRowClick={setSelectedLead}
+          onStatusChange={handleStatusChange}
+        />
+      ) : viewMode === "table" ? (
+        <LeadTable
           leads={filtered}
           users={users}
           loading={loading}
