@@ -198,81 +198,50 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       <div className="flex h-full pt-16 lg:pt-0">
-        {/* Desktop Sidebar - FIXED */}
-        <aside className="hidden lg:flex lg:flex-col w-56 bg-slate-900 flex-shrink-0 overflow-hidden">
+        {/* Desktop Sidebar */}
+        <aside className="hidden lg:flex lg:flex-col w-[72px] bg-white border-l border-gray-100 shadow-sm flex-shrink-0 overflow-hidden">
           <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="px-4 py-4 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-                  <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Building2 className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold text-white block leading-tight">CRM Pro</span>
-                    <span className="text-xs text-slate-400 leading-tight">ניהול לקוחות</span>
-                  </div>
-                </Link>
-                <NotificationBell />
+            <div className="flex flex-col items-center py-4 border-b border-gray-100 flex-shrink-0 gap-1">
+              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-white" />
               </div>
+              <NotificationBell />
             </div>
 
             {/* Nav Items */}
-            <div className="flex-1 overflow-y-auto py-2 px-2">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest px-2 mb-2">תפריט</p>
-              <nav className="space-y-0.5">
-                {visibleNavItems.map((item) => (
+            <div className="flex-1 overflow-y-auto py-3 flex flex-col items-center gap-0.5">
+              {visibleNavItems.map((item) => {
+                const active = location.pathname === item.url;
+                return (
                   <Link
                     key={item.title}
                     to={item.url}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
-                      location.pathname === item.url
-                        ? 'bg-blue-600 text-white font-medium shadow-sm'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                    }`}
+                    title={item.title}
+                    className={`flex flex-col items-center gap-1 w-full px-1 py-2.5 transition-all duration-150 relative group
+                      ${active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-700'}`}
                   >
-                    <item.icon className="w-4 h-4 flex-shrink-0" />
-                    <span>{item.title}</span>
+                    {active && (
+                      <span className="absolute right-0 top-2 bottom-2 w-0.5 bg-blue-600 rounded-l-full" />
+                    )}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors
+                      ${active ? 'bg-blue-50' : 'group-hover:bg-gray-50'}`}>
+                      <item.icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-medium leading-tight text-center line-clamp-1 w-full px-0.5">
+                      {item.title}
+                    </span>
                   </Link>
-                ))}
-              </nav>
-
-              {/* Live Stats */}
-              <div className="mt-4 mx-1 bg-slate-800 rounded-xl p-3 space-y-2.5">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">היום</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">לקוחות פעילים</span>
-                  <span className="text-sm font-bold text-white">{sidebarStats.activeCustomers ?? "—"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">תשלומים פתוחים</span>
-                  <span className="text-sm font-bold text-amber-400">{sidebarStats.pendingPayments ?? "—"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-slate-400">הכנסות החודש</span>
-                  <span className="text-sm font-bold text-emerald-400">
-                    {sidebarStats.monthlyRevenue != null ? `₪${sidebarStats.monthlyRevenue.toLocaleString()}` : "—"}
-                  </span>
-                </div>
-              </div>
+                );
+              })}
             </div>
 
-            {/* User Info */}
-            <div className="px-3 py-3 border-t border-slate-800 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs font-bold">
-                    {currentUser?.full_name?.charAt(0) || "מ"}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-white truncate">
-                    {currentUser?.full_name || "משתמש המערכת"}
-                  </p>
-                  <p className="text-xs text-slate-400 truncate">
-                    {currentUser?.job_title || currentUser?.user_category?.replace(/_/g, ' ') || "משתמש"}
-                  </p>
-                </div>
+            {/* User avatar */}
+            <div className="flex flex-col items-center py-3 border-t border-gray-100 flex-shrink-0">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">
+                  {currentUser?.full_name?.charAt(0) || "מ"}
+                </span>
               </div>
             </div>
           </div>
