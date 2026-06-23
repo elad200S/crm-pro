@@ -38,7 +38,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   // זיהוי אילו משתנים של לקוח קיימים בטקסט ועדיין לא מולאו
   const neededVars = CLIENT_FILL_VARS.filter(v => rawBody.includes(v.key));
   const [clientData, setClientData] = useState({});
-  const [gateSubmitted, setGateSubmitted] = useState(neededVars.length === 0);
+  const [gateSubmitted, setGateSubmitted] = useState();
   const [approved, setApproved] = useState(false);
 
   const body = substituteAll(rawBody, lead, quote?.amount, clientData);
