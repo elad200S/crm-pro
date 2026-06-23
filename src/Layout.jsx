@@ -199,18 +199,20 @@ export default function Layout({ children, currentPageName }) {
 
       <div className="flex h-full pt-16 lg:pt-0">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex lg:flex-col w-[72px] bg-white border-l border-gray-100 shadow-sm flex-shrink-0 overflow-hidden">
+        <aside className="hidden lg:flex lg:flex-col w-[72px] bg-slate-800 flex-shrink-0 overflow-hidden shadow-xl">
           <div className="flex flex-col h-full">
-            {/* Logo */}
-            <div className="flex flex-col items-center py-4 border-b border-gray-100 flex-shrink-0 gap-1">
-              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
+            {/* Logo header — gradient */}
+            <div className="flex flex-col items-center py-4 flex-shrink-0 gap-2 bg-gradient-to-b from-blue-600 to-violet-600">
+              <Link to={createPageUrl("Dashboard")}>
+                <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center hover:bg-white/30 transition-colors">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+              </Link>
               <NotificationBell />
             </div>
 
-            {/* Nav Items — distributed evenly, no scroll */}
-            <nav className="flex-1 flex flex-col items-center justify-evenly py-2">
+            {/* Nav Items */}
+            <nav className="flex-1 flex flex-col items-center justify-evenly py-3">
               {visibleNavItems.map((item) => {
                 const active = location.pathname === item.url;
                 return (
@@ -218,17 +220,20 @@ export default function Layout({ children, currentPageName }) {
                     key={item.title}
                     to={item.url}
                     title={item.title}
-                    className={`flex flex-col items-center gap-0.5 w-full px-1 py-1.5 transition-all duration-150 relative group
-                      ${active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-700'}`}
+                    className="flex flex-col items-center gap-0.5 w-full px-1 py-1 relative group"
                   >
                     {active && (
-                      <span className="absolute right-0 top-1 bottom-1 w-0.5 bg-blue-600 rounded-l-full" />
+                      <span className="absolute right-0 top-1 bottom-1 w-[3px] bg-violet-400 rounded-l-full" />
                     )}
-                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors
-                      ${active ? 'bg-blue-50' : 'group-hover:bg-gray-50'}`}>
-                      <item.icon className="w-4.5 h-4.5 w-[18px] h-[18px]" />
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150
+                      ${active
+                        ? 'bg-white/15 text-white'
+                        : 'text-slate-400 hover:bg-white/8 hover:text-slate-200'
+                      }`}>
+                      <item.icon className="w-[18px] h-[18px]" />
                     </div>
-                    <span className="text-[9px] font-medium leading-tight text-center line-clamp-1 w-full px-0.5">
+                    <span className={`text-[9px] font-medium leading-tight text-center w-full px-0.5 transition-colors
+                      ${active ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'}`}>
                       {item.title}
                     </span>
                   </Link>
@@ -237,8 +242,8 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             {/* User avatar */}
-            <div className="flex flex-col items-center py-3 border-t border-gray-100 flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+            <div className="flex flex-col items-center py-3 border-t border-white/10 flex-shrink-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-violet-500 rounded-full flex items-center justify-center ring-2 ring-white/20">
                 <span className="text-white text-xs font-bold">
                   {currentUser?.full_name?.charAt(0) || "מ"}
                 </span>
