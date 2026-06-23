@@ -174,28 +174,69 @@ export default function Layout({ children, currentPageName }) {
         </div>
       </header>
 
-      {/* Mobile Menu - FIXED */}
+      {/* Mobile Sidebar — backdrop */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-gray-200 shadow-lg fixed top-16 left-0 right-0 z-[99] max-h-[calc(100vh-4rem)] overflow-y-auto">
-          <nav className="px-4 py-2">
-            {visibleNavItems.map((item) => (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/40 z-[98]"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar — slide panel */}
+      <div className={`lg:hidden fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[99] flex flex-col transform transition-transform duration-300 ease-in-out ${
+        mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        {/* Panel header */}
+        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+          <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+          <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
+            <span className="font-bold text-gray-900 text-base">CRM Pro</span>
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-white" />
+            </div>
+          </Link>
+        </div>
+
+        {/* Nav items */}
+        <nav className="flex-1 overflow-y-auto py-2">
+          {visibleNavItems.map((item) => {
+            const active = location.pathname === item.url;
+            return (
               <Link
                 key={item.title}
                 to={item.url}
-                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
-                  location.pathname === item.url
-                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                    : 'text-gray-700 hover:bg-gray-50'
-                }`}
                 onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center justify-between px-4 py-3 relative transition-colors ${
+                  active ? 'bg-purple-50' : 'hover:bg-gray-50'
+                }`}
               >
-                <item.icon className="w-5 h-5 flex-shrink-0" />
-                <span>{item.title}</span>
+                {active && (
+                  <span className="absolute right-0 top-2 bottom-2 w-[3px] bg-purple-500 rounded-l-full" />
+                )}
+                <span className={`text-sm font-medium ${active ? 'text-purple-700' : 'text-gray-600'}`}>
+                  {item.title}
+                </span>
+                <item.icon className={`w-5 h-5 flex-shrink-0 ${active ? 'text-purple-500' : 'text-gray-400'}`} />
               </Link>
-            ))}
-          </nav>
+            );
+          })}
+        </nav>
+
+        {/* User info at bottom */}
+        <div className="px-4 py-4 border-t border-gray-100">
+          <div className="flex items-center justify-end gap-3">
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900">{currentUser?.full_name || "משתמש"}</p>
+              <p className="text-xs text-gray-400">{currentUser?.job_title || ""}</p>
+            </div>
+            <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-sm font-bold">{currentUser?.full_name?.charAt(0) || "מ"}</span>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
 
       <div className="flex h-full pt-16 lg:pt-0">
         {/* Desktop Sidebar */}
