@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -68,6 +68,8 @@ export default function Layout({ children, currentPageName }) {
   const [loading, setLoading] = useState(true);
   const [visibleNavItems, setVisibleNavItems] = useState(navigationItems);
   const [sidebarStats, setSidebarStats] = useState({ activeCustomers: null, pendingPayments: null, monthlyRevenue: null });
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const touchStartX = useRef(null);
 
   useEffect(() => {
     checkUserOnboarding();
@@ -131,9 +133,24 @@ export default function Layout({ children, currentPageName }) {
 
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
-    if (notificationsOpen) {
-      setNotificationsOpen(false);
-    }
+    if (notificationsOpen) setNotificationsOpen(false);
+  };
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    setSwipeOffset(0);
+  };
+
+  const handleTouchMove = (e) => {
+    if (touchStartX.current === null) return;
+    const delta = e.touches[0].clientX - touchStartX.current;
+    if (delta > 0) setSwipeOffset(delta);
+  };
+
+  const handleTouchEnd = () => {
+    if (swipeOffset > 80) setMobileMenuOpen(false);
+    setSwipeOffset(0);
+    touchStartX.current = null;
   };
 
   const handleNotificationsToggle = (isOpen) => {
@@ -152,25 +169,21 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile Header - FIXED */}
       <header className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 shadow-sm fixed top-0 left-0 right-0 z-[100] h-16">
         <div className="flex items-center justify-between h-full">
-          <Link to={createPageUrl("Dashboard")} className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-lg font-semibold text-gray-900">CRM Pro</h1>
-          </Link>
           <div className="flex items-center gap-2">
-            <NotificationBell 
+            <Button variant="ghost" size="icon" onClick={handleMobileMenuToggle}>
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </Button>
+            <NotificationBell
               onOpenChange={handleNotificationsToggle}
               isOpen={notificationsOpen}
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleMobileMenuToggle}
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
           </div>
+          <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5">
+            <h1 className="text-lg font-semibold text-gray-900">CAI</h1>
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Building2 className="w-5 h-5 text-white" />
+            </div>
+          </Link>
         </div>
       </header>
 
@@ -183,16 +196,23 @@ export default function Layout({ children, currentPageName }) {
       )}
 
       {/* Mobile Sidebar — slide panel */}
-      <div className={`lg:hidden fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[99] flex flex-col transform transition-transform duration-300 ease-in-out ${
-        mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      <div
+        className="lg:hidden fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-[99] flex flex-col"
+        style={{
+          transform: mobileMenuOpen ? `translateX(${swipeOffset}px)` : 'translateX(100%)',
+          transition: swipeOffset > 0 ? 'none' : 'transform 0.3s ease-in-out',
+        }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {/* Panel header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
           <button onClick={() => setMobileMenuOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
             <X className="w-5 h-5 text-gray-400" />
           </button>
           <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
-            <span className="font-bold text-gray-900 text-base">CRM Pro</span>
+            <span className="font-bold text-gray-900 text-base">CAI</span>
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Building2 className="w-4 h-4 text-white" />
             </div>
