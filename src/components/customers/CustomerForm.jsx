@@ -15,6 +15,8 @@ export default function CustomerForm({ customer, onSubmit, onCancel }) {
     email: customer?.email || "",
     status: customer?.status || "חדש",
     company: customer?.company || "",
+    id_number: customer?.id_number || "",
+    business_address: customer?.business_address || "",
     source: customer?.source || "אתר",
     notes: customer?.notes || ""
   });
@@ -84,6 +86,24 @@ export default function CustomerForm({ customer, onSubmit, onCancel }) {
                 id="company"
                 value={formData.company}
                 onChange={(e) => handleChange("company", e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="id_number">ח"פ / ת"ז</Label>
+              <Input
+                id="id_number"
+                value={formData.id_number}
+                onChange={(e) => handleChange("id_number", e.target.value)}
+                placeholder="מספר ח״פ או ת״ז"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="business_address">כתובת העסק</Label>
+              <Input
+                id="business_address"
+                value={formData.business_address}
+                onChange={(e) => handleChange("business_address", e.target.value)}
+                placeholder="רחוב, עיר"
               />
             </div>
             <div className="space-y-2">

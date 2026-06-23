@@ -115,6 +115,8 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
                     ? format(new Date(customer.created_date), "dd/MM/yyyy", { locale: he })
                     : null
               } />
+              <Field label='ח"פ / ת"ז'    value={customer.id_number} />
+              <Field label="כתובת העסק"  value={customer.business_address} />
             </div>
 
             {customer.notes && (

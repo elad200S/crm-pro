@@ -8,11 +8,11 @@ import { FileText, Tag, User } from "lucide-react";
 
 const VARIABLES = [
   { key: "{customer-name}",     label: "שם לקוח",   autoField: "full_name" },
-  { key: "{customer-id}",       label: 'ח"פ / ת"ז', autoField: null },
+  { key: "{customer-id}",       label: 'ח"פ / ת"ז', autoField: "id_number" },
   { key: "{customer-email}",    label: "מייל",       autoField: "email" },
   { key: "{customer-phone}",    label: "טלפון",      autoField: "phone" },
   { key: "{customer-business}", label: "שם העסק",   autoField: "company_name" },
-  { key: "{customer-address}",  label: "כתובת העסק", autoField: null },
+  { key: "{customer-address}",  label: "כתובת העסק", autoField: "business_address" },
   { key: "{current-date}",      label: "תאריך היום", autoField: "__date__" },
   { key: "{price}",             label: "מחיר",       autoField: "__price__" },
   { key: "{signature}",         label: "חתימה",      autoField: "__sig__" },

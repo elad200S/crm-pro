@@ -101,8 +101,10 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   };
 
   const [linkCopied, setLinkCopied] = useState(false);
+  const [shortLinkCache, setShortLinkCache] = useState(null);
+  const [shorteningLink, setShorteningLink] = useState(false);
 
-  const generateSignLink = () => {
+  const buildRawLink = () => {
     const data = {
       id: quote?.id,
       title: quote?.title,
@@ -120,16 +122,36 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     return `${window.location.origin}/ClientSign?q=${encoded}`;
   };
 
-  const handleCopyLink = () => {
-    const link = generateSignLink();
+  const getSignLink = async () => {
+    if (shortLinkCache) return shortLinkCache;
+    const longUrl = buildRawLink();
+    setShorteningLink(true);
+    try {
+      const resp = await fetch(
+        `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`,
+        { signal: AbortSignal.timeout(5000) }
+      );
+      const short = await resp.text();
+      if (short.startsWith("https://tinyurl.com/")) {
+        setShortLinkCache(short);
+        setShorteningLink(false);
+        return short;
+      }
+    } catch {}
+    setShorteningLink(false);
+    return longUrl;
+  };
+
+  const handleCopyLink = async () => {
+    const link = await getSignLink();
     navigator.clipboard.writeText(link).then(() => {
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2500);
     });
   };
 
-  const handleSendLinkWhatsApp = () => {
-    const link = generateSignLink();
+  const handleSendLinkWhatsApp = async () => {
+    const link = await getSignLink();
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const msg = encodeURIComponent(
@@ -208,14 +230,16 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
               <Printer className="w-4 h-4" /> הדפסה / PDF
             </button>
             {lead?.phone && (
-              <button onClick={handleSendLinkWhatsApp}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">
-                <MessageCircle className="w-4 h-4" /> שלח קישור לחתימה
+              <button onClick={handleSendLinkWhatsApp} disabled={shorteningLink}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors disabled:opacity-60">
+                <MessageCircle className="w-4 h-4" />
+                {shorteningLink ? "מכין קישור..." : "שלח קישור לחתימה"}
               </button>
             )}
-            <button onClick={handleCopyLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors">
-              <Link2 className="w-4 h-4" /> {linkCopied ? "✓ הועתק!" : "העתק קישור"}
+            <button onClick={handleCopyLink} disabled={shorteningLink}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-60">
+              <Link2 className="w-4 h-4" />
+              {linkCopied ? "✓ הועתק!" : shorteningLink ? "מקצר..." : "העתק קישור"}
             </button>
             {lead?.email && (
               <button onClick={handleEmail}
