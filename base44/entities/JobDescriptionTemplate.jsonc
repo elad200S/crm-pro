@@ -37,5 +37,63 @@
     "title",
     "user_category",
     "file_url"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "user_category": "\u05de\u05e0\u05d4\u05dc_\u05e8\u05d0\u05e9\u05d9"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "user_category": "\u05de\u05e0\u05d4\u05dc_\u05e8\u05d0\u05e9\u05d9"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "user_category": "\u05de\u05e0\u05d4\u05dc_\u05e8\u05d0\u05e9\u05d9"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "user_category": "\u05de\u05e0\u05d4\u05dc_\u05e8\u05d0\u05e9\u05d9"
+          }
+        }
+      ]
+    }
+  }
 }
