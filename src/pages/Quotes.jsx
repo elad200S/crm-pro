@@ -66,7 +66,7 @@ export default function Quotes() {
   };
 
   const handleCreateSubmit = async (data) => {
-    await base44.entities.Quote.create(data);
+    await base44.entities.Quote.create({ ...data, status: "תבנית" });
     setCreatingDoc(false);
     await loadData();
   };

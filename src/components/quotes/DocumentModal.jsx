@@ -1,10 +1,12 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Tag, User } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileText, Tag, User, LayoutTemplate } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const VARIABLES = [
   { key: "{customer-name}",     label: "שם לקוח",   autoField: "full_name" },
@@ -56,6 +58,13 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
   const hasLead = !!lead;
   const entityName = lead?.full_name || null;
   const textareaRef = useRef();
+
+  const [templates, setTemplates] = useState([]);
+  useEffect(() => {
+    base44.entities.Quote.list('-created_date', 100).then(all => {
+      setTemplates(all.filter(q => q.status === "תבנית" && !q.lead_id && !q.customer_id));
+    }).catch(() => {});
+  }, []);
 
   const [form, setForm] = useState({
     title: doc?.title || "",
@@ -122,6 +131,33 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
         </DialogHeader>
 
         <div className="space-y-4 py-2">
+          {/* בחירת תבנית */}
+          {isNew && templates.length > 0 && (
+            <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-3">
+              <p className="text-xs font-semibold text-indigo-700 flex items-center gap-1.5 mb-2">
+                <LayoutTemplate className="w-3.5 h-3.5" />
+                בחר תבנית קיימת
+              </p>
+              <Select onValueChange={(val) => {
+                const t = templates.find(t => t.id === val);
+                if (t) {
+                  set("title", t.title || "");
+                  set("body", t.notes || "");
+                  set("price", t.amount || "");
+                }
+              }}>
+                <SelectTrigger className="h-8 text-sm bg-white">
+                  <SelectValue placeholder="בחר תבנית..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map(t => (
+                    <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* כותרת */}
           <div className="space-y-1.5">
             <Label>כותרת המסמך *</Label>

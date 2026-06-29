@@ -9,21 +9,26 @@ import { base44 } from "@/api/base44Client";
 
 const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
-const CLIENT_VARS = [
-  { key: "{customer-id}",      label: 'ח"פ / ת"ז',  required: true  },
-  { key: "{customer-address}", label: "כתובת העסק",  required: false },
+// כל השדות האפשריים — עם מיפוי לנתוני הליד ב-URL
+const ALL_VARS = [
+  { key: "{customer-id}",       label: 'ח"פ / ת"ז',    required: true,  leadField: "id_number" },
+  { key: "{customer-address}",  label: "כתובת העסק",    required: false, leadField: "business_address" },
+  { key: "{customer-email}",    label: "אימייל",         required: false, leadField: "email" },
+  { key: "{customer-business}", label: "שם העסק",       required: false, leadField: "company" },
+  { key: "{customer-name}",     label: "שם מלא",        required: false, leadField: "name" },
+  { key: "{customer-phone}",    label: "טלפון",          required: false, leadField: "phone" },
 ];
 
-const substituteAll = (text, lead, price, clientData) => {
+const substituteAll = (text, clientData, price) => {
   if (!text) return "";
   const blank = "_______________";
   return text
-    .replace(/\{customer-name\}/g,     lead?.name     || blank)
-    .replace(/\{customer-email\}/g,    lead?.email    || blank)
-    .replace(/\{customer-phone\}/g,    lead?.phone    || blank)
-    .replace(/\{customer-business\}/g, lead?.company  || blank)
-    .replace(/\{customer-id\}/g,       clientData["{customer-id}"]      || blank)
-    .replace(/\{customer-address\}/g,  clientData["{customer-address}"] || blank)
+    .replace(/\{customer-name\}/g,     clientData["{customer-name}"]     || blank)
+    .replace(/\{customer-email\}/g,    clientData["{customer-email}"]    || blank)
+    .replace(/\{customer-phone\}/g,    clientData["{customer-phone}"]    || blank)
+    .replace(/\{customer-business\}/g, clientData["{customer-business}"] || blank)
+    .replace(/\{customer-id\}/g,       clientData["{customer-id}"]       || blank)
+    .replace(/\{customer-address\}/g,  clientData["{customer-address}"]  || blank)
     .replace(/\{current-date\}/g,      todayStr())
     .replace(/\{price\}/g,             price ? `₪${parseFloat(price).toLocaleString()}` : blank)
     .replace(/\{signature\}/g,         "");
@@ -132,7 +137,7 @@ function SignaturePad({ onSignConfirmed }) {
 }
 
 // ─── הדפסה / PDF ─────────────────────────────────────────────────────────────
-function printDoc({ title, body, price, lead, signatureDataUrl }) {
+function printDoc({ title, body, price, clientData, signatureDataUrl }) {
   const signImg = signatureDataUrl
     ? `<img src="${signatureDataUrl}" style="max-height:70px;margin-top:4px;" />`
     : "";
@@ -165,7 +170,7 @@ function printDoc({ title, body, price, lead, signatureDataUrl }) {
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
       ${price > 0 ? `<div class="price"><span style="color:#3b82f6;font-weight:600;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:900;color:#1d4ed8">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
-        <div class="sig-line">${signImg}<div>חתימת הלקוח — ${lead?.name || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div>
+        <div class="sig-line">${signImg}<div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div>
         <div class="sig-line">EH Automation — אלעד חנינה</div>
       </div>
       <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
@@ -183,12 +188,27 @@ export default function ClientSign() {
 
   let docData = null;
   try {
-    // תיקון encoding עברית: atob → escape → decodeURIComponent
     docData = JSON.parse(decodeURIComponent(escape(atob(encoded))));
   } catch {}
 
-  const [step, setStep] = useState("form");
-  const [clientData, setClientData] = useState({});
+  const { id, title, rawBody, amount, valid_until, lead } = docData || {};
+  const price = parseFloat(amount) || 0;
+
+  // מילוי מוקדם מנתוני הליד ב-URL
+  const initData = {};
+  ALL_VARS.forEach(v => {
+    const val = lead?.[v.leadField] || "";
+    if (val) initData[v.key] = val;
+  });
+
+  // שדות שחסרים מהמסמך ולא נמלאו מהליד
+  const computeNeeded = (cd) =>
+    ALL_VARS.filter(v => (rawBody || "").includes(v.key) && !(cd[v.key] || "").trim());
+
+  const [clientData, setClientData] = useState(initData);
+  const [step, setStep] = useState(() =>
+    computeNeeded(initData).length === 0 ? "document" : "form"
+  );
   const [signature, setSignature] = useState(null);
   const [signing, setSigning] = useState(false);
 
@@ -204,19 +224,18 @@ export default function ClientSign() {
     );
   }
 
-  const { id, title, rawBody, amount, valid_until, lead } = docData;
-  const price = parseFloat(amount) || 0;
-  const neededVars = CLIENT_VARS.filter(v => (rawBody || "").includes(v.key));
+  const neededVars = computeNeeded(clientData);
   const allRequired = neededVars.filter(v => v.required).every(v => (clientData[v.key] || "").trim());
-  const body = substituteAll(rawBody || "", lead, amount, clientData);
+  const body = substituteAll(rawBody || "", clientData, amount);
 
   const handleFormSubmit = async () => {
-    // שמירת פרטי הלקוח במסמך
     try {
       if (id) {
         await base44.entities.Quote.update(id, {
-          signing_client_id:      clientData["{customer-id}"]      || "",
-          signing_client_address: clientData["{customer-address}"] || "",
+          signing_client_id:      clientData["{customer-id}"]       || "",
+          signing_client_address: clientData["{customer-address}"]  || "",
+          signing_client_email:   clientData["{customer-email}"]    || "",
+          signing_client_company: clientData["{customer-business}"] || "",
         });
       }
     } catch {}
@@ -232,7 +251,7 @@ export default function ClientSign() {
     setStep("done");
   };
 
-  // ── שלב 1: טופס ──────────────────────────────────────────────────────────
+  // ── שלב 1: טופס פרטים חסרים ───────────────────────────────────────────────
   if (step === "form") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4" dir="rtl">
@@ -241,45 +260,29 @@ export default function ClientSign() {
             <h1 className="text-2xl font-black text-blue-600">EH Automation</h1>
             <p className="text-gray-400 text-xs mt-0.5">אלעד חנינה • 054-710-8219</p>
             <div className="mt-4 h-px bg-gray-100" />
-            <h2 className="text-lg font-bold text-gray-800 mt-4">{title}</h2>
+            <h2 className="text-lg font-bold text-gray-800 mt-4">ממתין לך מסמך לחתימה</h2>
             {lead?.name && <p className="text-sm text-gray-500 mt-1">שלום, {lead.name}</p>}
           </div>
 
-          {neededVars.length === 0 ? (
-            <>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5 text-sm text-blue-700">
-                ניתן להמשיך לצפייה ולחתימה על ההסכם
+          <div className="space-y-4">
+            {neededVars.map(v => (
+              <div key={v.key} className="space-y-1.5">
+                <Label>{v.label}{v.required ? " *" : ""}</Label>
+                <Input
+                  value={clientData[v.key] || ""}
+                  onChange={e => setClientData(d => ({ ...d, [v.key]: e.target.value }))}
+                  placeholder={`הזן ${v.label}`}
+                />
               </div>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setStep("document")}>
-                הצג הסכם ←
-              </Button>
-            </>
-          ) : (
-            <>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-5 text-sm text-blue-700">
-                לפני הצגת ההסכם, נא למלא את הפרטים הבאים — הם יוזנו לתוך ההסכם ויישמרו
-              </div>
-              <div className="space-y-4">
-                {neededVars.map(v => (
-                  <div key={v.key} className="space-y-1.5">
-                    <Label>{v.label}{v.required ? " *" : ""}</Label>
-                    <Input
-                      value={clientData[v.key] || ""}
-                      onChange={e => setClientData(d => ({ ...d, [v.key]: e.target.value }))}
-                      placeholder={`הזן ${v.label}`}
-                    />
-                  </div>
-                ))}
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
-                  disabled={!allRequired}
-                  onClick={handleFormSubmit}
-                >
-                  שמור והמשך לחתימה ←
-                </Button>
-              </div>
-            </>
-          )}
+            ))}
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
+              disabled={!allRequired}
+              onClick={handleFormSubmit}
+            >
+              שמור והמשך לחתימה ←
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -329,7 +332,7 @@ export default function ClientSign() {
           <div className="px-10 pb-4">
             <div className="flex gap-16">
               <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
-                חתימת הלקוח — {lead?.name || ""}
+                חתימת הלקוח — {clientData["{customer-name}"] || lead?.name || ""}
               </div>
               <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
                 EH Automation — אלעד חנינה
@@ -367,14 +370,14 @@ export default function ClientSign() {
         <p className="text-gray-400 text-xs">{todayStr()}</p>
 
         <div className="mt-5 bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mb-6">
-          תודה, {lead?.name || ""}.<br />
+          תודה, {clientData["{customer-name}"] || lead?.name || ""}.<br />
           ההסכם נחתם ונשמר בהצלחה.<br />
           נציג מ-EH Automation יצור איתך קשר בקרוב.
         </div>
 
         <Button
           className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2"
-          onClick={() => printDoc({ title, body, price, lead, signatureDataUrl: signature })}
+          onClick={() => printDoc({ title, body, price, clientData, signatureDataUrl: signature })}
         >
           <Download className="w-4 h-4" />
           הורד / הדפס עותק PDF

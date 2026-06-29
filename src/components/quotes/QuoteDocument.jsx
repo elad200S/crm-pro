@@ -116,6 +116,8 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
         phone: lead?.phone,
         email: lead?.email,
         company: lead?.company_name,
+        id_number: lead?.id_number || "",
+        business_address: lead?.business_address || "",
       }
     };
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
@@ -128,11 +130,11 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     setShorteningLink(true);
     try {
       const resp = await fetch(
-        `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`,
+        `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`,
         { signal: AbortSignal.timeout(5000) }
       );
       const short = await resp.text();
-      if (short.startsWith("https://tinyurl.com/")) {
+      if (short.startsWith("https://is.gd/")) {
         setShortLinkCache(short);
         setShorteningLink(false);
         return short;
