@@ -35,6 +35,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, is
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-white dark:bg-gray-950"> {/* Added sticky header */}
               <TableRow className="bg-gray-50">
+                <TableHead className="text-right w-16">#</TableHead>
                 <TableHead className="text-right">שם מלא</TableHead>
                 <TableHead className="text-right">פרטי קשר</TableHead>
                 <TableHead className="text-right">חברה</TableHead>
@@ -47,6 +48,15 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, is
             <TableBody>
               {customers.map((customer) => (
                 <TableRow key={customer.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => onRowClick && onRowClick(customer)}>
+                 <TableCell className="text-right">
+                   {customer.customer_number ? (
+                     <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                       #{customer.customer_number}
+                     </span>
+                   ) : (
+                     <span className="text-xs text-gray-300">—</span>
+                   )}
+                 </TableCell>
                  <TableCell className="text-right">
                    <div className="font-semibold text-gray-900">
                      {customer.first_name} {customer.last_name}

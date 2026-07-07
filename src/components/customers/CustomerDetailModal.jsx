@@ -62,8 +62,13 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" dir="rtl">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
             {customer.first_name} {customer.last_name}
+            {customer.customer_number && (
+              <span className="text-sm font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                #{customer.customer_number}
+              </span>
+            )}
           </DialogTitle>
           <div className="flex items-center gap-2 flex-wrap mt-1">
             <Badge className={statusColors[customer.status]}>{customer.status}</Badge>

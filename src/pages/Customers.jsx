@@ -126,8 +126,11 @@ export default function Customers() {
         }
         await Customer.update(editingCustomer.id, customerData);
       } else {
+        const maxNum = customers.reduce((max, c) => Math.max(max, parseInt(c.customer_number) || 0), 0);
+        const customer_number = String(maxNum + 1).padStart(3, '0');
         await Customer.create({
           ...customerData,
+          customer_number,
           registration_date: customerData.registration_date || new Date().toISOString().split('T')[0]
         });
       }
