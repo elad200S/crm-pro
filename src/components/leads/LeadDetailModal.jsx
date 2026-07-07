@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
-const statusColors = {
-  "התקבל": "bg-blue-100 text-blue-800",
-  "שיחה חוזרת": "bg-yellow-100 text-yellow-800",
-  "בוצע איפיון": "bg-purple-100 text-purple-800",
-  "נשלחה הצעת מחיר": "bg-orange-100 text-orange-800",
-  "לא רלוונטי": "bg-gray-100 text-gray-600",
-  "נסגר בהצלחה (שולם)": "bg-green-100 text-green-800",
+const STATUS_GRADIENT = {
+  "התקבל":                "from-blue-500 to-blue-700",
+  "שיחה חוזרת":           "from-yellow-500 to-amber-600",
+  "בוצע איפיון":          "from-purple-500 to-purple-700",
+  "נשלחה הצעת מחיר":     "from-indigo-500 to-indigo-700",
+  "לא רלוונטי":           "from-gray-400 to-gray-600",
+  "נסגר בהצלחה (שולם)":  "from-green-500 to-emerald-700",
 };
 
 const priorityColors = {
@@ -52,9 +52,9 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
         variant="outline"
         size="sm"
         onClick={() => setOpen(o => !o)}
-        className="text-purple-600 border-purple-200 hover:bg-purple-50 flex items-center gap-1"
+        className="text-purple-600 border-purple-200 hover:bg-purple-50 h-8 gap-1"
       >
-        <FileText className="w-4 h-4" />
+        <FileText className="w-3.5 h-3.5" />
         מסמך
         <ChevronDown className="w-3.5 h-3.5" />
       </Button>
@@ -105,103 +105,147 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
   };
 
   if (!lead) return null;
-  const agentName = users?.find(u => u.id === lead.agent_id)?.full_name;
 
-  const Field = ({ label, value }) => value ? (
-    <div>
-      <p className="text-xs text-gray-400">{label}</p>
-      <p className="text-sm font-medium text-gray-800">{value}</p>
-    </div>
-  ) : null;
+  const agentName = users?.find(u => u.id === lead.agent_id)?.full_name;
+  const gradient = STATUS_GRADIENT[lead.status] || "from-gray-500 to-gray-700";
+  const initials = (lead.full_name || lead.phone || "?")[0]?.toUpperCase() || "?";
+
+  const detailItems = [
+    agentName           && { label: "סוכן מטפל",    value: agentName },
+    lead.service_requested && { label: "שירות מבוקש", value: lead.service_requested },
+    lead.last_contact_at && { label: "קשר אחרון",    value: format(new Date(lead.last_contact_at), "dd/MM/yy HH:mm", { locale: he }), red: false },
+    lead.next_followup_at && { label: "מעקב הבא",    value: format(new Date(lead.next_followup_at), "dd/MM/yy HH:mm", { locale: he }), red: new Date(lead.next_followup_at) < new Date() },
+  ].filter(Boolean);
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">
-            {lead.full_name || lead.phone || "ליד ללא שם"}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-lg p-0 overflow-hidden max-h-[90vh] flex flex-col gap-0">
 
-        <div className="space-y-4 py-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge className={statusColors[lead.status]}>{lead.status}</Badge>
-            {lead.lead_source && <Badge variant="outline">{lead.lead_source}</Badge>}
-            {lead.is_converted && <Badge className="bg-green-100 text-green-700">הומר ללקוח</Badge>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {lead.phone && (
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span>{lead.phone}</span>
+        {/* ── Gradient Header ── */}
+        <div className={`bg-gradient-to-br ${gradient} p-5 text-white flex-shrink-0`}>
+          <div className="flex items-start gap-4">
+            <div className="w-13 h-13 w-[52px] h-[52px] bg-white/20 border border-white/30 rounded-2xl flex items-center justify-center text-xl font-black flex-shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold leading-tight">
+                {lead.full_name || lead.phone || "ליד ללא שם"}
+              </h2>
+              {lead.company_name && (
+                <p className="text-white/70 text-sm mt-0.5 flex items-center gap-1">
+                  <Building2 className="w-3.5 h-3.5 flex-shrink-0" />{lead.company_name}
+                </p>
+              )}
+              <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                <span className="bg-white/20 border border-white/30 px-2.5 py-0.5 rounded-full text-xs font-medium">
+                  {lead.status}
+                </span>
+                {lead.lead_source && (
+                  <span className="bg-white/20 border border-white/30 px-2.5 py-0.5 rounded-full text-xs">
+                    {lead.lead_source}
+                  </span>
+                )}
+                {lead.is_converted && (
+                  <span className="bg-white/20 border border-white/30 px-2.5 py-0.5 rounded-full text-xs">
+                    הומר ✓
+                  </span>
+                )}
               </div>
-            )}
-            {lead.email && (
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="truncate">{lead.email}</span>
-              </div>
-            )}
-            {lead.company_name && (
-              <div className="flex items-center gap-2 text-sm">
-                <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span>{lead.company_name}</span>
-              </div>
-            )}
+            </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4 border-t pt-3">
-            <Field label="סוכן מטפל" value={agentName} />
-            <Field label="שירות מבוקש" value={lead.service_requested} />
-            <Field label="קשר אחרון" value={lead.last_contact_at ? format(new Date(lead.last_contact_at), "dd/MM/yyyy HH:mm", { locale: he }) : null} />
-            <Field label="מעקב הבא" value={lead.next_followup_at ? format(new Date(lead.next_followup_at), "dd/MM/yyyy HH:mm", { locale: he }) : null} />
-            <Field label="תאריך יצירה" value={lead.created_date ? format(new Date(lead.created_date), "dd/MM/yyyy", { locale: he }) : null} />
-            <Field label="פרטי מקור" value={lead.source_details} />
-          </div>
+        {/* ── Scrollable body ── */}
+        <div className="overflow-y-auto flex-1 p-5 space-y-4">
 
-          {lead.notes && (
-            <div className="border-t pt-3">
-              <p className="text-xs text-gray-400 mb-1">הערות</p>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap">{lead.notes}</p>
+          {/* Contact */}
+          {(lead.phone || lead.email) && (
+            <div className="grid grid-cols-2 gap-2">
+              {lead.phone && (
+                <a href={`tel:${lead.phone}`}
+                  className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-gray-400">טלפון</p>
+                    <p className="text-sm font-medium text-gray-800 truncate">{lead.phone}</p>
+                  </div>
+                </a>
+              )}
+              {lead.email && (
+                <a href={`mailto:${lead.email}`}
+                  className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-gray-400">אימייל</p>
+                    <p className="text-sm font-medium text-gray-800 truncate">{lead.email}</p>
+                  </div>
+                </a>
+              )}
             </div>
           )}
 
-          {/* Tasks Section */}
+          {/* Details grid */}
+          {detailItems.length > 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              {detailItems.map((item, i) => (
+                <div key={i} className={`p-3 rounded-xl border ${item.red ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-100"}`}>
+                  <p className="text-[10px] text-gray-400 mb-0.5">{item.label}</p>
+                  <p className={`text-sm font-medium ${item.red ? "text-red-600" : "text-gray-800"}`}>{item.value}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Notes */}
+          {lead.notes && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-100">
+              <p className="text-[10px] text-amber-700 font-semibold mb-1">הערות</p>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{lead.notes}</p>
+            </div>
+          )}
+
+          {/* Tasks */}
           <div className="border-t pt-3">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-                <Clock className="w-4 h-4" /> משימות ({tasks.length})
+            <div className="flex items-center justify-between mb-2.5">
+              <h4 className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-purple-500" />
+                משימות
+                <span className="text-xs font-normal text-gray-400">({tasks.length})</span>
               </h4>
               {onAddTask && (
-                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => { onAddTask(lead); onClose(); }}>
-                  <Plus className="w-3 h-3 ml-1" /> הוסף
+                <Button size="sm" variant="outline" className="h-7 text-xs gap-1"
+                  onClick={() => { onAddTask(lead); onClose(); }}>
+                  <Plus className="w-3 h-3" /> הוסף
                 </Button>
               )}
             </div>
 
             {loadingTasks ? (
-              <p className="text-xs text-gray-400">טוען...</p>
+              <div className="h-8 animate-pulse bg-gray-100 rounded-lg" />
             ) : tasks.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-2">אין משימות לליד זה</p>
+              <p className="text-xs text-gray-400 text-center py-3">אין משימות לליד זה</p>
             ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
+              <div className="space-y-1.5 max-h-40 overflow-y-auto">
                 {tasks.map(task => {
-                  const isOverdue = task.status !== "הושלם" && new Date(task.due_date) < new Date();
+                  const isOverdue = task.status !== "הושלם" && task.due_date && new Date(task.due_date) < new Date();
                   return (
-                    <div key={task.id} className={`flex items-center justify-between p-2 rounded-lg text-xs border ${isOverdue ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-200"}`}>
+                    <div key={task.id}
+                      className={`flex items-center gap-2.5 p-2.5 rounded-lg text-xs border ${isOverdue ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-100"}`}>
+                      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.status === "הושלם" ? "bg-green-400" : isOverdue ? "bg-red-400" : "bg-amber-400"}`} />
                       <div className="flex-1 min-w-0">
-                        <span className={`font-medium truncate block ${task.status === "הושלם" ? "line-through text-gray-400" : ""}`}>{task.title}</span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={isOverdue ? "text-red-600 font-semibold" : "text-gray-400"}>
-                            {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}
-                            {isOverdue && " ⚠"}
+                        <span className={`font-medium block truncate ${task.status === "הושלם" ? "line-through text-gray-400" : ""}`}>{task.title}</span>
+                        {task.due_date && (
+                          <span className={`text-[10px] ${isOverdue ? "text-red-500 font-semibold" : "text-gray-400"}`}>
+                            {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}{isOverdue && " · באיחור"}
                           </span>
-                          <Badge className={`text-[10px] py-0 px-1 ${priorityColors[task.priority]}`}>{task.priority}</Badge>
-                        </div>
+                        )}
                       </div>
                       {task.status !== "הושלם" && (
-                        <Button variant="ghost" size="icon" className="h-6 w-6 flex-shrink-0 text-green-600" onClick={() => markDone(task.id)}>
+                        <Button variant="ghost" size="icon" className="h-5 w-5 flex-shrink-0 text-green-600" onClick={() => markDone(task.id)}>
                           <CheckCircle className="w-3.5 h-3.5" />
                         </Button>
                       )}
@@ -213,29 +257,32 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-between gap-2 pt-2 border-t">
-          <Button variant="outline" size="sm" onClick={onClose}>סגור</Button>
-          <div className="flex gap-2 flex-wrap">
+        {/* ── Footer: Actions ── */}
+        <div className="border-t bg-gray-50 px-5 py-3 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+          <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-500 h-8">
+            סגור
+          </Button>
+          <div className="flex gap-1.5 flex-wrap justify-end">
             {lead.phone && (
               <Button variant="outline" size="sm" onClick={() => { onWhatsApp(lead); onClose(); }}
-                className="text-green-600 border-green-200 hover:bg-green-50">
-                <MessageCircle className="w-4 h-4 ml-1" /> וואטסאפ
+                className="text-green-600 border-green-200 hover:bg-green-50 h-8 gap-1">
+                <MessageCircle className="w-3.5 h-3.5" /> וואטסאפ
               </Button>
             )}
             <DocDropdown lead={lead} onQuote={onQuote} onClose={onClose} />
             {!lead.is_converted && (
               <Button variant="outline" size="sm" onClick={() => { onConvert(lead); onClose(); }}
-                className="text-teal-600 border-teal-200 hover:bg-teal-50">
-                <UserCheck className="w-4 h-4 ml-1" /> המרה
+                className="text-teal-600 border-teal-200 hover:bg-teal-50 h-8 gap-1">
+                <UserCheck className="w-3.5 h-3.5" /> המרה
               </Button>
             )}
             <Button variant="outline" size="sm" onClick={() => { onEdit(lead); onClose(); }}
-              className="text-blue-600 border-blue-200 hover:bg-blue-50">
-              <Edit className="w-4 h-4 ml-1" /> עריכה
+              className="text-blue-600 border-blue-200 hover:bg-blue-50 h-8 gap-1">
+              <Edit className="w-3.5 h-3.5" /> עריכה
             </Button>
             <Button variant="outline" size="sm" onClick={() => { onDelete(lead); onClose(); }}
-              className="text-red-600 border-red-200 hover:bg-red-50">
-              <Trash2 className="w-4 h-4 ml-1" /> מחיקה
+              className="text-red-600 border-red-200 hover:bg-red-50 h-8 gap-1">
+              <Trash2 className="w-3.5 h-3.5" /> מחיקה
             </Button>
           </div>
         </div>

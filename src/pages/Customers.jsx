@@ -4,7 +4,8 @@ const { Customer } = base44.entities;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, Download } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +35,7 @@ export default function Customers() {
   });
   const [customerToDelete, setCustomerToDelete] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const navigate = useNavigate();
 
   const exportToCSV = () => {
     const headers = ["שם פרטי", "שם משפחה", "טלפון", "אימייל", "חברה", "סטטוס", "מקור הגעה", "תאריך רישום"];
@@ -107,7 +108,7 @@ export default function Customers() {
 
   useEffect(() => {
     if (location.state?.viewCustomer) {
-      setSelectedCustomer(location.state.viewCustomer);
+      navigate(createPageUrl("CustomerProfile"), { state: { customer: location.state.viewCustomer } });
       window.history.replaceState({}, document.title);
     } else if (location.state?.editCustomer) {
       setEditingCustomer(location.state.editCustomer);
@@ -235,20 +236,9 @@ export default function Customers() {
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           isAdmin={currentUser?.role === 'admin'}
-          onRowClick={setSelectedCustomer}
+          onRowClick={(c) => navigate(createPageUrl("CustomerProfile"), { state: { customer: c } })}
         />
       </div>
-
-      {selectedCustomer && (
-        <CustomerCard
-          customer={selectedCustomer}
-          onClose={() => setSelectedCustomer(null)}
-          onEdit={(c) => { handleEdit(c); setSelectedCustomer(null); }}
-          onDelete={(c) => { handleDeleteClick(c); setSelectedCustomer(null); }}
-          currentUser={currentUser}
-          onUpdate={loadCustomers}
-        />
-      )}
 
       <AlertDialog open={!!customerToDelete} onOpenChange={() => setCustomerToDelete(null)}>
         <AlertDialogContent>
