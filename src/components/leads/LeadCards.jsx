@@ -141,6 +141,7 @@ export default function LeadCards({ leads, users, onEdit, onDelete, onWhatsApp, 
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-gray-900 text-sm leading-snug truncate">
                     {lead.full_name || lead.phone}
+                    {lead.lead_number && <span className="text-[11px] text-gray-400 font-mono font-normal mr-1.5">L-{lead.lead_number}</span>}
                   </h3>
                   <span className={`flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.text}`}>
                     {lead.status || "חדש"}

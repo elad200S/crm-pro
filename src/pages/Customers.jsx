@@ -79,6 +79,16 @@ export default function Customers() {
   const loadCustomers = useCallback(async () => {
     try {
       const data = await Customer.list('-created_date');
+      // השלמת מספרים ללקוחות ותיקים שנוצרו לפני מנגנון המספור
+      const missingNum = data.filter(c => !c.customer_number).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+      if (missingNum.length) {
+        let next = data.reduce((max, c) => Math.max(max, parseInt(c.customer_number) || 0), 0);
+        for (const c of missingNum) {
+          next += 1;
+          c.customer_number = String(next).padStart(3, '0');
+          await Customer.update(c.id, { customer_number: c.customer_number }).catch(() => {});
+        }
+      }
       setCustomers(data);
     } catch (error) {
       console.error("שגיאה בטעינת לקוחות:", error);

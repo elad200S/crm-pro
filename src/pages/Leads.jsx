@@ -77,6 +77,16 @@ export default function Leads() {
       base44.entities.Lead.list("-created_date", 200),
       base44.entities.User.list()
     ]);
+    // השלמת מספרים ללידים ותיקים שנוצרו לפני מנגנון המספור
+    const missingNum = leadsData.filter(l => !l.lead_number).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+    if (missingNum.length) {
+      let next = leadsData.reduce((max, l) => Math.max(max, parseInt(l.lead_number) || 0), 0);
+      for (const l of missingNum) {
+        next += 1;
+        l.lead_number = String(next).padStart(3, '0');
+        await base44.entities.Lead.update(l.id, { lead_number: l.lead_number }).catch(() => {});
+      }
+    }
     setLeads(leadsData);
     setUsers(usersData);
     setLoading(false);
@@ -160,6 +170,8 @@ export default function Leads() {
         timestamp: new Date().toISOString()
       });
     } else {
+      const maxNum = leads.reduce((max, l) => Math.max(max, parseInt(l.lead_number) || 0), 0);
+      payload.lead_number = String(maxNum + 1).padStart(3, '0');
       saved = await base44.entities.Lead.create(payload);
       await OUTBOUND_EVENT(webhookUrl, {
         event_name: "lead_created",
@@ -260,7 +272,10 @@ export default function Leads() {
     const nameParts = (lead.full_name || "").trim().split(" ");
     const firstName = nameParts[0] || "ליד";
     const lastName = nameParts.slice(1).join(" ") || "מומר";
+    const allCustomers = await base44.entities.Customer.list();
+    const maxCustNum = allCustomers.reduce((max, c) => Math.max(max, parseInt(c.customer_number) || 0), 0);
     const customer = await base44.entities.Customer.create({
+      customer_number: String(maxCustNum + 1).padStart(3, '0'),
       first_name: firstName,
       last_name: lastName,
       phone: lead.phone || "",

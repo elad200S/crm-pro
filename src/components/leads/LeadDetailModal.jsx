@@ -130,6 +130,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold leading-tight">
                 {lead.full_name || lead.phone || "ליד ללא שם"}
+                {lead.lead_number && <span className="text-sm text-white/70 font-mono font-normal mr-2">L-{lead.lead_number}</span>}
               </h2>
               {lead.company_name && (
                 <p className="text-white/70 text-sm mt-0.5 flex items-center gap-1">

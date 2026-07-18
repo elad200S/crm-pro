@@ -99,6 +99,7 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-gray-900 truncate leading-tight">
                                     {lead.full_name || lead.phone}
+                                    {lead.lead_number && <span className="text-[10px] text-gray-400 font-mono font-normal mr-1">L-{lead.lead_number}</span>}
                                   </p>
                                   {lead.company_name && (
                                     <p className="text-xs text-gray-400 truncate">{lead.company_name}</p>

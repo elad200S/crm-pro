@@ -64,7 +64,10 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
                       <span className="text-white text-xs font-bold">{initials}</span>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{lead.full_name || "—"}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-semibold text-gray-900">{lead.full_name || "—"}</p>
+                        {lead.lead_number && <span className="text-xs text-gray-400 font-mono">L-{lead.lead_number}</span>}
+                      </div>
                       {lead.company_name && <p className="text-xs text-gray-400 truncate max-w-[140px]">{lead.company_name}</p>}
                     </div>
                   </div>
