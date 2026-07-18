@@ -122,7 +122,7 @@ function SignaturePad({ onSignConfirmed }) {
           <RotateCcw className="w-3 h-3" /> נקה
         </button>
         {signed && !confirmed && (
-          <button onClick={confirm} className="mr-auto px-4 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button onClick={confirm} className="mr-auto px-4 py-1.5 text-sm bg-emerald-700 text-white rounded-lg hover:bg-emerald-800">
             אשר חתימה ✓
           </button>
         )}
@@ -148,27 +148,30 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
       <title>${title || "הסכם עבודה"}</title>
       <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; direction: rtl; color: #111; background: white; }
-        .page { max-width: 820px; margin: 0 auto; padding: 54px 60px 70px; }
-        .hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 3px solid #2563eb; }
-        .brand h1 { font-size: 26px; font-weight: 900; color: #2563eb; }
-        .brand p { font-size: 12px; color: #94a3b8; margin-top: 3px; }
-        .meta { text-align: left; }
-        .meta h2 { font-size: 17px; font-weight: 700; color: #1e293b; }
-        .meta p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .body { font-size: 14px; line-height: 2.1; color: #1e293b; white-space: pre-wrap; margin-bottom: 36px; }
-        .price { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 44px; }
+        html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { font-family: 'Segoe UI', 'Heebo', Arial, sans-serif; direction: rtl; color: #0e1b14; background: white; }
+        .page { max-width: 820px; margin: 0 auto; padding: 0 40px 40px; }
+        .hdr { background: linear-gradient(135deg, #0e7a4e 0%, #06462c 100%); color: #fff; border-radius: 0 0 22px 22px; padding: 30px 36px; margin: 0 -40px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+        .brand h1 { font-size: 24px; font-weight: 800; }
+        .brand h1 span { color: #3ddc97; }
+        .brand p { font-size: 12px; opacity: .75; margin-top: 3px; }
+        .meta { text-align: left; font-size: 12.5px; }
+        .meta h2 { font-size: 17px; font-weight: 700; }
+        .meta p { opacity: .8; margin-top: 3px; }
+        .body { font-size: 14px; line-height: 2.1; white-space: pre-wrap; margin-bottom: 32px; }
+        .price { background: #ecf5ef; border: 1px solid #dfe9e3; border-radius: 14px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .sig-row { display: flex; gap: 60px; margin-top: 14px; }
-        .sig-line { flex: 1; border-top: 1px solid #94a3b8; padding-top: 8px; font-size: 11px; color: #94a3b8; text-align: center; }
-        .footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
+        .sig-line { flex: 1; border-top: 1px solid #5f7a6c; padding-top: 8px; font-size: 11px; color: #5f7a6c; text-align: center; }
+        .footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid #dfe9e3; display: flex; justify-content: space-between; font-size: 11px; color: #5f7a6c; }
+        @page { size: A4; margin: 0; }
       </style>
     </head><body><div class="page">
       <div class="hdr">
-        <div class="brand"><h1>EH Automation</h1><p>אלעד חנינה • 054-710-8219</p></div>
+        <div class="brand"><h1>EH <span>Automation</span></h1><p>אתרים · אוטומציות · סוכני AI לעסקים</p><p>אלעד חנינה • 054-710-8219 • eladauto66@gmail.com</p></div>
         <div class="meta"><h2>${title || "הסכם עבודה"}</h2><p>תאריך: ${todayStr()}</p></div>
       </div>
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
-      ${price > 0 ? `<div class="price"><span style="color:#3b82f6;font-weight:600;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:900;color:#1d4ed8">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
+      ${price > 0 ? `<div class="price"><span style="color:#0e7a4e;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0e7a4e">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
         <div class="sig-line">${signImg}<div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div>
         <div class="sig-line">EH Automation — אלעד חנינה</div>
@@ -254,10 +257,10 @@ export default function ClientSign() {
   // ── שלב 1: טופס פרטים חסרים ───────────────────────────────────────────────
   if (step === "form") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4" dir="rtl">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-white flex items-center justify-center p-4" dir="rtl">
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
           <div className="text-center mb-7">
-            <h1 className="text-2xl font-black text-blue-600">EH Automation</h1>
+            <h1 className="text-2xl font-black text-emerald-700">EH Automation</h1>
             <p className="text-gray-400 text-xs mt-0.5">אלעד חנינה • 054-710-8219</p>
             <div className="mt-4 h-px bg-gray-100" />
             <h2 className="text-lg font-bold text-gray-800 mt-4">ממתין לך מסמך לחתימה</h2>
@@ -276,7 +279,7 @@ export default function ClientSign() {
               </div>
             ))}
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 mt-2"
+              className="w-full bg-emerald-700 hover:bg-emerald-800 mt-2"
               disabled={!allRequired}
               onClick={handleFormSubmit}
             >
@@ -294,12 +297,13 @@ export default function ClientSign() {
       <div className="min-h-screen bg-gray-100 py-8 px-4" dir="rtl">
         <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
 
-          <div className="bg-blue-600 px-10 py-5 flex justify-between items-center">
+          <div className="px-10 py-5 flex justify-between items-center"
+            style={{ background: "linear-gradient(135deg,#0e7a4e,#06462c)" }}>
             <div>
-              <h1 className="text-xl font-black text-white">EH Automation</h1>
-              <p className="text-blue-200 text-xs mt-0.5">אלעד חנינה • 054-710-8219</p>
+              <h1 className="text-xl font-black text-white">EH <span style={{ color: "#3ddc97" }}>Automation</span></h1>
+              <p className="text-white/70 text-xs mt-0.5">אלעד חנינה • 054-710-8219</p>
             </div>
-            <div className="text-left text-blue-100 text-sm">
+            <div className="text-left text-white/80 text-sm">
               <p className="font-bold text-white text-base">{title}</p>
               <p className="text-xs mt-0.5">תאריך: {todayStr()}</p>
               {valid_until && <p className="text-xs">בתוקף עד: {valid_until}</p>}
@@ -312,15 +316,16 @@ export default function ClientSign() {
             </div>
 
             {price > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 flex justify-between items-center mb-8">
-                <span className="text-sm font-semibold text-blue-600">סכום הסכם</span>
-                <span className="text-2xl font-black text-blue-700">&#8362;{price.toLocaleString()}</span>
+              <div className="rounded-xl px-5 py-4 flex justify-between items-center mb-8"
+                style={{ background: "#ecf5ef", border: "1px solid #dfe9e3" }}>
+                <span className="text-sm font-bold" style={{ color: "#0e7a4e" }}>סכום הסכם</span>
+                <span className="text-2xl font-black" style={{ color: "#0e7a4e" }}>&#8362;{price.toLocaleString()}</span>
               </div>
             )}
 
             <div className="border-t-2 border-gray-100 pt-8">
               <h3 className="text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
-                <PenLine className="w-4 h-4 text-blue-600" /> חתימה דיגיטלית
+                <PenLine className="w-4 h-4 text-emerald-700" /> חתימה דיגיטלית
               </h3>
               <p className="text-xs text-gray-400 mb-3">
                 קראתי את ההסכם ואני מסכים/ה לכל תנאיו — אנא חתום/י למטה ולחץ "אשר חתימה"
@@ -376,7 +381,7 @@ export default function ClientSign() {
         </div>
 
         <Button
-          className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2"
+          className="w-full bg-emerald-700 hover:bg-emerald-800 flex items-center justify-center gap-2"
           onClick={() => printDoc({ title, body, price, clientData, signatureDataUrl: signature })}
         >
           <Download className="w-4 h-4" />

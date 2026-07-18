@@ -56,7 +56,6 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   };
 
   const handlePrint = () => {
-    const content = printRef.current.innerHTML;
     const win = window.open("", "_blank");
     win.document.write(`
       <html dir="rtl">
@@ -65,25 +64,48 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           <title>${quote?.title || "מסמך"}</title>
           <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
-            body { font-family: 'Segoe UI', Arial, sans-serif; direction: rtl; color: #111; background: white; }
-            .page { max-width: 820px; margin: 0 auto; padding: 54px 60px 70px; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 3px solid #2563eb; }
-            .brand h1 { font-size: 26px; font-weight: 900; color: #2563eb; }
-            .brand p { font-size: 12px; color: #94a3b8; margin-top: 3px; }
-            .doc-meta { text-align: left; }
-            .doc-meta h2 { font-size: 17px; font-weight: 700; color: #1e293b; }
-            .doc-meta p { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-            .body-text { font-size: 14px; line-height: 2.1; color: #1e293b; white-space: pre-wrap; margin-bottom: 36px; }
-            .price-box { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 44px; }
-            .price-box .lbl { font-size: 13px; color: #3b82f6; font-weight: 600; }
-            .price-box .amt { font-size: 24px; font-weight: 900; color: #1d4ed8; }
-            .sig-row { display: flex; gap: 60px; margin-top: 10px; }
-            .sig-line { flex: 1; border-top: 1px solid #94a3b8; padding-top: 8px; font-size: 11px; color: #94a3b8; text-align: center; }
-            .footer { margin-top: 50px; padding-top: 14px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; }
-            @media print { .page { padding: 30px 40px; } }
+            html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { font-family: 'Segoe UI', 'Heebo', Arial, sans-serif; direction: rtl; color: #0e1b14; background: white; }
+            .page { max-width: 820px; margin: 0 auto; padding: 0 40px 40px; }
+            .head { background: linear-gradient(135deg, #0e7a4e 0%, #06462c 100%); color: #fff; border-radius: 0 0 22px 22px; padding: 30px 36px; margin: 0 -40px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+            .brand h1 { font-size: 24px; font-weight: 800; }
+            .brand h1 span { color: #3ddc97; }
+            .brand p { font-size: 12px; opacity: .75; margin-top: 3px; }
+            .doc-meta { text-align: left; font-size: 12.5px; }
+            .doc-meta h2 { font-size: 17px; font-weight: 700; }
+            .doc-meta p { opacity: .8; margin-top: 3px; }
+            .body-text { font-size: 14px; line-height: 2.1; white-space: pre-wrap; margin-bottom: 32px; }
+            .price-box { background: #ecf5ef; border: 1px solid #dfe9e3; border-radius: 14px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+            .price-box .lbl { font-size: 13px; color: #0e7a4e; font-weight: 700; }
+            .price-box .amt { font-size: 24px; font-weight: 800; color: #0e7a4e; }
+            .sig-row { display: flex; gap: 60px; margin-top: 14px; }
+            .sig-line { flex: 1; border-top: 1px solid #5f7a6c; padding-top: 8px; font-size: 11px; color: #5f7a6c; text-align: center; }
+            .footer { margin-top: 44px; padding-top: 14px; border-top: 1px solid #dfe9e3; display: flex; justify-content: space-between; font-size: 11px; color: #5f7a6c; }
+            @page { size: A4; margin: 0; }
+            @media print { .page { padding: 0 40px 30px; } }
           </style>
         </head>
-        <body><div class="page">${content}</div></body>
+        <body><div class="page">
+          <div class="head">
+            <div class="brand">
+              <h1>EH <span>Automation</span></h1>
+              <p>אתרים · אוטומציות · סוכני AI לעסקים</p>
+              <p>אלעד חנינה • 054-710-8219 • eladauto66@gmail.com</p>
+            </div>
+            <div class="doc-meta">
+              <h2>${quote?.title || "הסכם עבודה"}</h2>
+              <p>תאריך: ${todayStr()}</p>
+              ${quote?.valid_until ? `<p>בתוקף עד: ${format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}</p>` : ""}
+            </div>
+          </div>
+          <div class="body-text">${body.replace(/\n/g, "<br/>")}</div>
+          ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
+          <div class="sig-row">
+            <div class="sig-line">חתימת הלקוח ותאריך</div>
+            <div class="sig-line">EH Automation — אלעד חנינה</div>
+          </div>
+          <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
+        </div></body>
       </html>
     `);
     win.document.close();
@@ -177,16 +199,16 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
       <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8" dir="rtl">
           <div className="text-center mb-6">
-            <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-2xl">📋</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900">{quote?.title || "הסכם עבודה"}</h2>
             <p className="text-sm text-gray-500 mt-1">מאת EH Automation — אלעד חנינה</p>
           </div>
 
-          <div className="bg-blue-50 rounded-xl p-4 mb-6">
-            <p className="text-sm text-blue-700 font-medium mb-1">לפני הצפייה במסמך</p>
-            <p className="text-xs text-blue-500">יש למלא את הפרטים הבאים — הם יופיעו בהסכם</p>
+          <div className="bg-emerald-50 rounded-xl p-4 mb-6">
+            <p className="text-sm text-emerald-700 font-medium mb-1">לפני הצפייה במסמך</p>
+            <p className="text-xs text-emerald-600">יש למלא את הפרטים הבאים — הם יופיעו בהסכם</p>
           </div>
 
           <div className="space-y-4">
@@ -204,7 +226,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           </div>
 
           <Button
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 h-11 text-base"
+            className="w-full mt-6 bg-emerald-700 hover:bg-emerald-800 h-11 text-base"
             disabled={!allFilled}
             onClick={() => setGateSubmitted(true)}
           >
@@ -228,7 +250,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
         <div className="flex items-center justify-between px-6 py-3 border-b bg-gray-50 rounded-t-2xl flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             <button onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 text-white text-sm rounded-lg hover:bg-emerald-800 transition-colors">
               <Printer className="w-4 h-4" /> הדפסה / PDF
             </button>
             {lead?.phone && (
@@ -259,16 +281,18 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
         <div ref={printRef} className="px-14 py-10" dir="rtl"
           style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
 
-          <div className="flex justify-between items-start mb-8 pb-5 border-b-[3px] border-blue-600">
+          <div className="flex justify-between items-start mb-8 rounded-2xl px-6 py-5 text-white"
+            style={{ background: "linear-gradient(135deg,#0e7a4e,#06462c)" }}>
             <div>
-              <h1 className="text-2xl font-black text-blue-600">EH Automation</h1>
-              <p className="text-gray-400 text-xs mt-1">אלעד חנינה • 054-710-8219</p>
+              <h1 className="text-2xl font-black">EH <span style={{ color: "#3ddc97" }}>Automation</span></h1>
+              <p className="text-xs mt-1 opacity-75">אתרים · אוטומציות · סוכני AI לעסקים</p>
+              <p className="text-xs opacity-75">אלעד חנינה • 054-710-8219</p>
             </div>
             <div className="text-left">
-              <h2 className="text-lg font-bold text-gray-800">{quote?.title || "הסכם עבודה"}</h2>
-              <p className="text-xs text-gray-400 mt-1">תאריך: {todayStr()}</p>
+              <h2 className="text-lg font-bold">{quote?.title || "הסכם עבודה"}</h2>
+              <p className="text-xs mt-1 opacity-80">תאריך: {todayStr()}</p>
               {quote?.valid_until && (
-                <p className="text-xs text-gray-400">
+                <p className="text-xs opacity-80">
                   בתוקף עד: {format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}
                 </p>
               )}
@@ -283,9 +307,10 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           )}
 
           {price > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl px-5 py-4 flex justify-between items-center mb-10">
-              <span className="text-sm font-semibold text-blue-600">סכום הסכם</span>
-              <span className="text-2xl font-black text-blue-700">₪{price.toLocaleString()}</span>
+            <div className="rounded-xl px-5 py-4 flex justify-between items-center mb-10"
+              style={{ background: "#ecf5ef", border: "1px solid #dfe9e3" }}>
+              <span className="text-sm font-bold" style={{ color: "#0e7a4e" }}>סכום הסכם</span>
+              <span className="text-2xl font-black" style={{ color: "#0e7a4e" }}>₪{price.toLocaleString()}</span>
             </div>
           )}
 
