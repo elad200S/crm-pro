@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,13 @@ const statusColors = {
 };
 
 export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, onDelete, onStatusChange }) {
+  const navigate = useNavigate();
+
+  // לחיצה על משימה שמקושרת לליד מעבירה ישר לכרטיס הליד
+  const openLead = (task) => {
+    if (task.lead_id) navigate(`${createPageUrl("Leads")}?lead=${task.lead_id}`);
+  };
+
   const isOverdue = (dueDate, status) => {
     return status !== "הושלם" && new Date(dueDate) < new Date();
   };
@@ -55,7 +64,10 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
           {tasks.map((task) => (
             <div
               key={task.id}
+              onClick={() => openLead(task)}
               className={`p-3 rounded-lg border transition-colors hover:bg-gray-50 ${
+                task.lead_id ? 'cursor-pointer' : ''
+              } ${
                 isOverdue(task.due_date, task.status) ? 'border-red-200 bg-red-50' : 'border-gray-200'
               }`}
             >
@@ -76,7 +88,7 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onStatusChange(task.id, "הושלם")}
+                      onClick={(e) => { e.stopPropagation(); onStatusChange(task.id, "הושלם"); }}
                       className="h-7 w-7 text-green-600 hover:text-green-800"
                       title="סמן כהושלם"
                     >
@@ -86,7 +98,7 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onEdit(task)}
+                    onClick={(e) => { e.stopPropagation(); onEdit(task); }}
                     className="h-7 w-7 text-blue-600 hover:text-blue-800"
                   >
                     <Edit className="w-4 h-4" />
@@ -94,7 +106,7 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onDelete(task)}
+                    onClick={(e) => { e.stopPropagation(); onDelete(task); }}
                     className="h-7 w-7 text-red-600 hover:text-red-800"
                   >
                     <Trash2 className="w-4 h-4" />

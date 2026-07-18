@@ -30,7 +30,10 @@ export default function TaskList({ tasks, onTaskClick, isPersonal }) {
   };
 
   const handleTaskClick = (task) => {
-    if (onTaskClick) {
+    if (task.lead_id) {
+      // משימה שמקושרת לליד — ישר לכרטיס הליד
+      navigate(`${createPageUrl("Leads")}?lead=${task.lead_id}`);
+    } else if (onTaskClick) {
       onTaskClick(task);
     } else {
       // אם אין callback, נווט לעמוד היומן

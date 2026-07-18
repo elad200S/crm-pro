@@ -80,6 +80,12 @@ export default function Leads() {
     setLeads(leadsData);
     setUsers(usersData);
     setLoading(false);
+    // דיפ-לינק: /Leads?lead=<id> פותח ישר את כרטיס הליד (למשל בלחיצה על משימה)
+    const openLeadId = new URLSearchParams(window.location.search).get("lead");
+    if (openLeadId) {
+      const found = leadsData.find(l => l.id === openLeadId);
+      if (found) setSelectedLead(found);
+    }
   };
 
   const reload = async () => {

@@ -9,14 +9,15 @@ import { base44 } from "@/api/base44Client";
 
 const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
-// כל השדות האפשריים — עם מיפוי לנתוני הליד ב-URL
+// כל השדות האפשריים — עם מיפוי לנתוני הליד ב-URL.
+// core = שדות חובה שמופיעים בכל טופס, תמיד.
 const ALL_VARS = [
-  { key: "{customer-id}",       label: 'ח"פ / ת"ז',    required: true,  leadField: "id_number" },
-  { key: "{customer-address}",  label: "כתובת העסק",    required: false, leadField: "business_address" },
-  { key: "{customer-email}",    label: "אימייל",         required: false, leadField: "email" },
-  { key: "{customer-business}", label: "שם העסק",       required: false, leadField: "company" },
-  { key: "{customer-name}",     label: "שם מלא",        required: false, leadField: "name" },
-  { key: "{customer-phone}",    label: "טלפון",          required: false, leadField: "phone" },
+  { key: "{customer-id}",       label: 'ח"פ / ת"ז', leadField: "id_number",        core: true },
+  { key: "{customer-phone}",    label: "טלפון",      leadField: "phone",            core: true },
+  { key: "{customer-address}",  label: "כתובת",      leadField: "business_address", core: true },
+  { key: "{customer-business}", label: "שם העסק",    leadField: "company",          core: true },
+  { key: "{customer-name}",     label: "שם מלא",     leadField: "name",             core: false },
+  { key: "{customer-email}",    label: "אימייל",      leadField: "email",            core: false },
 ];
 
 const substituteAll = (text, clientData, price) => {
@@ -160,8 +161,10 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
         .meta p { opacity: .8; margin-top: 3px; }
         .body { font-size: 14px; line-height: 2.1; white-space: pre-wrap; margin-bottom: 32px; }
         .price { background: #ecf5ef; border: 1px solid #dfe9e3; border-radius: 14px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .sig-row { display: flex; gap: 60px; margin-top: 14px; }
-        .sig-line { flex: 1; border-top: 1px solid #5f7a6c; padding-top: 8px; font-size: 11px; color: #5f7a6c; text-align: center; }
+        .sig-row { display: flex; gap: 60px; margin-top: 14px; align-items: flex-end; }
+        .sig-line { flex: 1; font-size: 11px; color: #5f7a6c; text-align: center; }
+        .sig-line img { display: block; margin: 0 auto; }
+        .sig-line .line { border-top: 1px solid #5f7a6c; padding-top: 8px; }
         .footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid #dfe9e3; display: flex; justify-content: space-between; font-size: 11px; color: #5f7a6c; }
         @page { size: A4; margin: 0; }
       </style>
@@ -173,8 +176,8 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
       ${price > 0 ? `<div class="price"><span style="color:#0e7a4e;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0e7a4e">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
-        <div class="sig-line">${signImg}<div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div>
-        <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:56px;mix-blend-mode:multiply;display:block;margin:0 auto 4px;" />EH Automation — אלעד חנינה</div>
+        <div class="sig-line">${signImg}<div class="line"><div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div></div>
+        <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:52px;" /><div class="line">EH Automation — אלעד חנינה</div></div>
       </div>
       <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
     </div></body></html>
@@ -204,17 +207,16 @@ export default function ClientSign() {
     if (val) initData[v.key] = val;
   });
 
-  // שדות שחסרים מהמסמך ולא נמלאו מהליד
-  const computeNeeded = (cd) =>
-    ALL_VARS.filter(v => (rawBody || "").includes(v.key) && !(cd[v.key] || "").trim());
+  // שדות הטופס: 4 שדות החובה מופיעים תמיד, ובנוסף כל שדה שהסוכן שילב במסמך.
+  // כולם חובה — המסמך לא נפתח לפני שהלקוח מילא ואישר את כל הפרטים.
+  const computeFormVars = () =>
+    ALL_VARS.filter(v => v.core || (rawBody || "").includes(v.key));
 
   const [clientData, setClientData] = useState(initData);
-  // רשימת השדות בטופס קבועה מראש — כדי שהשדות לא ייעלמו תוך כדי הקלדה,
-  // והנתונים ייכנסו למסמך רק אחרי לחיצה על "שמור והמשך לחתימה"
-  const [formVars] = useState(() => computeNeeded(initData));
-  const [step, setStep] = useState(() =>
-    computeNeeded(initData).length === 0 ? "document" : "form"
-  );
+  // רשימת השדות קבועה מראש כדי שלא ייעלמו תוך כדי הקלדה; הטופס תמיד מוצג
+  // קודם, גם אם הפרטים מולאו מראש — כדי שהלקוח יוודא שהם נכונים
+  const [formVars] = useState(computeFormVars);
+  const [step, setStep] = useState("form");
   const [signature, setSignature] = useState(null);
   const [signing, setSigning] = useState(false);
 
@@ -230,7 +232,7 @@ export default function ClientSign() {
     );
   }
 
-  const allRequired = formVars.filter(v => v.required).every(v => (clientData[v.key] || "").trim());
+  const allFilled = formVars.every(v => (clientData[v.key] || "").trim());
   const body = substituteAll(rawBody || "", clientData, amount);
 
   const handleFormSubmit = async () => {
@@ -238,9 +240,11 @@ export default function ClientSign() {
       if (id) {
         await base44.entities.Quote.update(id, {
           signing_client_id:      clientData["{customer-id}"]       || "",
+          signing_client_phone:   clientData["{customer-phone}"]    || "",
           signing_client_address: clientData["{customer-address}"]  || "",
           signing_client_email:   clientData["{customer-email}"]    || "",
           signing_client_company: clientData["{customer-business}"] || "",
+          signing_client_name:    clientData["{customer-name}"]     || "",
         });
       }
     } catch {}
@@ -272,7 +276,7 @@ export default function ClientSign() {
           <div className="space-y-4">
             {formVars.map(v => (
               <div key={v.key} className="space-y-1.5">
-                <Label>{v.label}{v.required ? " *" : ""}</Label>
+                <Label>{v.label} *</Label>
                 <Input
                   value={clientData[v.key] || ""}
                   onChange={e => setClientData(d => ({ ...d, [v.key]: e.target.value }))}
@@ -280,9 +284,12 @@ export default function ClientSign() {
                 />
               </div>
             ))}
+            <p className="text-xs text-gray-400 text-center">
+              ודא שכל הפרטים נכונים — הם יופיעו בהסכם ולא ניתן יהיה לשנותם לאחר החתימה
+            </p>
             <Button
               className="w-full bg-emerald-700 hover:bg-emerald-800 mt-2"
-              disabled={!allRequired}
+              disabled={!allFilled}
               onClick={handleFormSubmit}
             >
               שמור והמשך לחתימה ←
@@ -337,13 +344,15 @@ export default function ClientSign() {
           </div>
 
           <div className="px-10 pb-4">
-            <div className="flex gap-16">
-              <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
-                חתימת הלקוח — {clientData["{customer-name}"] || lead?.name || ""}
+            <div className="flex gap-16 items-end">
+              <div className="flex-1 text-center text-xs text-gray-400">
+                <div className="border-t border-gray-300 pt-3">
+                  חתימת הלקוח — {clientData["{customer-name}"] || lead?.name || ""}
+                </div>
               </div>
-              <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
-                <img src="/signature.png" alt="" className="h-14 mx-auto mb-1" style={{ mixBlendMode: "multiply" }} />
-                EH Automation — אלעד חנינה
+              <div className="flex-1 text-center text-xs text-gray-400">
+                <img src="/signature.png" alt="" className="h-12 mx-auto" />
+                <div className="border-t border-gray-300 pt-3">EH Automation — אלעד חנינה</div>
               </div>
             </div>
           </div>

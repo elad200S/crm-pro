@@ -78,8 +78,10 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
             .price-box { background: #ecf5ef; border: 1px solid #dfe9e3; border-radius: 14px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
             .price-box .lbl { font-size: 13px; color: #0e7a4e; font-weight: 700; }
             .price-box .amt { font-size: 24px; font-weight: 800; color: #0e7a4e; }
-            .sig-row { display: flex; gap: 60px; margin-top: 14px; }
-            .sig-line { flex: 1; border-top: 1px solid #5f7a6c; padding-top: 8px; font-size: 11px; color: #5f7a6c; text-align: center; }
+            .sig-row { display: flex; gap: 60px; margin-top: 14px; align-items: flex-end; }
+            .sig-line { flex: 1; font-size: 11px; color: #5f7a6c; text-align: center; }
+            .sig-line img { display: block; margin: 0 auto; }
+            .sig-line .line { border-top: 1px solid #5f7a6c; padding-top: 8px; }
             .footer { margin-top: 44px; padding-top: 14px; border-top: 1px solid #dfe9e3; display: flex; justify-content: space-between; font-size: 11px; color: #5f7a6c; }
             @page { size: A4; margin: 0; }
             @media print { .page { padding: 0 40px 30px; } }
@@ -101,8 +103,8 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           <div class="body-text">${body.replace(/\n/g, "<br/>")}</div>
           ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
-            <div class="sig-line">חתימת הלקוח ותאריך</div>
-            <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:56px;mix-blend-mode:multiply;display:block;margin:0 auto 4px;" />EH Automation — אלעד חנינה</div>
+            <div class="sig-line"><div class="line">חתימת הלקוח ותאריך</div></div>
+            <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:52px;" /><div class="line">EH Automation — אלעד חנינה</div></div>
           </div>
           <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
         </div></body>
@@ -314,11 +316,13 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
             </div>
           )}
 
-          <div className="flex gap-16 mt-14">
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">חתימת הלקוח ותאריך</div>
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
-              <img src="/signature.png" alt="" className="h-14 mx-auto mb-1" style={{ mixBlendMode: "multiply" }} />
-              EH Automation — אלעד חנינה
+          <div className="flex gap-16 mt-14 items-end">
+            <div className="flex-1 text-center text-xs text-gray-400">
+              <div className="border-t border-gray-300 pt-3">חתימת הלקוח ותאריך</div>
+            </div>
+            <div className="flex-1 text-center text-xs text-gray-400">
+              <img src="/signature.png" alt="" className="h-12 mx-auto" />
+              <div className="border-t border-gray-300 pt-3">EH Automation — אלעד חנינה</div>
             </div>
           </div>
 
