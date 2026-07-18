@@ -102,7 +102,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
             <div class="sig-line">חתימת הלקוח ותאריך</div>
-            <div class="sig-line">EH Automation — אלעד חנינה</div>
+            <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:56px;mix-blend-mode:multiply;display:block;margin:0 auto 4px;" />EH Automation — אלעד חנינה</div>
           </div>
           <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
         </div></body>
@@ -316,7 +316,10 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
 
           <div className="flex gap-16 mt-14">
             <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">חתימת הלקוח ותאריך</div>
-            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">EH Automation — אלעד חנינה</div>
+            <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
+              <img src="/signature.png" alt="" className="h-14 mx-auto mb-1" style={{ mixBlendMode: "multiply" }} />
+              EH Automation — אלעד חנינה
+            </div>
           </div>
 
           <div className="mt-10 pt-4 border-t border-gray-100 flex justify-between text-[11px] text-gray-400">

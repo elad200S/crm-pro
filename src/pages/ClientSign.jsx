@@ -174,7 +174,7 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
       ${price > 0 ? `<div class="price"><span style="color:#0e7a4e;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0e7a4e">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
         <div class="sig-line">${signImg}<div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div>
-        <div class="sig-line">EH Automation — אלעד חנינה</div>
+        <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:56px;mix-blend-mode:multiply;display:block;margin:0 auto 4px;" />EH Automation — אלעד חנינה</div>
       </div>
       <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
     </div></body></html>
@@ -209,6 +209,9 @@ export default function ClientSign() {
     ALL_VARS.filter(v => (rawBody || "").includes(v.key) && !(cd[v.key] || "").trim());
 
   const [clientData, setClientData] = useState(initData);
+  // רשימת השדות בטופס קבועה מראש — כדי שהשדות לא ייעלמו תוך כדי הקלדה,
+  // והנתונים ייכנסו למסמך רק אחרי לחיצה על "שמור והמשך לחתימה"
+  const [formVars] = useState(() => computeNeeded(initData));
   const [step, setStep] = useState(() =>
     computeNeeded(initData).length === 0 ? "document" : "form"
   );
@@ -227,8 +230,7 @@ export default function ClientSign() {
     );
   }
 
-  const neededVars = computeNeeded(clientData);
-  const allRequired = neededVars.filter(v => v.required).every(v => (clientData[v.key] || "").trim());
+  const allRequired = formVars.filter(v => v.required).every(v => (clientData[v.key] || "").trim());
   const body = substituteAll(rawBody || "", clientData, amount);
 
   const handleFormSubmit = async () => {
@@ -268,7 +270,7 @@ export default function ClientSign() {
           </div>
 
           <div className="space-y-4">
-            {neededVars.map(v => (
+            {formVars.map(v => (
               <div key={v.key} className="space-y-1.5">
                 <Label>{v.label}{v.required ? " *" : ""}</Label>
                 <Input
@@ -340,6 +342,7 @@ export default function ClientSign() {
                 חתימת הלקוח — {clientData["{customer-name}"] || lead?.name || ""}
               </div>
               <div className="flex-1 border-t border-gray-300 pt-3 text-center text-xs text-gray-400">
+                <img src="/signature.png" alt="" className="h-14 mx-auto mb-1" style={{ mixBlendMode: "multiply" }} />
                 EH Automation — אלעד חנינה
               </div>
             </div>
