@@ -179,10 +179,7 @@ export default function Layout({ children, currentPageName }) {
             />
           </div>
           <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5">
-            <h1 className="text-lg font-semibold text-gray-900">CAI</h1>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo-hey.png" alt="HEY Digital" className="h-7 object-contain" />
           </Link>
         </div>
       </header>
@@ -212,10 +209,7 @@ export default function Layout({ children, currentPageName }) {
             <X className="w-5 h-5 text-gray-400" />
           </button>
           <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
-            <span className="font-bold text-gray-900 text-base">CAI</span>
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Building2 className="w-4 h-4 text-white" />
-            </div>
+            <img src="/logo-hey.png" alt="HEY Digital" className="h-6 object-contain" />
           </Link>
         </div>
 
@@ -264,9 +258,7 @@ export default function Layout({ children, currentPageName }) {
           <div className="flex flex-col h-full">
             {/* Logo */}
             <div className="flex flex-col items-center py-4 border-b border-gray-100 flex-shrink-0 gap-1">
-              <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
+              <img src="/stamp-hey.png" alt="HEY Digital" className="w-10 h-10 object-contain" />
               <NotificationBell />
             </div>
 

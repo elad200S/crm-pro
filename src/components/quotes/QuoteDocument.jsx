@@ -67,22 +67,23 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
             html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             body { font-family: 'Segoe UI', 'Heebo', Arial, sans-serif; direction: rtl; color: #0e1b14; background: white; }
             .page { max-width: 820px; margin: 0 auto; padding: 0 40px 40px; }
-            .head { background: linear-gradient(135deg, #0e7a4e 0%, #06462c 100%); color: #fff; border-radius: 0 0 22px 22px; padding: 30px 36px; margin: 0 -40px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
-            .brand h1 { font-size: 24px; font-weight: 800; }
-            .brand h1 span { color: #3ddc97; }
+            .head { background: linear-gradient(135deg, #0A8E7F 0%, #0B1B1A 100%); color: #fff; border-radius: 0 0 22px 22px; padding: 30px 36px; margin: 0 -40px 28px; display: flex; justify-content: space-between; align-items: flex-start; }
+            .brand .tag { color: #5DF5D1; letter-spacing: 2px; font-size: 10px; margin-top: 8px; }
             .brand p { font-size: 12px; opacity: .75; margin-top: 3px; }
             .doc-meta { text-align: left; font-size: 12.5px; }
             .doc-meta h2 { font-size: 17px; font-weight: 700; }
             .doc-meta p { opacity: .8; margin-top: 3px; }
             .body-text { font-size: 14px; line-height: 2.1; white-space: pre-wrap; margin-bottom: 32px; }
-            .price-box { background: #ecf5ef; border: 1px solid #dfe9e3; border-radius: 14px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-            .price-box .lbl { font-size: 13px; color: #0e7a4e; font-weight: 700; }
-            .price-box .amt { font-size: 24px; font-weight: 800; color: #0e7a4e; }
+            .price-box { background: #e8f7f4; border: 1px solid #d8ebe7; border-radius: 14px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+            .price-box .lbl { font-size: 13px; color: #0A8E7F; font-weight: 700; }
+            .price-box .amt { font-size: 24px; font-weight: 800; color: #0A8E7F; }
             .sig-row { display: flex; gap: 60px; margin-top: 14px; align-items: flex-end; }
             .sig-line { flex: 1; font-size: 11px; color: #5f7a6c; text-align: center; }
             .sig-line img { display: block; margin: 0 auto; }
+            .sig-line .sigwrap { display: flex; align-items: flex-end; justify-content: center; gap: 12px; }
+            .sig-line .sigwrap img { margin: 0; }
             .sig-line .line { border-top: 1px solid #5f7a6c; padding-top: 8px; }
-            .footer { margin-top: 44px; padding-top: 14px; border-top: 1px solid #dfe9e3; display: flex; justify-content: space-between; font-size: 11px; color: #5f7a6c; }
+            .footer { margin-top: 44px; padding-top: 14px; border-top: 1px solid #d8ebe7; display: flex; justify-content: space-between; font-size: 11px; color: #5f7a6c; }
             @page { size: A4; margin: 0; }
             @media print { .page { padding: 0 40px 30px; } }
           </style>
@@ -90,8 +91,8 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
         <body><div class="page">
           <div class="head">
             <div class="brand">
-              <h1>EH <span>Automation</span></h1>
-              <p>אתרים · אוטומציות · סוכני AI לעסקים</p>
+              <img src="${window.location.origin}/logo-hey.png" style="height:38px;" />
+              <p class="tag">AUTOMATE. GROW. SUCCEED.</p>
               <p>אלעד חנינה • 054-710-8219 • eladauto66@gmail.com</p>
             </div>
             <div class="doc-meta">
@@ -104,9 +105,9 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
             <div class="sig-line"><div class="line">חתימת הלקוח ותאריך</div></div>
-            <div class="sig-line"><img src="${window.location.origin}/signature.png" style="max-height:52px;" /><div class="line">EH Automation — אלעד חנינה</div></div>
+            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/signature.png" style="max-height:52px;" /><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
           </div>
-          <div class="footer"><span>EH Automation • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
+          <div class="footer"><span>HEY Digital • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
         </div></body>
       </html>
     `);
@@ -119,7 +120,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const text = encodeURIComponent(
-      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_EH Automation — אלעד חנינה | 054-710-8219_`
+      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_HEY Digital — אלעד חנינה | 054-710-8219_`
     );
     window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
   };
@@ -181,7 +182,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const msg = encodeURIComponent(
-      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_EH Automation — אלעד חנינה_`
+      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_HEY Digital — אלעד חנינה_`
     );
     window.open(`https://wa.me/${intlPhone}?text=${msg}`, "_blank");
   };
@@ -190,7 +191,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const to = lead?.email || "";
     const subject = encodeURIComponent(quote?.title || "הסכם עבודה");
     const bodyText = encodeURIComponent(
-      `שלום ${lead?.full_name || ""},\n\n${body}\n\nבברכה,\nEH Automation — אלעד חנינה\n054-710-8219`
+      `שלום ${lead?.full_name || ""},\n\n${body}\n\nבברכה,\nHEY Digital — אלעד חנינה\n054-710-8219`
     );
     window.open(`mailto:${to}?subject=${subject}&body=${bodyText}`, "_blank");
   };
@@ -201,16 +202,16 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
       <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8" dir="rtl">
           <div className="text-center mb-6">
-            <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-14 h-14 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <span className="text-2xl">📋</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900">{quote?.title || "הסכם עבודה"}</h2>
-            <p className="text-sm text-gray-500 mt-1">מאת EH Automation — אלעד חנינה</p>
+            <p className="text-sm text-gray-500 mt-1">מאת HEY Digital — אלעד חנינה</p>
           </div>
 
-          <div className="bg-emerald-50 rounded-xl p-4 mb-6">
-            <p className="text-sm text-emerald-700 font-medium mb-1">לפני הצפייה במסמך</p>
-            <p className="text-xs text-emerald-600">יש למלא את הפרטים הבאים — הם יופיעו בהסכם</p>
+          <div className="bg-teal-50 rounded-xl p-4 mb-6">
+            <p className="text-sm text-teal-700 font-medium mb-1">לפני הצפייה במסמך</p>
+            <p className="text-xs text-teal-600">יש למלא את הפרטים הבאים — הם יופיעו בהסכם</p>
           </div>
 
           <div className="space-y-4">
@@ -228,7 +229,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           </div>
 
           <Button
-            className="w-full mt-6 bg-emerald-700 hover:bg-emerald-800 h-11 text-base"
+            className="w-full mt-6 bg-teal-700 hover:bg-teal-800 h-11 text-base"
             disabled={!allFilled}
             onClick={() => setGateSubmitted(true)}
           >
@@ -252,7 +253,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
         <div className="flex items-center justify-between px-6 py-3 border-b bg-gray-50 rounded-t-2xl flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
             <button onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 text-white text-sm rounded-lg hover:bg-emerald-800 transition-colors">
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-700 text-white text-sm rounded-lg hover:bg-teal-800 transition-colors">
               <Printer className="w-4 h-4" /> הדפסה / PDF
             </button>
             {lead?.phone && (
@@ -284,11 +285,11 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           style={{ fontFamily: "'Segoe UI', Arial, sans-serif" }}>
 
           <div className="flex justify-between items-start mb-8 rounded-2xl px-6 py-5 text-white"
-            style={{ background: "linear-gradient(135deg,#0e7a4e,#06462c)" }}>
+            style={{ background: "linear-gradient(135deg,#0A8E7F,#0B1B1A)" }}>
             <div>
-              <h1 className="text-2xl font-black">EH <span style={{ color: "#3ddc97" }}>Automation</span></h1>
-              <p className="text-xs mt-1 opacity-75">אתרים · אוטומציות · סוכני AI לעסקים</p>
-              <p className="text-xs opacity-75">אלעד חנינה • 054-710-8219</p>
+              <img src="/logo-hey.png" alt="HEY Digital" className="h-9" />
+              <p className="text-[10px] mt-2 tracking-widest" style={{ color: "#5DF5D1" }}>AUTOMATE. GROW. SUCCEED.</p>
+              <p className="text-xs opacity-75 mt-1">אלעד חנינה • 054-710-8219</p>
             </div>
             <div className="text-left">
               <h2 className="text-lg font-bold">{quote?.title || "הסכם עבודה"}</h2>
@@ -310,9 +311,9 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
 
           {price > 0 && (
             <div className="rounded-xl px-5 py-4 flex justify-between items-center mb-10"
-              style={{ background: "#ecf5ef", border: "1px solid #dfe9e3" }}>
-              <span className="text-sm font-bold" style={{ color: "#0e7a4e" }}>סכום הסכם</span>
-              <span className="text-2xl font-black" style={{ color: "#0e7a4e" }}>₪{price.toLocaleString()}</span>
+              style={{ background: "#e8f7f4", border: "1px solid #d8ebe7" }}>
+              <span className="text-sm font-bold" style={{ color: "#0A8E7F" }}>סכום הסכם</span>
+              <span className="text-2xl font-black" style={{ color: "#0A8E7F" }}>₪{price.toLocaleString()}</span>
             </div>
           )}
 
@@ -321,13 +322,16 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
               <div className="border-t border-gray-300 pt-3">חתימת הלקוח ותאריך</div>
             </div>
             <div className="flex-1 text-center text-xs text-gray-400">
-              <img src="/signature.png" alt="" className="h-12 mx-auto" />
-              <div className="border-t border-gray-300 pt-3">EH Automation — אלעד חנינה</div>
+              <div className="flex items-end justify-center gap-3">
+                <img src="/signature.png" alt="" className="h-12" />
+                <img src="/stamp-hey.png" alt="" className="h-16" />
+              </div>
+              <div className="border-t border-gray-300 pt-3">HEY Digital — אלעד חנינה</div>
             </div>
           </div>
 
           <div className="mt-10 pt-4 border-t border-gray-100 flex justify-between text-[11px] text-gray-400">
-            <span>EH Automation • אלעד חנינה • 054-710-8219</span>
+            <span>HEY Digital • אלעד חנינה • 054-710-8219</span>
             <span>הופק: {todayStr()}</span>
           </div>
         </div>
