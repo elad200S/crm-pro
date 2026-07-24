@@ -26,7 +26,7 @@ const DEFAULT_BODY = `{customer-name}
 טלפון: {customer-phone}
 שם העסק: {customer-business}
 
-הח"מ {customer-name} (להלן: "המזמין"), מזמין בזה את שירותיה של EH Automation (להלן: "החברה"), על פי תנאי הסכם התקשרות זה.
+הח"מ {customer-name} (להלן: "המזמין"), מזמין בזה את שירותיה של HEY Digital (להלן: "החברה"), על פי תנאי הסכם התקשרות זה.
 
 תיאור השירותים:
 
