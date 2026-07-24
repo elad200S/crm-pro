@@ -35,24 +35,41 @@ const getGradient = (name = "") =>
 export default function CustomerProfile() {
   const navigate = useNavigate();
   const location = useLocation();
-  const customer = location.state?.customer;
+  const [customer, setCustomer] = useState(location.state?.customer || null);
 
   const [payments, setPayments] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!customer) { navigate(createPageUrl("Customers")); return; }
-    loadData();
-  }, [customer?.id]);
+    const init = async () => {
+      let c = location.state?.customer || null;
+      if (!c) {
+        // כניסה ישירה דרך URL (?customer=<id>) — למשל מסוכן אוטומציה
+        const customerId = new URLSearchParams(location.search).get("customer");
+        if (customerId) {
+          c = await base44.entities.Customer.get(customerId).catch(() => null);
+        }
+      }
+      if (!c) { setNotFound(true); setLoading(false); return; }
+      setCustomer(c);
+      await loadData(c);
+    };
+    init();
+  }, [location.search, location.state]);
 
-  const loadData = async () => {
+  useEffect(() => {
+    if (notFound) navigate(createPageUrl("Customers"));
+  }, [notFound]);
+
+  const loadData = async (c) => {
     try {
       const [pData, tData, qData] = await Promise.all([
-        base44.entities.Payment.filter({ customer_id: customer.id }, '-created_date', 50).catch(() => []),
-        base44.entities.Task.list('-due_date', 200).then(all => all.filter(t => t.customer_id === customer.id)).catch(() => []),
-        base44.entities.Quote.list('-created_date', 200).then(all => all.filter(q => q.customer_id === customer.id)).catch(() => []),
+        base44.entities.Payment.filter({ customer_id: c.id }, '-created_date', 50).catch(() => []),
+        base44.entities.Task.list('-due_date', 200).then(all => all.filter(t => t.customer_id === c.id)).catch(() => []),
+        base44.entities.Quote.list('-created_date', 200).then(all => all.filter(q => q.customer_id === c.id)).catch(() => []),
       ]);
       setPayments(pData);
       setTasks(tData);

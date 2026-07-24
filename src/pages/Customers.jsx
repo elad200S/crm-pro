@@ -118,7 +118,7 @@ export default function Customers() {
 
   useEffect(() => {
     if (location.state?.viewCustomer) {
-      navigate(createPageUrl("CustomerProfile"), { state: { customer: location.state.viewCustomer } });
+      navigate(`${createPageUrl("CustomerProfile")}?customer=${location.state.viewCustomer.id}`, { state: { customer: location.state.viewCustomer } });
       window.history.replaceState({}, document.title);
     } else if (location.state?.editCustomer) {
       setEditingCustomer(location.state.editCustomer);
@@ -246,7 +246,7 @@ export default function Customers() {
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           isAdmin={currentUser?.role === 'admin'}
-          onRowClick={(c) => navigate(createPageUrl("CustomerProfile"), { state: { customer: c } })}
+          onRowClick={(c) => navigate(`${createPageUrl("CustomerProfile")}?customer=${c.id}`, { state: { customer: c } })}
         />
       </div>
 
