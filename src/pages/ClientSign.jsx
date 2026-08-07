@@ -178,7 +178,7 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
       ${price > 0 ? `<div class="price"><span style="color:#0A8E7F;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0A8E7F">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
         <div class="sig-line">${signImg}<div class="line"><div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div></div>
-        <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/signature.png" style="max-height:52px;" /><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
+        <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
       </div>
       <div class="footer"><span>HEY Digital • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
     </div></body></html>
@@ -255,7 +255,13 @@ export default function ClientSign() {
   const handleSign = async () => {
     setSigning(true);
     try {
-      if (id) await base44.entities.Quote.update(id, { status: "אושר" });
+      if (id) {
+        await base44.entities.Quote.update(id, {
+          status: "אושר",
+          client_signature: signature,
+          signed_date: new Date().toISOString(),
+        });
+      }
     } catch {}
     setSigning(false);
     setStep("done");
@@ -353,7 +359,6 @@ export default function ClientSign() {
               </div>
               <div className="flex-1 text-center text-xs text-gray-400">
                 <div className="flex items-end justify-center gap-3">
-                  <img src="/signature.png" alt="" className="h-12" />
                   <img src="/stamp-hey.png" alt="" className="h-16" />
                 </div>
                 <div className="border-t border-gray-300 pt-3">HEY Digital — אלעד חנינה</div>

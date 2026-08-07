@@ -104,8 +104,8 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           <div class="body-text">${body.replace(/\n/g, "<br/>")}</div>
           ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
-            <div class="sig-line"><div class="line">חתימת הלקוח ותאריך</div></div>
-            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/signature.png" style="max-height:52px;" /><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
+            <div class="sig-line">${quote?.client_signature ? `<img src="${quote.client_signature}" style="max-height:52px;" />` : ""}<div class="line">${quote?.client_signature ? `${quote?.signing_client_name || lead?.full_name || ""}${quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}` : "חתימת הלקוח ותאריך"}</div></div>
+            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
           </div>
           <div class="footer"><span>HEY Digital • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
         </div></body>
@@ -319,11 +319,20 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
 
           <div className="flex gap-16 mt-14 items-end">
             <div className="flex-1 text-center text-xs text-gray-400">
-              <div className="border-t border-gray-300 pt-3">חתימת הלקוח ותאריך</div>
+              {quote?.client_signature ? (
+                <>
+                  <img src={quote.client_signature} alt="" className="h-12 mx-auto mb-1" />
+                  <div className="border-t border-gray-300 pt-3">
+                    {quote?.signing_client_name || lead?.full_name || ""}
+                    {quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}
+                  </div>
+                </>
+              ) : (
+                <div className="border-t border-gray-300 pt-3">חתימת הלקוח ותאריך</div>
+              )}
             </div>
             <div className="flex-1 text-center text-xs text-gray-400">
               <div className="flex items-end justify-center gap-3">
-                <img src="/signature.png" alt="" className="h-12" />
                 <img src="/stamp-hey.png" alt="" className="h-16" />
               </div>
               <div className="border-t border-gray-300 pt-3">HEY Digital — אלעד חנינה</div>
