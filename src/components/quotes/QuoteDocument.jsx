@@ -96,7 +96,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
               <p>eladauto66@gmail.com</p>
             </div>
             <div class="doc-meta">
-              <h2>הסכם עבודה</h2>
+              <h2>${quote?.title || "הסכם עבודה"}</h2>
               <p>תאריך: ${todayStr()}</p>
               ${quote?.valid_until ? `<p>בתוקף עד: ${format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}</p>` : ""}
             </div>
@@ -120,7 +120,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const text = encodeURIComponent(
-      `*הסכם עבודה*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_HEY Digital_`
+      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_HEY Digital_`
     );
     window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
   };

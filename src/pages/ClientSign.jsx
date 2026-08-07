@@ -172,7 +172,7 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
     </head><body><div class="page">
       <div class="hdr">
         <div class="brand"><img src="${window.location.origin}/logo-hey.png" style="height:38px;" /><p class="tag">AUTOMATE. GROW. SUCCEED.</p><p>eladauto66@gmail.com</p></div>
-        <div class="meta"><h2>הסכם עבודה</h2><p>תאריך: ${todayStr()}</p></div>
+        <div class="meta"><h2>${title || "הסכם עבודה"}</h2><p>תאריך: ${todayStr()}</p></div>
       </div>
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
       ${price > 0 ? `<div class="price"><span style="color:#0A8E7F;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0A8E7F">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
@@ -356,7 +356,7 @@ export default function ClientSign() {
               <img src="/logo-hey.png" alt="HEY Digital" className="h-8" />
             </div>
             <div className="text-left text-white/80 text-sm">
-              <p className="font-bold text-white text-base">הסכם עבודה</p>
+              <p className="font-bold text-white text-base">{title || "הסכם עבודה"}</p>
               <p className="text-xs mt-0.5">תאריך: {todayStr()}</p>
               {valid_until && <p className="text-xs">בתוקף עד: {valid_until}</p>}
             </div>
@@ -429,6 +429,7 @@ export default function ClientSign() {
           <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
         <h2 className="text-2xl font-black text-gray-800 mb-2">ההסכם נחתם!</h2>
+        <p className="text-gray-500 text-sm mb-1">{title || "הסכם עבודה"}</p>
         <p className="text-gray-400 text-xs">{todayStr()}</p>
 
         <div className="mt-5 bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mb-6">
