@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -83,9 +83,13 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
 export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onConvert, onAddTask }) {
   const [tasks, setTasks] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
+  const [signedQuotes, setSignedQuotes] = useState([]);
 
   useEffect(() => {
-    if (lead?.id) loadTasks();
+    if (lead?.id) {
+      loadTasks();
+      loadSignedQuotes();
+    }
   }, [lead?.id]);
 
   const loadTasks = async () => {
@@ -96,6 +100,17 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
       setTasks([]);
     } finally {
       setLoadingTasks(false);
+    }
+  };
+
+  // הסכמים חתומים ללקוח הזה — נתוני החתימה (client_signature, signed_date)
+  // כבר נשמרים על ה-Quote בזמן החתימה; כאן רק שולפים ומציגים על כרטיס הליד.
+  const loadSignedQuotes = async () => {
+    try {
+      const all = await base44.entities.Quote.list("-signed_date", 100);
+      setSignedQuotes(all.filter(q => q.lead_id === lead.id && q.client_signature));
+    } catch (e) {
+      setSignedQuotes([]);
     }
   };
 
@@ -188,6 +203,24 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                   </div>
                 </a>
               )}
+            </div>
+          )}
+
+          {/* Signed agreements */}
+          {signedQuotes.length > 0 && (
+            <div className="p-3 rounded-xl bg-green-50 border border-green-100">
+              <p className="text-[10px] text-green-700 font-semibold mb-1.5 flex items-center gap-1">
+                <PenLine className="w-3 h-3" /> הסכם חתום
+              </p>
+              <div className="space-y-1">
+                {signedQuotes.map(q => (
+                  <p key={q.id} className="text-sm text-gray-700">
+                    {q.title || "הסכם"}
+                    {q.signed_date && ` — נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`}
+                    {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
+                  </p>
+                ))}
+              </div>
             </div>
           )}
 
