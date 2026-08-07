@@ -171,16 +171,16 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
       </style>
     </head><body><div class="page">
       <div class="hdr">
-        <div class="brand"><img src="${window.location.origin}/logo-hey.png" style="height:38px;" /><p class="tag">AUTOMATE. GROW. SUCCEED.</p><p>אלעד חנינה • 054-710-8219 • eladauto66@gmail.com</p></div>
-        <div class="meta"><h2>${title || "הסכם עבודה"}</h2><p>תאריך: ${todayStr()}</p></div>
+        <div class="brand"><img src="${window.location.origin}/logo-hey.png" style="height:38px;" /><p class="tag">AUTOMATE. GROW. SUCCEED.</p><p>eladauto66@gmail.com</p></div>
+        <div class="meta"><h2>הסכם עבודה</h2><p>תאריך: ${todayStr()}</p></div>
       </div>
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
       ${price > 0 ? `<div class="price"><span style="color:#0A8E7F;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0A8E7F">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
         <div class="sig-line">${signImg}<div class="line"><div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div></div>
-        <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
+        <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
       </div>
-      <div class="footer"><span>HEY Digital • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
+      <div class="footer"><span>HEY Digital • eladauto66@gmail.com</span><span>הופק: ${todayStr()}</span></div>
     </div></body></html>
   `);
   win.document.close();
@@ -198,7 +198,7 @@ export default function ClientSign() {
     docData = JSON.parse(decodeURIComponent(escape(atob(encoded))));
   } catch {}
 
-  const { id, title, rawBody, amount, valid_until, lead } = docData || {};
+  const { id, lead_id, customer_id, title, rawBody, amount, valid_until, lead } = docData || {};
   const price = parseFloat(amount) || 0;
 
   // מילוי מוקדם מנתוני הליד ב-URL
@@ -227,7 +227,7 @@ export default function ClientSign() {
         <div className="text-center p-8">
           <p className="text-4xl mb-3">❌</p>
           <h2 className="text-lg font-bold text-gray-700 mb-1">קישור לא תקין</h2>
-          <p className="text-gray-400 text-sm">פנה לאלעד חנינה לקבל קישור מחודש</p>
+          <p className="text-gray-400 text-sm">פנה ל-HEY Digital לקבל קישור מחודש</p>
         </div>
       </div>
     );
@@ -237,16 +237,54 @@ export default function ClientSign() {
   const body = substituteAll(rawBody || "", clientData, amount);
 
   const handleFormSubmit = async () => {
+    const idNumber = clientData["{customer-id}"]       || "";
+    const phone    = clientData["{customer-phone}"]    || "";
+    const address  = clientData["{customer-address}"]  || "";
+    const email    = clientData["{customer-email}"]    || "";
+    const company  = clientData["{customer-business}"] || "";
+    const fullName = clientData["{customer-name}"]     || "";
+
     try {
       if (id) {
         await base44.entities.Quote.update(id, {
-          signing_client_id:      clientData["{customer-id}"]       || "",
-          signing_client_phone:   clientData["{customer-phone}"]    || "",
-          signing_client_address: clientData["{customer-address}"]  || "",
-          signing_client_email:   clientData["{customer-email}"]    || "",
-          signing_client_company: clientData["{customer-business}"] || "",
-          signing_client_name:    clientData["{customer-name}"]     || "",
+          signing_client_id:      idNumber,
+          signing_client_phone:   phone,
+          signing_client_address: address,
+          signing_client_email:   email,
+          signing_client_company: company,
+          signing_client_name:    fullName,
         });
+      }
+      // הפרטים שהלקוח אישר כאן הם המדויקים ביותר שיש לנו — מסנכרנים אותם
+      // גם לכרטיס הליד וגם לכרטיס הלקוח (אם קיימים), כדי שלא יישארו רק על ההסכם.
+      // רק שדות שבאמת מולאו — לא דורסים נתון קיים בריק.
+      if (lead_id) {
+        const leadUpdate = {};
+        if (idNumber) leadUpdate.id_number = idNumber;
+        if (address)  leadUpdate.business_address = address;
+        if (phone)    leadUpdate.phone = phone;
+        if (email)    leadUpdate.email = email;
+        if (company)  leadUpdate.company_name = company;
+        if (fullName) leadUpdate.full_name = fullName;
+        if (Object.keys(leadUpdate).length) {
+          await base44.entities.Lead.update(lead_id, leadUpdate).catch(() => {});
+        }
+      }
+      if (customer_id) {
+        const customerUpdate = {};
+        if (idNumber) customerUpdate.id_number = idNumber;
+        if (address)  customerUpdate.business_address = address;
+        if (phone)    customerUpdate.phone = phone;
+        if (email)    customerUpdate.email = email;
+        if (company)  customerUpdate.company = company;
+        if (fullName) {
+          const parts = fullName.trim().split(/\s+/);
+          customerUpdate.first_name = parts[0] || "";
+          customerUpdate.last_name = parts.slice(1).join(" ") || "";
+        }
+        if (Object.keys(customerUpdate).length) {
+          await base44.entities.Customer.update(customer_id, customerUpdate).catch(() => {});
+        }
       }
     } catch {}
     setStep("document");
@@ -274,7 +312,6 @@ export default function ClientSign() {
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
           <div className="text-center mb-7">
             <h1 className="text-2xl font-black text-teal-700">HEY DIGITAL</h1>
-            <p className="text-gray-400 text-xs mt-0.5">אלעד חנינה • 054-710-8219</p>
             <div className="mt-4 h-px bg-gray-100" />
             <h2 className="text-lg font-bold text-gray-800 mt-4">ממתין לך מסמך לחתימה</h2>
             {lead?.name && <p className="text-sm text-gray-500 mt-1">שלום, {lead.name}</p>}
@@ -317,10 +354,9 @@ export default function ClientSign() {
             style={{ background: "linear-gradient(135deg,#0A8E7F,#0B1B1A)" }}>
             <div>
               <img src="/logo-hey.png" alt="HEY Digital" className="h-8" />
-              <p className="text-white/70 text-xs mt-1.5">אלעד חנינה • 054-710-8219</p>
             </div>
             <div className="text-left text-white/80 text-sm">
-              <p className="font-bold text-white text-base">{title}</p>
+              <p className="font-bold text-white text-base">הסכם עבודה</p>
               <p className="text-xs mt-0.5">תאריך: {todayStr()}</p>
               {valid_until && <p className="text-xs">בתוקף עד: {valid_until}</p>}
             </div>
@@ -353,6 +389,7 @@ export default function ClientSign() {
           <div className="px-10 pb-4">
             <div className="flex gap-16 items-end">
               <div className="flex-1 text-center text-xs text-gray-400">
+                {signature && <img src={signature} alt="" className="h-12 mx-auto mb-1" />}
                 <div className="border-t border-gray-300 pt-3">
                   חתימת הלקוח — {clientData["{customer-name}"] || lead?.name || ""}
                 </div>
@@ -361,7 +398,7 @@ export default function ClientSign() {
                 <div className="flex items-end justify-center gap-3">
                   <img src="/stamp-hey.png" alt="" className="h-16" />
                 </div>
-                <div className="border-t border-gray-300 pt-3">HEY Digital — אלעד חנינה</div>
+                <div className="border-t border-gray-300 pt-3">HEY Digital</div>
               </div>
             </div>
           </div>
@@ -392,7 +429,6 @@ export default function ClientSign() {
           <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
         <h2 className="text-2xl font-black text-gray-800 mb-2">ההסכם נחתם!</h2>
-        <p className="text-gray-500 text-sm mb-1">{title}</p>
         <p className="text-gray-400 text-xs">{todayStr()}</p>
 
         <div className="mt-5 bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mb-6">

@@ -56,6 +56,14 @@
       "type": "string",
       "description": "\u05e9\u05dd \u05d4\u05d7\u05d1\u05e8\u05d4"
     },
+    "id_number": {
+      "type": "string",
+      "description": "\u05d7\"\u05e4 / \u05ea\"\u05d6"
+    },
+    "business_address": {
+      "type": "string",
+      "description": "\u05db\u05ea\u05d5\u05d1\u05ea \u05d4\u05e2\u05e1\u05e7"
+    },
     "source": {
       "type": "string",
       "enum": [

@@ -16,6 +16,8 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
     phone: "",
     email: "",
     company_name: "",
+    id_number: "",
+    business_address: "",
     service_requested: "",
     lead_source: "ידני",
     source_details: "",
@@ -53,6 +55,14 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
             <div className="space-y-1">
               <Label>שם חברה</Label>
               <Input value={form.company_name} onChange={e => set("company_name", e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>ח"פ / ת"ז</Label>
+              <Input value={form.id_number} onChange={e => set("id_number", e.target.value)} placeholder="מספר ח״פ או ת״ז" />
+            </div>
+            <div className="space-y-1">
+              <Label>כתובת העסק</Label>
+              <Input value={form.business_address} onChange={e => set("business_address", e.target.value)} placeholder="רחוב, עיר" />
             </div>
             <div className="space-y-1">
               <Label>מקור ליד *</Label>

@@ -93,10 +93,10 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
             <div class="brand">
               <img src="${window.location.origin}/logo-hey.png" style="height:38px;" />
               <p class="tag">AUTOMATE. GROW. SUCCEED.</p>
-              <p>אלעד חנינה • 054-710-8219 • eladauto66@gmail.com</p>
+              <p>eladauto66@gmail.com</p>
             </div>
             <div class="doc-meta">
-              <h2>${quote?.title || "הסכם עבודה"}</h2>
+              <h2>הסכם עבודה</h2>
               <p>תאריך: ${todayStr()}</p>
               ${quote?.valid_until ? `<p>בתוקף עד: ${format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}</p>` : ""}
             </div>
@@ -105,9 +105,9 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
             <div class="sig-line">${quote?.client_signature ? `<img src="${quote.client_signature}" style="max-height:52px;" />` : ""}<div class="line">${quote?.client_signature ? `${quote?.signing_client_name || lead?.full_name || ""}${quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}` : "חתימת הלקוח ותאריך"}</div></div>
-            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital — אלעד חנינה</div></div>
+            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
           </div>
-          <div class="footer"><span>HEY Digital • אלעד חנינה • 054-710-8219</span><span>הופק: ${todayStr()}</span></div>
+          <div class="footer"><span>HEY Digital • eladauto66@gmail.com</span><span>הופק: ${todayStr()}</span></div>
         </div></body>
       </html>
     `);
@@ -120,7 +120,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const text = encodeURIComponent(
-      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_HEY Digital — אלעד חנינה | 054-710-8219_`
+      `*הסכם עבודה*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_HEY Digital_`
     );
     window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
   };
@@ -132,6 +132,8 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   const buildRawLink = () => {
     const data = {
       id: quote?.id,
+      lead_id: quote?.lead_id || "",
+      customer_id: quote?.customer_id || "",
       title: quote?.title,
       rawBody: quote?.notes,
       amount: quote?.amount,
@@ -182,7 +184,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const msg = encodeURIComponent(
-      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_HEY Digital — אלעד חנינה_`
+      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_HEY Digital_`
     );
     window.open(`https://wa.me/${intlPhone}?text=${msg}`, "_blank");
   };
@@ -191,7 +193,7 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
     const to = lead?.email || "";
     const subject = encodeURIComponent(quote?.title || "הסכם עבודה");
     const bodyText = encodeURIComponent(
-      `שלום ${lead?.full_name || ""},\n\n${body}\n\nבברכה,\nHEY Digital — אלעד חנינה\n054-710-8219`
+      `שלום ${lead?.full_name || ""},\n\n${body}\n\nבברכה,\nHEY Digital\neladauto66@gmail.com`
     );
     window.open(`mailto:${to}?subject=${subject}&body=${bodyText}`, "_blank");
   };

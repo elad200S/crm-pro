@@ -112,6 +112,8 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
 
   const detailItems = [
     agentName           && { label: "סוכן מטפל",    value: agentName },
+    lead.id_number      && { label: 'ח"פ / ת"ז',    value: lead.id_number },
+    lead.business_address && { label: "כתובת העסק", value: lead.business_address },
     lead.service_requested && { label: "שירות מבוקש", value: lead.service_requested },
     lead.last_contact_at && { label: "קשר אחרון",    value: format(new Date(lead.last_contact_at), "dd/MM/yy HH:mm", { locale: he }), red: false },
     lead.next_followup_at && { label: "מעקב הבא",    value: format(new Date(lead.next_followup_at), "dd/MM/yy HH:mm", { locale: he }), red: new Date(lead.next_followup_at) < new Date() },
