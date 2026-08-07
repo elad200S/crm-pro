@@ -8,13 +8,16 @@ import { X, Save, Plus, Trash2 } from "lucide-react";
 
 const emptyItem = () => ({ description: "", quantity: 1, unit_price: 0, total: 0 });
 
-export default function PaymentForm({ payment, customers, onSubmit, onCancel }) {
+export default function PaymentForm({ payment, prefill, customers, onSubmit, onCancel }) {
+  // prefill מגיע כשפותחים "צור חשבונית" מתוך הסכם שאושר — payment (עריכה) גובר עליו
+  const base = payment || prefill || {};
   const [formData, setFormData] = useState({
-    customer_id: payment?.customer_id || "",
-    due_date: payment?.due_date || "",
-    status: payment?.status || "נוצר",
-    payment_link: payment?.payment_link || "",
-    items: payment?.items?.length ? payment.items : [emptyItem()],
+    customer_id: base.customer_id || "",
+    quote_id: base.quote_id || "",
+    due_date: base.due_date || "",
+    status: base.status || "נוצר",
+    payment_link: base.payment_link || "",
+    items: base.items?.length ? base.items : [emptyItem()],
   });
 
   const set = (k, v) => setFormData(f => ({ ...f, [k]: v }));
@@ -36,6 +39,7 @@ export default function PaymentForm({ payment, customers, onSubmit, onCancel }) 
     e.preventDefault();
     onSubmit({
       customer_id: formData.customer_id,
+      quote_id: formData.quote_id,
       due_date: formData.due_date,
       status: formData.status,
       payment_link: formData.payment_link,
@@ -49,7 +53,14 @@ export default function PaymentForm({ payment, customers, onSubmit, onCancel }) 
     <Card className="mb-6">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>{payment ? "עריכת חשבונית" : "חשבונית חדשה"}</span>
+          <span className="flex items-center gap-2">
+            {payment ? "עריכת חשבונית" : "חשבונית חדשה"}
+            {formData.quote_id && (
+              <span className="text-xs font-normal bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+                מקושרת להסכם חתום
+              </span>
+            )}
+          </span>
           <Button variant="ghost" size="icon" onClick={onCancel}><X className="w-4 h-4" /></Button>
         </CardTitle>
       </CardHeader>

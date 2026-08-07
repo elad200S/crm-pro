@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-const { Payment, Customer, User } = base44.entities;
+const { Payment, Customer, User, Quote } = base44.entities;
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
@@ -33,6 +33,7 @@ export default function Payments() {
   });
   const [paymentToDelete, setPaymentToDelete] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [prefill, setPrefill] = useState(null);
 
   const filterPayments = useCallback(() => {
     let filtered = payments;
@@ -85,6 +86,30 @@ export default function Payments() {
     }
   }, []);
 
+  // הגעה מ"צור חשבונית" בהסכם חתום — /Payments?quote=<id> פותח את הטופס ממולא מראש
+  const loadPrefillFromQuote = useCallback(async () => {
+    const quoteId = new URLSearchParams(window.location.search).get("quote");
+    if (!quoteId) return;
+    try {
+      const quote = await Quote.get(quoteId);
+      if (!quote?.customer_id) return; // חשבונית דורשת לקוח קיים, לא ליד
+      const items = quote.items?.length
+        ? quote.items
+        : [{ description: quote.title || "עבודה לפי הסכם", quantity: 1, unit_price: quote.amount || 0, total: quote.amount || 0 }];
+      const due = new Date();
+      due.setDate(due.getDate() + 14);
+      setPrefill({
+        customer_id: quote.customer_id,
+        quote_id: quote.id,
+        items,
+        due_date: due.toISOString().split("T")[0],
+      });
+      setShowForm(true);
+    } catch (e) {
+      console.error("שגיאה בטעינת הסכם לחשבונית:", e);
+    }
+  }, []);
+
   const initializeData = useCallback(async () => {
     try {
       // קבלת המשתמש הנוכחי
@@ -93,11 +118,12 @@ export default function Payments() {
       
       // טעינת נתונים עם הגנה על פרטיות
       await loadData(user);
+      await loadPrefillFromQuote();
     } catch (error) {
       console.error("שגיאה באתחול:", error);
       setLoading(false);
     }
-  }, [loadData]);
+  }, [loadData, loadPrefillFromQuote]);
 
   useEffect(() => {
     initializeData();
@@ -128,6 +154,7 @@ export default function Payments() {
       }
       setShowForm(false);
       setEditingPayment(null);
+      setPrefill(null);
       loadData(currentUser);
     } catch (error) {
       console.error("שגיאה בשמירת תשלום:", error);
@@ -139,6 +166,7 @@ export default function Payments() {
       alert("אין לך הרשאה לערוך תשלום זה");
       return;
     }
+    setPrefill(null);
     setEditingPayment(payment);
     setShowForm(true);
   };
@@ -206,8 +234,8 @@ export default function Payments() {
               {!isAdmin(currentUser) && " (התשלומים שלך בלבד)"}
             </p>
           </div>
-          <Button 
-            onClick={() => setShowForm(true)}
+          <Button
+            onClick={() => { setPrefill(null); setShowForm(true); }}
             className="bg-blue-600 hover:bg-blue-700 shadow-md"
           >
             <Plus className="w-5 h-5 ml-2" />
@@ -225,11 +253,13 @@ export default function Payments() {
       {showForm && (
         <PaymentForm
           payment={editingPayment}
+          prefill={prefill}
           customers={customers}
           onSubmit={handleSubmit}
           onCancel={() => {
             setShowForm(false);
             setEditingPayment(null);
+            setPrefill(null);
           }}
         />
       )}

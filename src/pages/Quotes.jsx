@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus } from "lucide-react";
+import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus, PenLine, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import QuoteEditModal from "../components/quotes/QuoteEditModal";
@@ -25,6 +27,7 @@ export default function Quotes() {
   const [quotes, setQuotes] = useState([]);
   const [leads, setLeads] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingQuote, setEditingQuote] = useState(null);
   const [previewQuote, setPreviewQuote] = useState(null);
@@ -36,16 +39,20 @@ export default function Quotes() {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    const [quotesData, leadsData, customersData] = await Promise.all([
+    const [quotesData, leadsData, customersData, paymentsData] = await Promise.all([
       base44.entities.Quote.list('-created_date', 200),
       base44.entities.Lead.list('-created_date', 200),
-      base44.entities.Customer.list('-created_date', 200)
+      base44.entities.Customer.list('-created_date', 200),
+      base44.entities.Payment.list('-created_date', 200).catch(() => [])
     ]);
     setQuotes(quotesData);
     setLeads(leadsData);
     setCustomers(customersData);
+    setPayments(paymentsData);
     setLoading(false);
   };
+
+  const getLinkedPayment = (quoteId) => payments.find(p => p.quote_id === quoteId);
 
   const getEntityName = (quote) => {
     if (quote.lead_id) {
@@ -213,6 +220,11 @@ export default function Quotes() {
                         {expired && (
                           <Badge className="bg-orange-100 text-orange-700 text-xs">פג תוקף</Badge>
                         )}
+                        {quote.client_signature && (
+                          <Badge className="bg-emerald-100 text-emerald-700 text-xs flex items-center gap-1">
+                            <PenLine className="w-3 h-3" /> נחתם דיגיטלית
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
                         <span className="font-medium text-gray-700">{entity.name}</span>
@@ -268,6 +280,34 @@ export default function Quotes() {
                           <Edit className="w-3.5 h-3.5 ml-1" />
                           עריכה
                         </Button>
+                        {quote.status === "אושר" && (() => {
+                          const linkedPayment = getLinkedPayment(quote.id);
+                          if (linkedPayment) {
+                            return (
+                              <Link to={createPageUrl("Payments")}>
+                                <Button variant="outline" size="sm" className="text-emerald-700 hover:text-emerald-800 border-emerald-200">
+                                  <Receipt className="w-3.5 h-3.5 ml-1" />
+                                  חשבונית: {linkedPayment.status}
+                                </Button>
+                              </Link>
+                            );
+                          }
+                          if (!quote.customer_id) {
+                            return (
+                              <span className="text-[11px] text-gray-400 max-w-[120px] text-left">
+                                יש להמיר לליד ללקוח כדי להפיק חשבונית
+                              </span>
+                            );
+                          }
+                          return (
+                            <Link to={`${createPageUrl("Payments")}?quote=${quote.id}`}>
+                              <Button variant="outline" size="sm" className="text-emerald-700 hover:text-emerald-800 border-emerald-200">
+                                <Receipt className="w-3.5 h-3.5 ml-1" />
+                                צור חשבונית
+                              </Button>
+                            </Link>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
