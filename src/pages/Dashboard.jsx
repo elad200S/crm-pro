@@ -49,8 +49,8 @@ export default function Dashboard() {
       setCurrentUser(user);
       const isAdmin = user.role === 'admin';
       const [customersData, paymentsData, tasksData, leadsData] = await Promise.all([
-        isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by: user.email }, '-created_date', 100),
-        isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by: user.email }, '-created_date', 500),
+        isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
+        isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
         Lead.list('-created_date', 200)
       ]);
@@ -197,7 +197,7 @@ export default function Dashboard() {
             linkTo={createPageUrl("Payments")}
           />
           <StatsCard
-            title={isAdmin ? "הכנסות החודש" : "ההכנסות שלי"}
+            title={isAdmin ? "הכנסות החודש" : "הכנסות החודש שלי"}
             value={`₪${monthlyRevenue.toLocaleString()}`}
             icon={DollarSign}
             color="green"
