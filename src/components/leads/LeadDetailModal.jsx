@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, User, Briefcase, StickyNote } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -30,6 +30,38 @@ function HeaderAction({ icon: Icon, children, danger, onClick }) {
       <Icon className="w-3.5 h-3.5" />
       {children}
     </button>
+  );
+}
+
+// טלפון/מייל למעלה בכרטיס — גם קליק ישיר (חיוג/מייל) וגם העתקה, שני הדברים
+// ביחד ולא אחד במקום השני.
+function ContactChip({ icon: Icon, value, href }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  return (
+    <div className="flex items-center gap-1 bg-white/15 border border-white/25 rounded-full py-1 pl-1 pr-2.5 text-xs">
+      <a href={href} className="flex items-center gap-1.5 text-white hover:underline min-w-0">
+        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+        <span className="truncate max-w-[170px]">{value}</span>
+      </a>
+      <button
+        onClick={copy}
+        title="העתק"
+        className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
+      >
+        {copied ? <Check className="w-3 h-3 text-emerald-200" /> : <Copy className="w-3 h-3 text-white/80" />}
+      </button>
+    </div>
   );
 }
 
@@ -163,6 +195,12 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                 {lead.full_name || lead.phone || "ליד ללא שם"}
                 {lead.lead_number && <span className="text-sm text-white/70 font-mono font-normal mr-2">L-{lead.lead_number}</span>}
               </h2>
+              {(lead.phone || lead.email) && (
+                <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                  {lead.phone && <ContactChip icon={Phone} value={lead.phone} href={`tel:${lead.phone}`} />}
+                  {lead.email && <ContactChip icon={Mail} value={lead.email} href={`mailto:${lead.email}`} />}
+                </div>
+              )}
               {lead.company_name && (
                 <p className="text-white/70 text-sm mt-0.5 flex items-center gap-1">
                   <Building2 className="w-3.5 h-3.5 flex-shrink-0" />{lead.company_name}
@@ -217,40 +255,8 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
         <div className="overflow-y-auto flex-1 p-5">
           <div className="grid md:grid-cols-2 gap-5">
 
-            {/* עמודה ימנית: פרטי קשר, פרטים, הערות */}
+            {/* עמודה ימנית: פרטים, הערות (טלפון/מייל כבר למעלה בכותרת) */}
             <div className="space-y-4">
-              {(lead.phone || lead.email) && (
-                <div>
-                  <SectionTitle icon={User}>פרטי קשר</SectionTitle>
-                  <div className="grid grid-cols-2 gap-2">
-                    {lead.phone && (
-                      <a href={`tel:${lead.phone}`}
-                        className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Phone className="w-4 h-4 text-green-600" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-400">טלפון</p>
-                          <p className="text-sm font-medium text-gray-800 truncate">{lead.phone}</p>
-                        </div>
-                      </a>
-                    )}
-                    {lead.email && (
-                      <a href={`mailto:${lead.email}`}
-                        className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Mail className="w-4 h-4 text-purple-600" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-400">אימייל</p>
-                          <p className="text-sm font-medium text-gray-800 truncate">{lead.email}</p>
-                        </div>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-
               {detailItems.length > 0 && (
                 <div>
                   <SectionTitle icon={Briefcase}>פרטים</SectionTitle>
