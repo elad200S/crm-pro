@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { createPageUrl } from "@/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -127,6 +129,7 @@ function SectionTitle({ icon: Icon, children, count }) {
 }
 
 export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onConvert, onAddTask }) {
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [signedQuotes, setSignedQuotes] = useState([]);
@@ -232,7 +235,14 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
               </HeaderAction>
             )}
             <DocDropdown lead={lead} onQuote={onQuote} onClose={onClose} />
-            {!lead.is_converted && (
+            {lead.is_converted && lead.converted_customer_id ? (
+              <HeaderAction
+                icon={ArrowLeft}
+                onClick={() => { navigate(`${createPageUrl("CustomerProfile")}?customer=${lead.converted_customer_id}`); onClose(); }}
+              >
+                לכרטיס הלקוח
+              </HeaderAction>
+            ) : !lead.is_converted && (
               <HeaderAction icon={UserCheck} onClick={() => { onConvert(lead); onClose(); }}>
                 המרה
               </HeaderAction>
