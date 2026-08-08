@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, User, Briefcase, StickyNote } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -16,12 +15,23 @@ const STATUS_GRADIENT = {
   "נסגר בהצלחה (שולם)":  "from-green-500 to-emerald-700",
 };
 
-const priorityColors = {
-  "נמוכה": "bg-blue-100 text-blue-800",
-  "בינונית": "bg-yellow-100 text-yellow-800",
-  "גבוהה": "bg-orange-100 text-orange-800",
-  "קריטית": "bg-red-100 text-red-800"
-};
+// כפתור פעולה בראש הכרטיס — פיל שקוף על גבי הגרדיאנט, כדי שכל הפעולות
+// יהיו נגישות במבט ראשון בלי לגלול למטה.
+function HeaderAction({ icon: Icon, children, danger, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`h-8 px-3 rounded-full text-xs font-semibold flex items-center gap-1.5 border backdrop-blur-sm transition-colors ${
+        danger
+          ? "bg-red-500/20 border-red-200/40 hover:bg-red-500/30 text-white"
+          : "bg-white/15 border-white/25 hover:bg-white/25 text-white"
+      }`}
+    >
+      <Icon className="w-3.5 h-3.5" />
+      {children}
+    </button>
+  );
+}
 
 function DocDropdown({ lead, onQuote, onClose: closeModal }) {
   const [open, setOpen] = useState(false);
@@ -48,18 +58,12 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
 
   return (
     <div className="relative" ref={ref}>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => setOpen(o => !o)}
-        className="text-purple-600 border-purple-200 hover:bg-purple-50 h-8 gap-1"
-      >
-        <FileText className="w-3.5 h-3.5" />
+      <HeaderAction icon={FileText} onClick={() => setOpen(o => !o)}>
         מסמך
-        <ChevronDown className="w-3.5 h-3.5" />
-      </Button>
+        <ChevronDown className="w-3 h-3" />
+      </HeaderAction>
       {open && (
-        <div className="absolute bottom-full mb-1 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px]">
+        <div className="absolute top-full mt-1.5 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px] text-right">
           {templates.length === 0 ? (
             <p className="text-xs text-gray-400 px-3 py-2">אין תבניות</p>
           ) : templates.map(t => (
@@ -77,6 +81,16 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
         </div>
       )}
     </div>
+  );
+}
+
+function SectionTitle({ icon: Icon, children, count }) {
+  return (
+    <p className="text-xs font-bold text-gray-500 flex items-center gap-1.5 mb-2">
+      <Icon className="w-3.5 h-3.5 text-teal-600" />
+      {children}
+      {count != null && <span className="font-normal text-gray-400">({count})</span>}
+    </p>
   );
 }
 
@@ -136,12 +150,12 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg p-0 overflow-hidden max-h-[90vh] flex flex-col gap-0">
+      <DialogContent className="max-w-3xl p-0 overflow-hidden max-h-[90vh] flex flex-col gap-0">
 
-        {/* ── Gradient Header ── */}
-        <div className={`bg-gradient-to-br ${gradient} p-5 text-white flex-shrink-0`}>
+        {/* ── Gradient Header — זהות + כל הפעולות, נגיש בלי לגלול ── */}
+        <div className={`bg-gradient-to-br ${gradient} p-5 pb-4 text-white flex-shrink-0`}>
           <div className="flex items-start gap-4">
-            <div className="w-13 h-13 w-[52px] h-[52px] bg-white/20 border border-white/30 rounded-2xl flex items-center justify-center text-xl font-black flex-shrink-0">
+            <div className="w-[52px] h-[52px] bg-white/20 border border-white/30 rounded-2xl flex items-center justify-center text-xl font-black flex-shrink-0">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -171,155 +185,154 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
               </div>
             </div>
           </div>
-        </div>
 
-        {/* ── Scrollable body ── */}
-        <div className="overflow-y-auto flex-1 p-5 space-y-4">
-
-          {/* Contact */}
-          {(lead.phone || lead.email) && (
-            <div className="grid grid-cols-2 gap-2">
-              {lead.phone && (
-                <a href={`tel:${lead.phone}`}
-                  className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-gray-400">טלפון</p>
-                    <p className="text-sm font-medium text-gray-800 truncate">{lead.phone}</p>
-                  </div>
-                </a>
-              )}
-              {lead.email && (
-                <a href={`mailto:${lead.email}`}
-                  className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] text-gray-400">אימייל</p>
-                    <p className="text-sm font-medium text-gray-800 truncate">{lead.email}</p>
-                  </div>
-                </a>
-              )}
-            </div>
-          )}
-
-          {/* Signed agreements */}
-          {signedQuotes.length > 0 && (
-            <div className="p-3 rounded-xl bg-green-50 border border-green-100">
-              <p className="text-[10px] text-green-700 font-semibold mb-1.5 flex items-center gap-1">
-                <PenLine className="w-3 h-3" /> הסכם חתום
-              </p>
-              <div className="space-y-1">
-                {signedQuotes.map(q => (
-                  <p key={q.id} className="text-sm text-gray-700">
-                    {q.title || "הסכם"}
-                    {q.signed_date && ` — נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`}
-                    {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Details grid */}
-          {detailItems.length > 0 && (
-            <div className="grid grid-cols-2 gap-2">
-              {detailItems.map((item, i) => (
-                <div key={i} className={`p-3 rounded-xl border ${item.red ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-100"}`}>
-                  <p className="text-[10px] text-gray-400 mb-0.5">{item.label}</p>
-                  <p className={`text-sm font-medium ${item.red ? "text-red-600" : "text-gray-800"}`}>{item.value}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Notes */}
-          {lead.notes && (
-            <div className="p-3 rounded-xl bg-amber-50 border border-amber-100">
-              <p className="text-[10px] text-amber-700 font-semibold mb-1">הערות</p>
-              <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{lead.notes}</p>
-            </div>
-          )}
-
-          {/* Tasks */}
-          <div className="border-t pt-3">
-            <div className="flex items-center justify-between mb-2.5">
-              <h4 className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-purple-500" />
-                משימות
-                <span className="text-xs font-normal text-gray-400">({tasks.length})</span>
-              </h4>
-              {onAddTask && (
-                <Button size="sm" variant="outline" className="h-7 text-xs gap-1"
-                  onClick={() => { onAddTask(lead); onClose(); }}>
-                  <Plus className="w-3 h-3" /> הוסף
-                </Button>
-              )}
-            </div>
-
-            {loadingTasks ? (
-              <div className="h-8 animate-pulse bg-gray-100 rounded-lg" />
-            ) : tasks.length === 0 ? (
-              <p className="text-xs text-gray-400 text-center py-3">אין משימות לליד זה</p>
-            ) : (
-              <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                {tasks.map(task => {
-                  const isOverdue = task.status !== "הושלם" && task.due_date && new Date(task.due_date) < new Date();
-                  return (
-                    <div key={task.id}
-                      className={`flex items-center gap-2.5 p-2.5 rounded-lg text-xs border ${isOverdue ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-100"}`}>
-                      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.status === "הושלם" ? "bg-green-400" : isOverdue ? "bg-red-400" : "bg-amber-400"}`} />
-                      <div className="flex-1 min-w-0">
-                        <span className={`font-medium block truncate ${task.status === "הושלם" ? "line-through text-gray-400" : ""}`}>{task.title}</span>
-                        {task.due_date && (
-                          <span className={`text-[10px] ${isOverdue ? "text-red-500 font-semibold" : "text-gray-400"}`}>
-                            {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}{isOverdue && " · באיחור"}
-                          </span>
-                        )}
-                      </div>
-                      {task.status !== "הושלם" && (
-                        <Button variant="ghost" size="icon" className="h-5 w-5 flex-shrink-0 text-green-600" onClick={() => markDone(task.id)}>
-                          <CheckCircle className="w-3.5 h-3.5" />
-                        </Button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Footer: Actions ── */}
-        <div className="border-t bg-gray-50 px-5 py-3 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
-          <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-500 h-8">
-            סגור
-          </Button>
-          <div className="flex gap-1.5 flex-wrap justify-end">
+          {/* פעולות — עברו לכאן מהפוטר כדי שיהיו נוחות ונגישות מיד */}
+          <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-white/15">
             {lead.phone && (
-              <Button variant="outline" size="sm" onClick={() => { onWhatsApp(lead); onClose(); }}
-                className="text-green-600 border-green-200 hover:bg-green-50 h-8 gap-1">
-                <MessageCircle className="w-3.5 h-3.5" /> וואטסאפ
-              </Button>
+              <HeaderAction icon={MessageCircle} onClick={() => { onWhatsApp(lead); onClose(); }}>
+                וואטסאפ
+              </HeaderAction>
             )}
             <DocDropdown lead={lead} onQuote={onQuote} onClose={onClose} />
             {!lead.is_converted && (
-              <Button variant="outline" size="sm" onClick={() => { onConvert(lead); onClose(); }}
-                className="text-teal-600 border-teal-200 hover:bg-teal-50 h-8 gap-1">
-                <UserCheck className="w-3.5 h-3.5" /> המרה
-              </Button>
+              <HeaderAction icon={UserCheck} onClick={() => { onConvert(lead); onClose(); }}>
+                המרה
+              </HeaderAction>
             )}
-            <Button variant="outline" size="sm" onClick={() => { onEdit(lead); onClose(); }}
-              className="text-blue-600 border-blue-200 hover:bg-blue-50 h-8 gap-1">
-              <Edit className="w-3.5 h-3.5" /> עריכה
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => { onDelete(lead); onClose(); }}
-              className="text-red-600 border-red-200 hover:bg-red-50 h-8 gap-1">
-              <Trash2 className="w-3.5 h-3.5" /> מחיקה
-            </Button>
+            {onAddTask && (
+              <HeaderAction icon={Plus} onClick={() => { onAddTask(lead); onClose(); }}>
+                משימה
+              </HeaderAction>
+            )}
+            <HeaderAction icon={Edit} onClick={() => { onEdit(lead); onClose(); }}>
+              עריכה
+            </HeaderAction>
+            <HeaderAction icon={Trash2} danger onClick={() => { onDelete(lead); onClose(); }}>
+              מחיקה
+            </HeaderAction>
+          </div>
+        </div>
+
+        {/* ── גוף גלול, שתי עמודות — הכל גלוי בלי טאבים ── */}
+        <div className="overflow-y-auto flex-1 p-5">
+          <div className="grid md:grid-cols-2 gap-5">
+
+            {/* עמודה ימנית: פרטי קשר, פרטים, הערות */}
+            <div className="space-y-4">
+              {(lead.phone || lead.email) && (
+                <div>
+                  <SectionTitle icon={User}>פרטי קשר</SectionTitle>
+                  <div className="grid grid-cols-2 gap-2">
+                    {lead.phone && (
+                      <a href={`tel:${lead.phone}`}
+                        className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Phone className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] text-gray-400">טלפון</p>
+                          <p className="text-sm font-medium text-gray-800 truncate">{lead.phone}</p>
+                        </div>
+                      </a>
+                    )}
+                    {lead.email && (
+                      <a href={`mailto:${lead.email}`}
+                        className="flex items-center gap-2.5 p-3 rounded-xl border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors">
+                        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Mail className="w-4 h-4 text-purple-600" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] text-gray-400">אימייל</p>
+                          <p className="text-sm font-medium text-gray-800 truncate">{lead.email}</p>
+                        </div>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {detailItems.length > 0 && (
+                <div>
+                  <SectionTitle icon={Briefcase}>פרטים</SectionTitle>
+                  <div className="grid grid-cols-2 gap-2">
+                    {detailItems.map((item, i) => (
+                      <div key={i} className={`p-3 rounded-xl border ${item.red ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-100"}`}>
+                        <p className="text-[10px] text-gray-400 mb-0.5">{item.label}</p>
+                        <p className={`text-sm font-medium ${item.red ? "text-red-600" : "text-gray-800"}`}>{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {lead.notes && (
+                <div>
+                  <SectionTitle icon={StickyNote}>הערות</SectionTitle>
+                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-100">
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{lead.notes}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* עמודה שמאלית: מסמכים חתומים, משימות */}
+            <div className="space-y-4">
+              <div>
+                <SectionTitle icon={PenLine}>מסמכים</SectionTitle>
+                {signedQuotes.length > 0 ? (
+                  <div className="p-3 rounded-xl bg-green-50 border border-green-100">
+                    <p className="text-[10px] text-green-700 font-semibold mb-1.5 flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" /> הסכם חתום
+                    </p>
+                    <div className="space-y-1">
+                      {signedQuotes.map(q => (
+                        <p key={q.id} className="text-sm text-gray-700">
+                          {q.title || "הסכם"}
+                          {q.signed_date && ` — נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`}
+                          {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 py-2">אין הסכמים חתומים לליד זה</p>
+                )}
+              </div>
+
+              <div>
+                <SectionTitle icon={Clock} count={tasks.length}>משימות</SectionTitle>
+                {loadingTasks ? (
+                  <div className="h-8 animate-pulse bg-gray-100 rounded-lg" />
+                ) : tasks.length === 0 ? (
+                  <p className="text-xs text-gray-400 text-center py-3">אין משימות לליד זה</p>
+                ) : (
+                  <div className="space-y-1.5 max-h-52 overflow-y-auto">
+                    {tasks.map(task => {
+                      const isOverdue = task.status !== "הושלם" && task.due_date && new Date(task.due_date) < new Date();
+                      return (
+                        <div key={task.id}
+                          className={`flex items-center gap-2.5 p-2.5 rounded-lg text-xs border ${isOverdue ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-100"}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.status === "הושלם" ? "bg-green-400" : isOverdue ? "bg-red-400" : "bg-amber-400"}`} />
+                          <div className="flex-1 min-w-0">
+                            <span className={`font-medium block truncate ${task.status === "הושלם" ? "line-through text-gray-400" : ""}`}>{task.title}</span>
+                            {task.due_date && (
+                              <span className={`text-[10px] ${isOverdue ? "text-red-500 font-semibold" : "text-gray-400"}`}>
+                                {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}{isOverdue && " · באיחור"}
+                              </span>
+                            )}
+                          </div>
+                          {task.status !== "הושלם" && (
+                            <Button variant="ghost" size="icon" className="h-5 w-5 flex-shrink-0 text-green-600" onClick={() => markDone(task.id)}>
+                              <CheckCircle className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </DialogContent>
