@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-const { Customer, Payment, Task, Lead, Quote } = base44.entities;
+const { Customer, Payment, Task, Lead, Quote, Expense } = base44.entities;
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
@@ -14,6 +14,7 @@ import StatsCard from "../components/dashboard/StatsCard";
 import TaskList from "../components/dashboard/TaskList";
 import LeadsByStatus from "../components/dashboard/LeadsByStatus";
 import PaymentChart from "../components/dashboard/PaymentChart";
+import FinancialOverview from "../components/dashboard/FinancialOverview";
 
 function Skeleton({ className }) {
   return <div className={`animate-pulse bg-gray-100 rounded-xl ${className}`} />;
@@ -38,6 +39,7 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [leads, setLeads] = useState([]);
   const [quotes, setQuotes] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -48,19 +50,22 @@ export default function Dashboard() {
     try {
       const user = await base44.auth.me();
       setCurrentUser(user);
-      const isAdmin = user.role === 'admin';
-      const [customersData, paymentsData, tasksData, leadsData, quotesData] = await Promise.all([
+      const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
+      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
         Lead.list('-created_date', 200),
-        Quote.list('-valid_until', 500)
+        Quote.list('-valid_until', 500),
+        // הוצאות הן מידע פיננסי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
+        isAdmin ? Expense.list('-expense_date', 500) : Promise.resolve([])
       ]);
       setCustomers(customersData);
       setPayments(paymentsData);
       setTasks(tasksData);
       setLeads(leadsData);
       setQuotes(quotesData);
+      setExpenses(expensesData);
     } catch (e) {
       console.error("שגיאה בטעינת dashboard:", e);
     } finally {
@@ -115,7 +120,28 @@ export default function Dashboard() {
     return days <= RENEWAL_WINDOW_DAYS;
   });
 
-  const isAdmin = currentUser?.role === 'admin';
+  // תמונת מצב פיננסית (מנהלים בלבד) — הכנסות מול הוצאות, ותזרים נטו של החודש
+  const monthlyExpenses = expenses
+    .filter(e => {
+      const d = new Date(e.expense_date);
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    })
+    .reduce((s, e) => s + (e.amount || 0), 0);
+
+  const netCashFlow = monthlyRevenue - monthlyExpenses;
+
+  // "גיל" החוב הפתוח — כמה זמן כבר עבר מאז מועד התשלום שנקבע
+  const overduePayments = payments.filter(p =>
+    p.status !== "שולם" && p.status !== "מבוטל" && p.due_date && new Date(p.due_date) < now
+  );
+  const agingDays = (p) => Math.floor((now - new Date(p.due_date)) / (1000 * 60 * 60 * 24));
+  const aging = {
+    "0-30":  overduePayments.filter(p => agingDays(p) <= 30).reduce((s, p) => s + (p.amount || 0), 0),
+    "31-60": overduePayments.filter(p => agingDays(p) > 30 && agingDays(p) <= 60).reduce((s, p) => s + (p.amount || 0), 0),
+    "60+":   overduePayments.filter(p => agingDays(p) > 60).reduce((s, p) => s + (p.amount || 0), 0),
+  };
+
+  const isAdmin = currentUser?.role === 'admin' || currentUser?.user_category === "מנהל_ראשי";
   const relevantLeads = isAdmin ? leads : leads.filter(l => l.agent_id === currentUser?.id);
 
   const PIPELINE_STAGES = [
@@ -235,6 +261,16 @@ export default function Dashboard() {
             linkTo={createPageUrl("Payments")}
           />
         </div>
+      )}
+
+      {/* ── Financial Overview (מנהלים בלבד) ── */}
+      {!loading && isAdmin && (
+        <FinancialOverview
+          monthlyRevenue={monthlyRevenue}
+          monthlyExpenses={monthlyExpenses}
+          netCashFlow={netCashFlow}
+          aging={aging}
+        />
       )}
 
       {/* ── Pipeline ── */}
