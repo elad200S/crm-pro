@@ -12,7 +12,8 @@ import {
   X,
   UserPlus,
   FileText,
-  TrendingDown
+  TrendingDown,
+  Percent
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./components/notifications/NotificationBell";
@@ -42,6 +43,11 @@ const navigationItems = [
     title: "הוצאות",
     url: createPageUrl("Expenses"),
     icon: TrendingDown,
+  },
+  {
+    title: "עמלות",
+    url: createPageUrl("Commissions"),
+    icon: Percent,
   },
   {
     title: "מסמכים",
@@ -109,7 +115,7 @@ export default function Layout({ children, currentPageName }) {
       setCurrentUser(user);
 
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
-      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד", "הוצאות"];
+      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד", "הוצאות", "עמלות"];
       setVisibleNavItems(navigationItems.filter(item =>
         !adminOnlyPages.includes(item.title) || isAdmin
       ));
