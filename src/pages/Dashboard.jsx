@@ -16,6 +16,7 @@ import LeadsByStatus from "../components/dashboard/LeadsByStatus";
 import PaymentChart from "../components/dashboard/PaymentChart";
 import FinancialOverview from "../components/dashboard/FinancialOverview";
 import TargetEditModal from "../components/dashboard/TargetEditModal";
+import { logActivity } from "@/lib/activityLog";
 
 function Skeleton({ className }) {
   return <div className={`animate-pulse bg-gray-100 rounded-xl ${className}`} />;
@@ -179,11 +180,18 @@ export default function Dashboard() {
 
   const handleSaveTarget = async (data) => {
     try {
-      if (monthTarget?.id) {
-        await Target.update(monthTarget.id, data);
+      let targetId = monthTarget?.id;
+      if (targetId) {
+        await Target.update(targetId, data);
       } else {
-        await Target.create({ month: monthKey, ...data });
+        const created = await Target.create({ month: monthKey, ...data });
+        targetId = created.id;
       }
+      logActivity({
+        entity_type: "target", entity_id: targetId, action: "target_set",
+        summary: `יעד ${monthLabel} עודכן: ₪${(data.revenue_target || 0).toLocaleString()} הכנסות, ${data.deals_target || 0} עסקאות`,
+        amount: data.revenue_target,
+      });
       setShowTargetModal(false);
       loadData();
     } catch (e) {

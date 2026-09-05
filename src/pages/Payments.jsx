@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { logActivity } from "@/lib/activityLog";
 import PaymentForm from "../components/payments/PaymentForm";
 import PaymentTable from "../components/payments/PaymentTable";
 import PaymentFilters from "../components/payments/PaymentFilters";
@@ -144,12 +145,24 @@ export default function Payments() {
           return;
         }
         await Payment.update(editingPayment.id, paymentData);
+        if (paymentData.status === "שולם" && editingPayment.status !== "שולם") {
+          logActivity({
+            entity_type: "payment", entity_id: editingPayment.id, action: "paid",
+            summary: `חשבונית ${editingPayment.invoice_number || ""} סומנה כשולמה`,
+            amount: paymentData.amount,
+          });
+        }
       } else {
         const invoiceNumber = `INV-${Date.now()}`;
-        await Payment.create({
+        const created = await Payment.create({
           ...paymentData,
           invoice_number: invoiceNumber,
           invoice_date: new Date().toISOString().split('T')[0]
+        });
+        logActivity({
+          entity_type: "payment", entity_id: created.id, action: "created",
+          summary: `נוצרה חשבונית ${invoiceNumber} על סך ₪${(paymentData.amount || 0).toLocaleString()}`,
+          amount: paymentData.amount,
         });
       }
       setShowForm(false);

@@ -1,0 +1,71 @@
+{
+  "name": "ActivityLog",
+  "type": "object",
+  "properties": {
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "lead",
+        "quote",
+        "payment",
+        "customer",
+        "expense",
+        "cancellation",
+        "target"
+      ],
+      "description": "סוג הרשומה שהפעילות מתייחסת אליה"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "מזהה הרשומה שהפעילות מתייחסת אליה"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "created",
+        "status_changed",
+        "amount_changed",
+        "signed",
+        "approved",
+        "cancelled",
+        "paid",
+        "target_set"
+      ],
+      "description": "סוג הפעולה שבוצעה"
+    },
+    "summary": {
+      "type": "string",
+      "description": "תיאור קריא של מה שקרה"
+    },
+    "amount": {
+      "type": "number",
+      "description": "סכום כספי רלוונטי לפעולה (אם יש)"
+    }
+  },
+  "required": [
+    "entity_type",
+    "entity_id",
+    "action",
+    "summary"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "read": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "update": {
+      "user_condition": { "role": "admin" }
+    },
+    "delete": {
+      "user_condition": { "role": "admin" }
+    }
+  }
+}

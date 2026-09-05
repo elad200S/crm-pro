@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus, PenLine, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import { logActivity } from "@/lib/activityLog";
 import QuoteEditModal from "../components/quotes/QuoteEditModal";
 import QuoteDocument from "../components/quotes/QuoteDocument";
 import DocumentModal from "../components/quotes/DocumentModal";
@@ -67,6 +68,13 @@ export default function Quotes() {
   };
 
   const handleEditSubmit = async (data) => {
+    if (data.amount !== editingQuote.amount) {
+      logActivity({
+        entity_type: "quote", entity_id: editingQuote.id, action: "amount_changed",
+        summary: `סכום הצעה '${editingQuote.title || "ללא כותרת"}' שונה מ-₪${(editingQuote.amount || 0).toLocaleString()} ל-₪${(data.amount || 0).toLocaleString()}`,
+        amount: data.amount,
+      });
+    }
     await base44.entities.Quote.update(editingQuote.id, data);
     setEditingQuote(null);
     await loadData();
@@ -79,8 +87,14 @@ export default function Quotes() {
   };
 
   const handleStatusChange = async (quoteId, newStatus) => {
+    const quote = quotes.find(q => q.id === quoteId);
     await base44.entities.Quote.update(quoteId, { status: newStatus });
     setQuotes(prev => prev.map(q => q.id === quoteId ? { ...q, status: newStatus } : q));
+    logActivity({
+      entity_type: "quote", entity_id: quoteId, action: "status_changed",
+      summary: `סטטוס הצעה '${quote?.title || "ללא כותרת"}' שונה מ-${quote?.status || "?"} ל-${newStatus}`,
+      amount: quote?.amount,
+    });
   };
 
   const isExpired = (q) => q.valid_until && new Date(q.valid_until) < new Date() && q.status !== "אושר" && q.status !== "בוטל";

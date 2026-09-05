@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { base44 } from "@/api/base44Client";
+import { logActivity } from "@/lib/activityLog";
 
 const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
@@ -310,6 +311,11 @@ export default function ClientSign() {
           status: "אושר",
           client_signature: signature,
           signed_date: new Date().toISOString(),
+        });
+        logActivity({
+          entity_type: "quote", entity_id: id, action: "signed",
+          summary: `הסכם '${title || "הסכם עבודה"}' נחתם דיגיטלית על ידי הלקוח`,
+          amount: price,
         });
       }
       setStep("done");

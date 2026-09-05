@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { createPageUrl } from "@/utils";
+import { logActivity } from "@/lib/activityLog";
 import CancelCustomerModal from "../components/customers/CancelCustomerModal";
 
 const STATUS_COLORS = {
@@ -94,6 +95,11 @@ export default function CustomerProfile() {
         notes,
       });
       await base44.entities.Customer.update(customer.id, { status: "לא פעיל" });
+      logActivity({
+        entity_type: "customer", entity_id: customer.id, action: "cancelled",
+        summary: `הלקוח ${customer.first_name} ${customer.last_name} בוטל — סיבה: ${reason}`,
+        amount: refund_amount,
+      });
       setCustomer(c => ({ ...c, status: "לא פעיל" }));
       setShowCancelModal(false);
       await loadData({ ...customer, id: customer.id });

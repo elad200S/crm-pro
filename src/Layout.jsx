@@ -13,7 +13,8 @@ import {
   UserPlus,
   FileText,
   TrendingDown,
-  Percent
+  Percent,
+  History
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./components/notifications/NotificationBell";
@@ -68,6 +69,11 @@ const navigationItems = [
     title: "קבצי תיאור תפקיד",
     url: createPageUrl("JobDescriptionManagement"),
     icon: Building2,
+  },
+  {
+    title: "יומן פעילות",
+    url: createPageUrl("ActivityLog"),
+    icon: History,
   }
 ];
 
@@ -115,7 +121,7 @@ export default function Layout({ children, currentPageName }) {
       setCurrentUser(user);
 
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
-      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד", "הוצאות", "עמלות"];
+      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד", "הוצאות", "עמלות", "יומן פעילות"];
       setVisibleNavItems(navigationItems.filter(item =>
         !adminOnlyPages.includes(item.title) || isAdmin
       ));

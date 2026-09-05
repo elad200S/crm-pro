@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
+import { logActivity } from "@/lib/activityLog";
 import ExpenseForm from "../components/expenses/ExpenseForm";
 import ExpenseTable from "../components/expenses/ExpenseTable";
 
@@ -83,7 +84,12 @@ export default function Expenses() {
       if (editingExpense) {
         await Expense.update(editingExpense.id, data);
       } else {
-        await Expense.create(data);
+        const created = await Expense.create(data);
+        logActivity({
+          entity_type: "expense", entity_id: created.id, action: "created",
+          summary: `נוספה הוצאה: ${data.description} (${data.category})`,
+          amount: data.amount,
+        });
       }
       setShowForm(false);
       setEditingExpense(null);
