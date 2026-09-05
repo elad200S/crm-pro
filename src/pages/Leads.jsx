@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { UserPlus, Download, LayoutGrid, Kanban, List, ChevronDown, Check } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 
 import LeadStatsCards from "../components/leads/LeadStatsCards";
 import LeadFilters from "../components/leads/LeadFilters";
@@ -12,7 +10,6 @@ import LeadCards from "../components/leads/LeadCards";
 import LeadKanban from "../components/leads/LeadKanban";
 import LeadTable from "../components/leads/LeadTable";
 import LeadForm from "../components/leads/LeadForm";
-import QuoteModal from "../components/leads/QuoteModal";
 import DocumentModal from "../components/quotes/DocumentModal";
 import QuoteDocument from "../components/quotes/QuoteDocument";
 import AddTaskModal from "../components/leads/AddTaskModal";
@@ -26,7 +23,7 @@ const OUTBOUND_EVENT = async (accountWebhook, payload) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
-  }).catch(() => {});
+  }).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
 };
 
 export default function Leads() {
@@ -84,7 +81,7 @@ export default function Leads() {
       for (const l of missingNum) {
         next += 1;
         l.lead_number = String(next).padStart(3, '0');
-        await base44.entities.Lead.update(l.id, { lead_number: l.lead_number }).catch(() => {});
+        await base44.entities.Lead.update(l.id, { lead_number: l.lead_number }).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
       }
     }
     setLeads(leadsData);
@@ -191,7 +188,7 @@ export default function Leads() {
           related_type: "lead",
           priority: "medium",
           account_id: accountId
-        }).catch(() => {});
+        }).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
       }
     }
     setShowForm(false);
@@ -242,7 +239,7 @@ export default function Leads() {
       related_type: "quote",
       priority: "low",
       account_id: accountId
-    }).catch(() => {});
+    }).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
     const lead = leads.find(l => l.id === quoteTarget?.id) || quoteTarget;
     setQuoteTarget(null);
     setQuoteTemplate(null);
@@ -299,7 +296,7 @@ export default function Leads() {
       related_type: "lead",
       priority: "medium",
       account_id: accountId
-    }).catch(() => {});
+    }).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
 
     await OUTBOUND_EVENT(webhookUrl, {
       event_name: "lead_converted_to_customer",

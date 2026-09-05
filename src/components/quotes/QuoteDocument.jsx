@@ -50,9 +50,13 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
       if (quote?.id) {
         await base44.entities.Quote.update(quote.id, { status: "אושר" });
       }
-    } catch {}
-    setApproved(true);
-    if (onApprove) onApprove();
+      setApproved(true);
+      if (onApprove) onApprove();
+    } catch (e) {
+      // אל תראה "אושר" אם השמירה בפועל נכשלה
+      console.error("אישור ההסכם נכשל:", e);
+      alert("אישור ההסכם נכשל. נסה שוב.");
+    }
   };
 
   const handlePrint = () => {
@@ -166,7 +170,9 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
         setShorteningLink(false);
         return short;
       }
-    } catch {}
+    } catch (e) {
+      console.error("קיצור קישור נכשל, משתמשים בקישור המלא:", e);
+    }
     setShorteningLink(false);
     return longUrl;
   };

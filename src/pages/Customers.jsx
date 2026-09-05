@@ -20,7 +20,6 @@ import {
 import CustomerForm from "../components/customers/CustomerForm";
 import CustomerTable from "../components/customers/CustomerTable";
 import CustomerFilters from "../components/customers/CustomerFilters";
-import CustomerCard from "../components/customers/CustomerCard";
 
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -86,7 +85,8 @@ export default function Customers() {
         for (const c of missingNum) {
           next += 1;
           c.customer_number = String(next).padStart(3, '0');
-          await Customer.update(c.id, { customer_number: c.customer_number }).catch(() => {});
+          await Customer.update(c.id, { customer_number: c.customer_number })
+            .catch(e => console.error(`השלמת מספר ללקוח ${c.id} נכשלה:`, e));
         }
       }
       setCustomers(data);

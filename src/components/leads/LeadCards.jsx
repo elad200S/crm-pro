@@ -41,7 +41,9 @@ function QuoteDropdown({ lead, onQuote }) {
         const all = await base44.entities.Quote.list('-created_date', 50);
         // תבניות = מסמכים ללא ליד או לקוח מחובר
         setTemplates(all.filter(q => !q.lead_id && !q.customer_id));
-      } catch {}
+      } catch (e) {
+        console.error("טעינת תבניות מסמך נכשלה:", e);
+      }
     };
     load();
   }, []);

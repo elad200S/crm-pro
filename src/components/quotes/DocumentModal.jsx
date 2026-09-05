@@ -63,7 +63,7 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
   useEffect(() => {
     base44.entities.Quote.list('-created_date', 100).then(all => {
       setTemplates(all.filter(q => q.status === "תבנית" && !q.lead_id && !q.customer_id));
-    }).catch(() => {});
+    }).catch(e => console.error("טעינת תבניות מסמך נכשלה:", e));
   }, []);
 
   const [form, setForm] = useState({

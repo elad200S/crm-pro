@@ -196,7 +196,9 @@ export default function ClientSign() {
   let docData = null;
   try {
     docData = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-  } catch {}
+  } catch (e) {
+    console.error("קישור חתימה לא תקין — נכשל בפענוח:", e);
+  }
 
   const { id, lead_id, customer_id, title, rawBody, amount, valid_until, lead } = docData || {};
   const price = parseFloat(amount) || 0;
@@ -220,6 +222,7 @@ export default function ClientSign() {
   const [step, setStep] = useState("form");
   const [signature, setSignature] = useState(null);
   const [signing, setSigning] = useState(false);
+  const [signError, setSignError] = useState(false);
 
   if (!docData) {
     return (
@@ -267,7 +270,10 @@ export default function ClientSign() {
         if (company)  leadUpdate.company_name = company;
         if (fullName) leadUpdate.full_name = fullName;
         if (Object.keys(leadUpdate).length) {
-          await base44.entities.Lead.update(lead_id, leadUpdate).catch(() => {});
+          // סנכרון best-effort לכרטיס הליד — לא חוסם את החתימה אם נכשל,
+          // אבל לפחות נרשם כדי שאפשר יהיה לגלות שזה לא הצליח.
+          await base44.entities.Lead.update(lead_id, leadUpdate)
+            .catch(e => console.error("סנכרון פרטי חתימה לכרטיס הליד נכשל:", e));
         }
       }
       if (customer_id) {
@@ -283,15 +289,21 @@ export default function ClientSign() {
           customerUpdate.last_name = parts.slice(1).join(" ") || "";
         }
         if (Object.keys(customerUpdate).length) {
-          await base44.entities.Customer.update(customer_id, customerUpdate).catch(() => {});
+          await base44.entities.Customer.update(customer_id, customerUpdate)
+            .catch(e => console.error("סנכרון פרטי חתימה לכרטיס הלקוח נכשל:", e));
         }
       }
-    } catch {}
+    } catch (e) {
+      // שמירת הפרטים על ההסכם עצמו נכשלה — לא חוסם את המשך התהליך (הפרטים
+      // עדיין מוצגים בהסכם מהזיכרון), אבל חייבים לדעת שזה קרה.
+      console.error("שמירת פרטי הלקוח על ההסכם נכשלה:", e);
+    }
     setStep("document");
   };
 
   const handleSign = async () => {
     setSigning(true);
+    setSignError(false);
     try {
       if (id) {
         await base44.entities.Quote.update(id, {
@@ -300,9 +312,14 @@ export default function ClientSign() {
           signed_date: new Date().toISOString(),
         });
       }
-    } catch {}
+      setStep("done");
+    } catch (e) {
+      // קריטי: אם השמירה נכשלה, אסור להראות ללקוח מסך "נחתם בהצלחה" —
+      // זה בדיוק הבאג שכבר תפס אותנו פעם (חתימה ש"נחתמה" אבל לא נשמרה).
+      console.error("שמירת החתימה נכשלה:", e);
+      setSignError(true);
+    }
     setSigning(false);
-    setStep("done");
   };
 
   // ── שלב 1: טופס פרטים חסרים ───────────────────────────────────────────────
@@ -404,6 +421,11 @@ export default function ClientSign() {
           </div>
 
           <div className="px-10 pb-8 pt-4">
+            {signError && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5 text-center mb-3">
+                החתימה לא נשמרה בגלל תקלה זמנית. אנא נסה שוב — אם זה חוזר, פנה ל-HEY Digital.
+              </p>
+            )}
             <Button
               className="w-full bg-green-600 hover:bg-green-700 h-12 text-base font-bold"
               disabled={!signature || signing}

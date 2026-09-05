@@ -47,7 +47,9 @@ function ContactChip({ icon: Icon, value, href }) {
       await navigator.clipboard.writeText(value);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {}
+    } catch (err) {
+      console.error("העתקה ללוח נכשלה:", err);
+    }
   };
 
   return (
@@ -75,7 +77,7 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
   useEffect(() => {
     base44.entities.Quote.list('-created_date', 50)
       .then(all => setTemplates(all.filter(q => !q.lead_id && !q.customer_id)))
-      .catch(() => {});
+      .catch(e => console.error("טעינת תבניות מסמך נכשלה:", e));
   }, []);
 
   useEffect(() => {
@@ -146,6 +148,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
       const all = await base44.entities.Task.list("-created_date", 100);
       setTasks(all.filter(t => t.lead_id === lead.id));
     } catch (e) {
+      console.error("טעינת משימות הליד נכשלה:", e);
       setTasks([]);
     } finally {
       setLoadingTasks(false);
@@ -159,6 +162,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
       const all = await base44.entities.Quote.list("-signed_date", 100);
       setSignedQuotes(all.filter(q => q.lead_id === lead.id && q.client_signature));
     } catch (e) {
+      console.error("טעינת הסכמים חתומים לליד נכשלה:", e);
       setSignedQuotes([]);
     }
   };

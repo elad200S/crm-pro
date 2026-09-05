@@ -98,7 +98,9 @@ export default function Layout({ children, currentPageName }) {
         .filter(p => p.status === "שולם" && p.paid_date && new Date(p.paid_date).getMonth() === now.getMonth() && new Date(p.paid_date).getFullYear() === now.getFullYear())
         .reduce((s, p) => s + (p.amount || 0), 0);
       setSidebarStats({ activeCustomers, pendingPayments, monthlyRevenue });
-    } catch {}
+    } catch (e) {
+      console.error("טעינת נתוני סרגל צד נכשלה:", e);
+    }
   };
 
   const checkUserOnboarding = async () => {
