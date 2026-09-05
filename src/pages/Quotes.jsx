@@ -43,7 +43,7 @@ export default function Quotes() {
       base44.entities.Quote.list('-created_date', 200),
       base44.entities.Lead.list('-created_date', 200),
       base44.entities.Customer.list('-created_date', 200),
-      base44.entities.Payment.list('-created_date', 200).catch(() => [])
+      base44.entities.Payment.list('-created_date', 200).catch(e => { console.error("טעינה נכשלה:", e); return []; })
     ]);
     setQuotes(quotesData);
     setLeads(leadsData);

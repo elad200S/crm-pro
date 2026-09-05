@@ -50,7 +50,7 @@ export default function CustomerProfile() {
         // כניסה ישירה דרך URL (?customer=<id>) — למשל מסוכן אוטומציה
         const customerId = new URLSearchParams(location.search).get("customer");
         if (customerId) {
-          c = await base44.entities.Customer.get(customerId).catch(() => null);
+          c = await base44.entities.Customer.get(customerId).catch(e => { console.error("טעינה נכשלה:", e); return null; });
         }
       }
       if (!c) { setNotFound(true); setLoading(false); return; }
@@ -67,9 +67,9 @@ export default function CustomerProfile() {
   const loadData = async (c) => {
     try {
       const [pData, tData, qData] = await Promise.all([
-        base44.entities.Payment.filter({ customer_id: c.id }, '-created_date', 50).catch(() => []),
-        base44.entities.Task.list('-due_date', 200).then(all => all.filter(t => t.customer_id === c.id)).catch(() => []),
-        base44.entities.Quote.list('-created_date', 200).then(all => all.filter(q => q.customer_id === c.id)).catch(() => []),
+        base44.entities.Payment.filter({ customer_id: c.id }, '-created_date', 50).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
+        base44.entities.Task.list('-due_date', 200).then(all => all.filter(t => t.customer_id === c.id)).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
+        base44.entities.Quote.list('-created_date', 200).then(all => all.filter(q => q.customer_id === c.id)).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
       ]);
       setPayments(pData);
       setTasks(tData);
