@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-const { Customer, Payment, Task, Lead, Quote, Expense } = base44.entities;
+const { Customer, Payment, Task, Lead, Quote, Expense, Cancellation } = base44.entities;
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
@@ -40,6 +40,7 @@ export default function Dashboard() {
   const [leads, setLeads] = useState([]);
   const [quotes, setQuotes] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [cancellations, setCancellations] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -51,14 +52,15 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       setCurrentUser(user);
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
-      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData] = await Promise.all([
+      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
         Lead.list('-created_date', 200),
         Quote.list('-valid_until', 500),
-        // הוצאות הן מידע פיננסי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
-        isAdmin ? Expense.list('-expense_date', 500) : Promise.resolve([])
+        // הוצאות וביטולים הם מידע פיננסי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
+        isAdmin ? Expense.list('-expense_date', 500) : Promise.resolve([]),
+        isAdmin ? Cancellation.list('-cancelled_date', 200) : Promise.resolve([])
       ]);
       setCustomers(customersData);
       setPayments(paymentsData);
@@ -66,6 +68,7 @@ export default function Dashboard() {
       setLeads(leadsData);
       setQuotes(quotesData);
       setExpenses(expensesData);
+      setCancellations(cancellationsData);
     } catch (e) {
       console.error("שגיאה בטעינת dashboard:", e);
     } finally {
@@ -129,6 +132,11 @@ export default function Dashboard() {
     .reduce((s, e) => s + (e.amount || 0), 0);
 
   const netCashFlow = monthlyRevenue - monthlyExpenses;
+
+  const cancellationsThisMonth = cancellations.filter(c => {
+    const d = new Date(c.cancelled_date);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
 
   // "גיל" החוב הפתוח — כמה זמן כבר עבר מאז מועד התשלום שנקבע
   const overduePayments = payments.filter(p =>
@@ -270,6 +278,7 @@ export default function Dashboard() {
           monthlyExpenses={monthlyExpenses}
           netCashFlow={netCashFlow}
           aging={aging}
+          cancellationsThisMonth={cancellationsThisMonth.length}
         />
       )}
 

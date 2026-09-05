@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { TrendingUp, TrendingDown, Wallet, ChevronLeft } from "lucide-react";
+import { TrendingUp, TrendingDown, Wallet, ChevronLeft, UserX } from "lucide-react";
 
-export default function FinancialOverview({ monthlyRevenue, monthlyExpenses, netCashFlow, aging }) {
+export default function FinancialOverview({ monthlyRevenue, monthlyExpenses, netCashFlow, aging, cancellationsThisMonth }) {
   const totalAging = aging["0-30"] + aging["31-60"] + aging["60+"];
 
   return (
@@ -13,10 +13,18 @@ export default function FinancialOverview({ monthlyRevenue, monthlyExpenses, net
           <Wallet className="w-4 h-4 text-teal-600" />
           תמונת מצב פיננסית — החודש
         </h2>
-        <Link to={createPageUrl("Expenses")}
-          className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
-          ניהול הוצאות <ChevronLeft className="w-3.5 h-3.5" />
-        </Link>
+        <div className="flex items-center gap-3">
+          {cancellationsThisMonth > 0 && (
+            <Link to={createPageUrl("Customers")}
+              className="text-xs text-red-600 hover:text-red-700 flex items-center gap-1 font-medium">
+              <UserX className="w-3.5 h-3.5" /> {cancellationsThisMonth} ביטולים החודש
+            </Link>
+          )}
+          <Link to={createPageUrl("Expenses")}
+            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
+            ניהול הוצאות <ChevronLeft className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
 
       <div className="grid sm:grid-cols-3 gap-4 mb-5">

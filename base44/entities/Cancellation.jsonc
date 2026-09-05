@@ -1,0 +1,66 @@
+{
+  "name": "Cancellation",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string",
+      "description": "מזהה הלקוח שביטל"
+    },
+    "cancelled_date": {
+      "type": "string",
+      "format": "date",
+      "description": "תאריך הביטול"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "מחיר",
+        "איכות שירות",
+        "עבר למתחרה",
+        "קיצוצי תקציב",
+        "לא היה צורך יותר",
+        "אחר"
+      ],
+      "description": "סיבת הביטול"
+    },
+    "refund_amount": {
+      "type": "number",
+      "description": "סכום שהוחזר ללקוח (אם היה)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "הערות נוספות על הביטול"
+    }
+  },
+  "required": [
+    "customer_id",
+    "cancelled_date",
+    "reason"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "read": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "delete": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    }
+  }
+}

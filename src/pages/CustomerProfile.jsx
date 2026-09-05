@@ -6,10 +6,11 @@ import { he } from "date-fns/locale";
 import {
   ArrowRight, Phone, Mail, Edit,
   MessageCircle, FileText, Clock,
-  CreditCard, CheckCircle, Building2
+  CreditCard, CheckCircle, Building2, XCircle
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { createPageUrl } from "@/utils";
+import CancelCustomerModal from "../components/customers/CancelCustomerModal";
 
 const STATUS_COLORS = {
   "פעיל":      "bg-green-100 text-green-700",
@@ -40,6 +41,8 @@ export default function CustomerProfile() {
   const [payments, setPayments] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [quotes, setQuotes] = useState([]);
+  const [cancellation, setCancellation] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -66,16 +69,37 @@ export default function CustomerProfile() {
 
   const loadData = async (c) => {
     try {
-      const [pData, tData, qData] = await Promise.all([
+      const [pData, tData, qData, cancelData] = await Promise.all([
         base44.entities.Payment.filter({ customer_id: c.id }, '-created_date', 50).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
         base44.entities.Task.list('-due_date', 200).then(all => all.filter(t => t.customer_id === c.id)).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
         base44.entities.Quote.list('-created_date', 200).then(all => all.filter(q => q.customer_id === c.id)).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
+        base44.entities.Cancellation.filter({ customer_id: c.id }, '-cancelled_date', 1).catch(e => { console.error("טעינה נכשלה:", e); return []; }),
       ]);
       setPayments(pData);
       setTasks(tData);
       setQuotes(qData);
+      setCancellation(cancelData[0] || null);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelConfirm = async ({ reason, refund_amount, notes }) => {
+    try {
+      await base44.entities.Cancellation.create({
+        customer_id: customer.id,
+        cancelled_date: new Date().toISOString().split("T")[0],
+        reason,
+        refund_amount,
+        notes,
+      });
+      await base44.entities.Customer.update(customer.id, { status: "לא פעיל" });
+      setCustomer(c => ({ ...c, status: "לא פעיל" }));
+      setShowCancelModal(false);
+      await loadData({ ...customer, id: customer.id });
+    } catch (e) {
+      console.error("ביטול הלקוח נכשל:", e);
+      alert("ביטול הלקוח נכשל. נסה שוב.");
     }
   };
 
@@ -264,8 +288,32 @@ export default function CustomerProfile() {
                 className="w-10 h-10 bg-white/20 border border-white/30 rounded-xl flex items-center justify-center hover:bg-white/30 transition-colors">
                 <Edit className="w-4 h-4" />
               </button>
+              {customer.status !== "לא פעיל" && (
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  title="בטל לקוח"
+                  className="w-10 h-10 bg-white/20 border border-white/30 rounded-xl flex items-center justify-center hover:bg-red-500/40 transition-colors">
+                  <XCircle className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Cancellation info — למה הלקוח הזה בוטל */}
+          {cancellation && (
+            <div className="bg-red-50 border border-red-100 rounded-2xl p-4">
+              <p className="text-xs font-semibold text-red-700 mb-1.5 flex items-center gap-1.5">
+                <XCircle className="w-3.5 h-3.5" /> לקוח בוטל
+              </p>
+              <p className="text-sm text-gray-700">
+                {format(new Date(cancellation.cancelled_date), "dd/MM/yyyy", { locale: he })} · {cancellation.reason}
+                {cancellation.refund_amount > 0 && ` · הוחזר ₪${cancellation.refund_amount.toLocaleString()}`}
+              </p>
+              {cancellation.notes && (
+                <p className="text-xs text-gray-500 mt-1">{cancellation.notes}</p>
+              )}
+            </div>
+          )}
 
           {/* Contact info */}
           <div className="bg-white rounded-2xl border shadow-sm p-4 space-y-3">
@@ -320,6 +368,14 @@ export default function CustomerProfile() {
           )}
         </div>
       </div>
+
+      {showCancelModal && (
+        <CancelCustomerModal
+          customer={customer}
+          onConfirm={handleCancelConfirm}
+          onClose={() => setShowCancelModal(false)}
+        />
+      )}
     </div>
   );
 }
