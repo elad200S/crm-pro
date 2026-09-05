@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-const { Customer, Payment, Task, Lead, Quote, Expense, Cancellation } = base44.entities;
+const { Customer, Payment, Task, Lead, Quote, Expense, Cancellation, Target } = base44.entities;
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
 import { useNavigate, Link } from "react-router-dom";
 import {
-  Users, CreditCard, DollarSign, Target,
-  Plus, AlertCircle, Clock, UserPlus, ChevronLeft, FileText
+  Users, CreditCard, DollarSign, Target as TargetIcon,
+  Plus, AlertCircle, Clock, UserPlus, ChevronLeft, FileText, Pencil
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatsCard from "../components/dashboard/StatsCard";
@@ -15,6 +15,7 @@ import TaskList from "../components/dashboard/TaskList";
 import LeadsByStatus from "../components/dashboard/LeadsByStatus";
 import PaymentChart from "../components/dashboard/PaymentChart";
 import FinancialOverview from "../components/dashboard/FinancialOverview";
+import TargetEditModal from "../components/dashboard/TargetEditModal";
 
 function Skeleton({ className }) {
   return <div className={`animate-pulse bg-gray-100 rounded-xl ${className}`} />;
@@ -41,6 +42,8 @@ export default function Dashboard() {
   const [quotes, setQuotes] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [cancellations, setCancellations] = useState([]);
+  const [monthTarget, setMonthTarget] = useState(null);
+  const [showTargetModal, setShowTargetModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -52,15 +55,16 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       setCurrentUser(user);
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
-      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData] = await Promise.all([
+      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
         Lead.list('-created_date', 200),
         Quote.list('-valid_until', 500),
-        // הוצאות וביטולים הם מידע פיננסי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
+        // הוצאות, ביטולים ויעדים הם מידע ניהולי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
         isAdmin ? Expense.list('-expense_date', 500) : Promise.resolve([]),
-        isAdmin ? Cancellation.list('-cancelled_date', 200) : Promise.resolve([])
+        isAdmin ? Cancellation.list('-cancelled_date', 200) : Promise.resolve([]),
+        isAdmin ? Target.filter({ month: monthKey }) : Promise.resolve([])
       ]);
       setCustomers(customersData);
       setPayments(paymentsData);
@@ -69,6 +73,7 @@ export default function Dashboard() {
       setQuotes(quotesData);
       setExpenses(expensesData);
       setCancellations(cancellationsData);
+      setMonthTarget(targetsData[0] || null);
     } catch (e) {
       console.error("שגיאה בטעינת dashboard:", e);
     } finally {
@@ -81,7 +86,11 @@ export default function Dashboard() {
   const currentYear = now.getFullYear();
   const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
   const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-  const MONTHLY_DEALS_TARGET = 10;
+  const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
+  const monthLabel = format(now, "MMMM yyyy", { locale: he });
+  // ברירת מחדל כשאין יעד מוגדר לחודש — מנהל יכול לקבוע יעד אמיתי דרך "ערוך יעד"
+  const dealsTarget = monthTarget?.deals_target || 10;
+  const revenueTarget = monthTarget?.revenue_target || null;
 
   const activeCustomers = customers.filter(c => c.status === "פעיל").length;
 
@@ -168,6 +177,21 @@ export default function Dashboard() {
     return 'לילה טוב';
   };
 
+  const handleSaveTarget = async (data) => {
+    try {
+      if (monthTarget?.id) {
+        await Target.update(monthTarget.id, data);
+      } else {
+        await Target.create({ month: monthKey, ...data });
+      }
+      setShowTargetModal(false);
+      loadData();
+    } catch (e) {
+      console.error("שמירת יעד נכשלה:", e);
+      alert("שמירת היעד נכשלה. נסה שוב.");
+    }
+  };
+
   return (
     <div className="space-y-6">
 
@@ -194,6 +218,12 @@ export default function Dashboard() {
             className="text-green-600 border-green-200 hover:bg-green-50 gap-1.5 h-8">
             <Plus className="w-3.5 h-3.5" /> מסמך
           </Button>
+          {isAdmin && (
+            <Button size="sm" variant="outline" onClick={() => setShowTargetModal(true)}
+              className="text-orange-600 border-orange-200 hover:bg-orange-50 gap-1.5 h-8">
+              <Pencil className="w-3.5 h-3.5" /> יעד החודש
+            </Button>
+          )}
         </div>
       </div>
 
@@ -242,11 +272,11 @@ export default function Dashboard() {
           />
           <StatsCard
             title="עסקאות החודש"
-            value={`${monthlyDeals} / ${MONTHLY_DEALS_TARGET}`}
-            icon={Target}
+            value={`${monthlyDeals} / ${dealsTarget}`}
+            icon={TargetIcon}
             color="orange"
-            trend={monthlyDeals >= MONTHLY_DEALS_TARGET ? 'יעד הושג! 🎉' : `נותרו ${MONTHLY_DEALS_TARGET - monthlyDeals} ליעד`}
-            progress={Math.min((monthlyDeals / MONTHLY_DEALS_TARGET) * 100, 100)}
+            trend={monthlyDeals >= dealsTarget ? 'יעד הושג! 🎉' : `נותרו ${dealsTarget - monthlyDeals} ליעד`}
+            progress={Math.min((monthlyDeals / dealsTarget) * 100, 100)}
             linkTo={createPageUrl("Payments")}
           />
           <StatsCard
@@ -254,10 +284,13 @@ export default function Dashboard() {
             value={`₪${monthlyRevenue.toLocaleString()}`}
             icon={DollarSign}
             color="green"
-            trend={revenueGrowth !== null
-              ? (revenueGrowth >= 0 ? `↑ +${revenueGrowth}% מהחודש שעבר` : `↓ ${revenueGrowth}% מהחודש שעבר`)
-              : "הכנסות ששולמו"}
-            trendUp={revenueGrowth !== null ? revenueGrowth >= 0 : null}
+            trend={revenueTarget
+              ? `${Math.round((monthlyRevenue / revenueTarget) * 100)}% מהיעד (₪${revenueTarget.toLocaleString()})`
+              : revenueGrowth !== null
+                ? (revenueGrowth >= 0 ? `↑ +${revenueGrowth}% מהחודש שעבר` : `↓ ${revenueGrowth}% מהחודש שעבר`)
+                : "הכנסות ששולמו"}
+            trendUp={revenueTarget ? null : (revenueGrowth !== null ? revenueGrowth >= 0 : null)}
+            progress={revenueTarget ? Math.min((monthlyRevenue / revenueTarget) * 100, 100) : undefined}
             linkTo={createPageUrl("Payments")}
           />
           <StatsCard
@@ -336,6 +369,15 @@ export default function Dashboard() {
       {/* ── Payment Chart ── */}
       {!loading && (
         <PaymentChart payments={payments} isPersonal={!isAdmin} />
+      )}
+
+      {showTargetModal && (
+        <TargetEditModal
+          monthLabel={monthLabel}
+          target={monthTarget}
+          onSave={handleSaveTarget}
+          onClose={() => setShowTargetModal(false)}
+        />
       )}
 
     </div>
