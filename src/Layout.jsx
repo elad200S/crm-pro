@@ -2,16 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
-import { 
-  Users, 
-  CreditCard, 
-  BarChart3, 
+import {
+  Users,
+  CreditCard,
+  BarChart3,
   Calendar,
   Building2,
   Menu,
   X,
   UserPlus,
-  FileText
+  FileText,
+  TrendingDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "./components/notifications/NotificationBell";
@@ -36,6 +37,11 @@ const navigationItems = [
     title: "תשלומים",
     url: createPageUrl("Payments"),
     icon: CreditCard,
+  },
+  {
+    title: "הוצאות",
+    url: createPageUrl("Expenses"),
+    icon: TrendingDown,
   },
   {
     title: "מסמכים",
@@ -100,8 +106,8 @@ export default function Layout({ children, currentPageName }) {
       const user = await base44.auth.me();
       setCurrentUser(user);
 
-      const isAdmin = user.role === 'admin';
-      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד"];
+      const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
+      const adminOnlyPages = ["ניהול משתמשים", "קבצי תיאור תפקיד", "הוצאות"];
       setVisibleNavItems(navigationItems.filter(item =>
         !adminOnlyPages.includes(item.title) || isAdmin
       ));

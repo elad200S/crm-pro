@@ -50,6 +50,7 @@
 import Calendar from './pages/Calendar';
 import Customers from './pages/Customers';
 import Dashboard from './pages/Dashboard';
+import Expenses from './pages/Expenses';
 import JobDescriptionManagement from './pages/JobDescriptionManagement';
 import Leads from './pages/Leads';
 import Onboarding from './pages/Onboarding';
@@ -65,6 +66,7 @@ export const PAGES = {
     "Calendar": Calendar,
     "Customers": Customers,
     "Dashboard": Dashboard,
+    "Expenses": Expenses,
     "JobDescriptionManagement": JobDescriptionManagement,
     "Leads": Leads,
     "Onboarding": Onboarding,

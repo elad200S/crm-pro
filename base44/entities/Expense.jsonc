@@ -1,0 +1,89 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "תיאור ההוצאה"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "שכר",
+        "שיווק ופרסום",
+        "תוכנה ומנויים",
+        "ספקים וקבלנים",
+        "משרד ותשתית",
+        "מיסים ואגרות",
+        "אחר"
+      ],
+      "description": "קטגוריית הוצאה"
+    },
+    "vendor": {
+      "type": "string",
+      "description": "ספק / גורם מקבל התשלום"
+    },
+    "amount": {
+      "type": "number",
+      "description": "סכום ההוצאה"
+    },
+    "expense_date": {
+      "type": "string",
+      "format": "date",
+      "description": "תאריך ההוצאה"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "default": false,
+      "description": "הוצאה חוזרת (כל חודש)"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "העברה בנקאית",
+        "כרטיס אשראי",
+        "הוראת קבע",
+        "מזומן",
+        "צ'ק",
+        "אחר"
+      ],
+      "description": "אמצעי תשלום"
+    },
+    "notes": {
+      "type": "string",
+      "description": "הערות"
+    }
+  },
+  "required": [
+    "description",
+    "category",
+    "amount",
+    "expense_date"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "read": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    },
+    "delete": {
+      "$or": [
+        { "created_by_id": "{{user.id}}" },
+        { "user_condition": { "role": "admin" } }
+      ]
+    }
+  }
+}
