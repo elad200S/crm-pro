@@ -85,6 +85,17 @@ export default function Quotes() {
 
   const isExpired = (q) => q.valid_until && new Date(q.valid_until) < new Date() && q.status !== "אושר" && q.status !== "בוטל";
 
+  // הסכם חתום עם תוקף שמתקרב/עבר — זה לא "פג תוקף" של הצעה שלא נענתה,
+  // אלא תזכורת לחדש הסכם שכבר בתוקף. שני מושגים שונים לגמרי על אותו שדה.
+  const RENEWAL_WINDOW_DAYS = 14;
+  const renewalStatus = (q) => {
+    if (!q.client_signature || !q.valid_until) return null;
+    const days = Math.ceil((new Date(q.valid_until) - new Date()) / (1000 * 60 * 60 * 24));
+    if (days < 0) return "overdue";
+    if (days <= RENEWAL_WINDOW_DAYS) return "soon";
+    return null;
+  };
+
   const filtered = quotes.filter(q => {
     const entity = getEntityName(q);
     const matchSearch = !search ||
@@ -203,11 +214,12 @@ export default function Quotes() {
             const cfg = STATUS_CONFIG[quote.status] || STATUS_CONFIG["טיוטה"];
             const currSymbol = CURRENCY_SYMBOL[quote.currency] || "₪";
             const expired = isExpired(quote);
+            const renewal = renewalStatus(quote);
 
             return (
               <div
                 key={quote.id}
-                className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${expired ? "border-orange-200" : ""}`}
+                className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${expired || renewal ? "border-orange-200" : ""}`}
               >
                 <div className="p-5">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -224,6 +236,12 @@ export default function Quotes() {
                           <Badge className="bg-emerald-100 text-emerald-700 text-xs flex items-center gap-1">
                             <PenLine className="w-3 h-3" /> נחתם דיגיטלית
                           </Badge>
+                        )}
+                        {renewal === "overdue" && (
+                          <Badge className="bg-red-100 text-red-700 text-xs">ההסכם פג — לחדש</Badge>
+                        )}
+                        {renewal === "soon" && (
+                          <Badge className="bg-amber-100 text-amber-700 text-xs">מתקרב לחידוש</Badge>
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-const { Customer, Payment, Task, Lead } = base44.entities;
+const { Customer, Payment, Task, Lead, Quote } = base44.entities;
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { createPageUrl } from "@/utils";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Users, CreditCard, DollarSign, Target,
-  Plus, AlertCircle, Clock, UserPlus, ChevronLeft
+  Plus, AlertCircle, Clock, UserPlus, ChevronLeft, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatsCard from "../components/dashboard/StatsCard";
@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [payments, setPayments] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [leads, setLeads] = useState([]);
+  const [quotes, setQuotes] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -48,16 +49,18 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       setCurrentUser(user);
       const isAdmin = user.role === 'admin';
-      const [customersData, paymentsData, tasksData, leadsData] = await Promise.all([
+      const [customersData, paymentsData, tasksData, leadsData, quotesData] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
-        Lead.list('-created_date', 200)
+        Lead.list('-created_date', 200),
+        Quote.list('-valid_until', 500)
       ]);
       setCustomers(customersData);
       setPayments(paymentsData);
       setTasks(tasksData);
       setLeads(leadsData);
+      setQuotes(quotesData);
     } catch (e) {
       console.error("שגיאה בטעינת dashboard:", e);
     } finally {
@@ -102,6 +105,15 @@ export default function Dashboard() {
   const overdueTasks = tasks.filter(t =>
     t.status !== "הושלם" && t.status !== "דחוי" && t.due_date && new Date(t.due_date) < now
   );
+
+  // הסכמים חתומים שהתוקף שלהם עבר או מתקרב (14 יום) — תזכורת לחדש, לא קשור
+  // ל"פג תוקף" של הצעת מחיר שלא נענתה.
+  const RENEWAL_WINDOW_DAYS = 14;
+  const renewalsDue = quotes.filter(q => {
+    if (!q.client_signature || !q.valid_until) return false;
+    const days = Math.ceil((new Date(q.valid_until) - now) / (1000 * 60 * 60 * 24));
+    return days <= RENEWAL_WINDOW_DAYS;
+  });
 
   const isAdmin = currentUser?.role === 'admin';
   const relevantLeads = isAdmin ? leads : leads.filter(l => l.agent_id === currentUser?.id);
@@ -152,7 +164,7 @@ export default function Dashboard() {
       </div>
 
       {/* ── Alert Banner ── */}
-      {!loading && (overdueTasks.length > 0 || pendingPaymentsTotal > 0) && (
+      {!loading && (overdueTasks.length > 0 || pendingPaymentsTotal > 0 || renewalsDue.length > 0) && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-3 flex flex-wrap items-center gap-x-6 gap-y-2">
           <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
           {overdueTasks.length > 0 && (
@@ -167,6 +179,13 @@ export default function Dashboard() {
               className="flex items-center gap-1.5 text-sm text-amber-800 hover:text-amber-900 font-medium">
               <CreditCard className="w-3.5 h-3.5" />
               ₪{pendingPaymentsTotal.toLocaleString()} ממתינים לגבייה ←
+            </Link>
+          )}
+          {renewalsDue.length > 0 && (
+            <Link to={createPageUrl("Quotes")}
+              className="flex items-center gap-1.5 text-sm text-amber-800 hover:text-amber-900 font-medium">
+              <FileText className="w-3.5 h-3.5" />
+              {renewalsDue.length} הסכמים מתקרבים לחידוש/פג תוקף ←
             </Link>
           )}
         </div>
