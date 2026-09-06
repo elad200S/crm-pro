@@ -282,8 +282,9 @@ export default function Layout({ children, currentPageName }) {
               <NotificationBell />
             </div>
 
-            {/* Nav Items — distributed evenly, no scroll */}
-            <nav className="flex-1 flex flex-col items-center justify-evenly py-2">
+            {/* Nav Items — עם עוד ועוד עמודים זה כבר לא נכנס בגובה המסך, אז גולל במקום להיחתך */}
+            <nav className="flex-1 min-h-0 overflow-y-auto flex flex-col items-center gap-1 py-2
+              [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
               {visibleNavItems.map((item) => {
                 const active = location.pathname === item.url;
                 return (
@@ -291,7 +292,7 @@ export default function Layout({ children, currentPageName }) {
                     key={item.title}
                     to={item.url}
                     title={item.title}
-                    className={`flex flex-col items-center gap-0.5 w-full px-1 py-1.5 transition-all duration-150 relative group
+                    className={`flex flex-col items-center gap-0.5 w-full px-1 py-1.5 flex-shrink-0 transition-all duration-150 relative group
                       ${active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-700'}`}
                   >
                     {active && (
