@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { logActivity } from "@/lib/activityLog";
+import { provisionClientAccount } from "@/lib/provisionClientAccount";
 import PaymentForm from "../components/payments/PaymentForm";
 import PaymentTable from "../components/payments/PaymentTable";
 import PaymentFilters from "../components/payments/PaymentFilters";
@@ -151,6 +152,14 @@ export default function Payments() {
             summary: `חשבונית ${editingPayment.invoice_number || ""} סומנה כשולמה`,
             amount: paymentData.amount,
           });
+          const customer = customers.find(c => c.id === editingPayment.customer_id);
+          if (customer) {
+            provisionClientAccount({
+              name: `${customer.first_name} ${customer.last_name}`,
+              email: customer.email,
+              phone: customer.phone,
+            });
+          }
         }
       } else {
         const invoiceNumber = `INV-${Date.now()}`;
@@ -164,6 +173,16 @@ export default function Payments() {
           summary: `נוצרה חשבונית ${invoiceNumber} על סך ₪${(paymentData.amount || 0).toLocaleString()}`,
           amount: paymentData.amount,
         });
+        if (paymentData.status === "שולם") {
+          const customer = customers.find(c => c.id === paymentData.customer_id);
+          if (customer) {
+            provisionClientAccount({
+              name: `${customer.first_name} ${customer.last_name}`,
+              email: customer.email,
+              phone: customer.phone,
+            });
+          }
+        }
       }
       setShowForm(false);
       setEditingPayment(null);
