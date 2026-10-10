@@ -15,6 +15,7 @@ import TaskList from "../components/dashboard/TaskList";
 import LeadsByStatus from "../components/dashboard/LeadsByStatus";
 import PaymentChart from "../components/dashboard/PaymentChart";
 import FinancialOverview from "../components/dashboard/FinancialOverview";
+import RevenueByRep from "../components/dashboard/RevenueByRep";
 import TargetEditModal from "../components/dashboard/TargetEditModal";
 import { logActivity } from "@/lib/activityLog";
 
@@ -43,6 +44,7 @@ export default function Dashboard() {
   const [quotes, setQuotes] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [cancellations, setCancellations] = useState([]);
+  const [revenueByRep, setRevenueByRep] = useState([]);
   const [monthTarget, setMonthTarget] = useState(null);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -56,7 +58,9 @@ export default function Dashboard() {
       const user = await base44.auth.me();
       setCurrentUser(user);
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
-      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData] = await Promise.all([
+      const monthStart = format(new Date(now.getFullYear(), now.getMonth(), 1), "yyyy-MM-dd");
+      const nextMonthStart = format(new Date(now.getFullYear(), now.getMonth() + 1, 1), "yyyy-MM-dd");
+      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData, repRevenueData, usersData] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
@@ -65,7 +69,14 @@ export default function Dashboard() {
         // הוצאות, ביטולים ויעדים הם מידע ניהולי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
         isAdmin ? Expense.list('-expense_date', 500) : Promise.resolve([]),
         isAdmin ? Cancellation.list('-cancelled_date', 200) : Promise.resolve([]),
-        isAdmin ? Target.filter({ month: monthKey }) : Promise.resolve([])
+        isAdmin ? Target.filter({ month: monthKey }) : Promise.resolve([]),
+        // הכנסות החודש לפי נציג (מנהלים בלבד) — חישוב בצד השרת לפי מי שרשם את התשלום
+        isAdmin ? Payment.aggregate({
+          query: { status: "שולם", paid_date: { $gte: monthStart, $lt: nextMonthStart } },
+          groupBy: "created_by_id",
+          sum: "amount"
+        }) : Promise.resolve({ rows: [] }),
+        isAdmin ? base44.entities.User.list() : Promise.resolve([])
       ]);
       setCustomers(customersData);
       setPayments(paymentsData);
@@ -75,6 +86,11 @@ export default function Dashboard() {
       setExpenses(expensesData);
       setCancellations(cancellationsData);
       setMonthTarget(targetsData[0] || null);
+      const userMap = Object.fromEntries(usersData.map(u => [u.id, u.full_name]));
+      setRevenueByRep((repRevenueData.rows || []).map(r => ({
+        name: userMap[r.created_by_id] || "לא מזוהה",
+        amount: r.sum_amount || 0
+      })));
     } catch (e) {
       console.error("שגיאה בטעינת dashboard:", e);
     } finally {
@@ -322,6 +338,9 @@ export default function Dashboard() {
           cancellationsThisMonth={cancellationsThisMonth.length}
         />
       )}
+
+      {/* ── Revenue by Rep (מנהלים בלבד) ── */}
+      {!loading && isAdmin && <RevenueByRep data={revenueByRep} />}
 
       {/* ── Pipeline ── */}
       {loading ? (
