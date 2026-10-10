@@ -63,7 +63,7 @@ export default function Dashboard() {
       const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData, repRevenueData, usersData] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
-        isAdmin ? Task.list('-due_date', 50) : Task.filter({ assigned_to: user.id }, '-due_date', 50),
+        isAdmin ? Task.list('due_date', 50) : Task.filter({ assigned_to: user.id }, 'due_date', 50),
         Lead.list('-created_date', 200),
         Quote.list('-valid_until', 500),
         // הוצאות, ביטולים ויעדים הם מידע ניהולי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל

@@ -11,7 +11,8 @@
         "customer",
         "expense",
         "cancellation",
-        "target"
+        "target",
+        "task"
       ],
       "description": "סוג הרשומה שהפעילות מתייחסת אליה"
     },
@@ -40,6 +41,10 @@
     "amount": {
       "type": "number",
       "description": "סכום כספי רלוונטי לפעולה (אם יש)"
+    },
+    "device_info": {
+      "type": "string",
+      "description": "מכשיר/דפדפן שממנו בוצעה הפעולה"
     }
   },
   "required": [

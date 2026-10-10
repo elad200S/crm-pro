@@ -16,6 +16,7 @@ import AddTaskModal from "../components/leads/AddTaskModal";
 import DuplicateWarningModal from "../components/leads/DuplicateWarningModal";
 import ConvertToCustomerModal from "../components/leads/ConvertToCustomerModal";
 import LeadDetailModal from "../components/leads/LeadDetailModal";
+import { logActivity } from "@/lib/activityLog";
 
 const OUTBOUND_EVENT = async (accountWebhook, payload) => {
   if (!accountWebhook) return;
@@ -249,7 +250,14 @@ export default function Leads() {
   };
 
   const handleTaskSubmit = async (data) => {
-    await base44.entities.Task.create(data);
+    const lead = taskTarget;
+    const task = await base44.entities.Task.create(data);
+    logActivity({
+      entity_type: "task",
+      entity_id: task.id,
+      action: "created",
+      summary: `נוצרה משימה "${data.title}" עבור הליד ${lead?.full_name || lead?.phone || ""}`,
+    });
     setTaskTarget(null);
   };
 

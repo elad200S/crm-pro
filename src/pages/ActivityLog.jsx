@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import {
-  Filter, FileText, CreditCard, UserPlus, Users, Receipt, XCircle, Target as TargetIcon, History
+  Filter, FileText, CreditCard, UserPlus, Users, Receipt, XCircle, Target as TargetIcon, History, CheckSquare, Monitor
 } from "lucide-react";
 
 const isAdmin = (user) => user?.role === "admin" || user?.user_category === "מנהל_ראשי";
@@ -19,6 +19,7 @@ const ENTITY_CONFIG = {
   expense:      { label: "הוצאה",   icon: Receipt,   color: "bg-red-100 text-red-700" },
   cancellation: { label: "ביטול",   icon: XCircle,   color: "bg-red-100 text-red-700" },
   target:       { label: "יעד",     icon: TargetIcon, color: "bg-orange-100 text-orange-700" },
+  task:         { label: "משימה",   icon: CheckSquare, color: "bg-teal-100 text-teal-700" },
 };
 
 export default function ActivityLogPage() {
@@ -86,7 +87,7 @@ export default function ActivityLogPage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
               <History className="w-7 h-7 text-teal-600" /> יומן פעילות
             </h1>
-            <p className="text-gray-600">כל שינוי הקשור לכסף במערכת — מי, מה ומתי</p>
+            <p className="text-gray-600">כל פעילות במערכת — מי, מה, מתי ומאיזה מכשיר</p>
           </div>
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
@@ -122,9 +123,14 @@ export default function ActivityLogPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800">{log.summary}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {nameOf(log.created_by)}
-                      {log.created_date && ` · ${format(new Date(log.created_date), "dd/MM/yyyy HH:mm", { locale: he })}`}
+                    <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                      <span>{nameOf(log.created_by)}</span>
+                      {log.created_date && <span>· {format(new Date(log.created_date), "dd/MM/yyyy HH:mm", { locale: he })}</span>}
+                      {log.device_info && (
+                        <span className="flex items-center gap-0.5">
+                          <Monitor className="w-3 h-3" /> {log.device_info}
+                        </span>
+                      )}
                     </p>
                   </div>
                   {log.amount > 0 && (
