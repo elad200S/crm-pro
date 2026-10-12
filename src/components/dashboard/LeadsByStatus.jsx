@@ -28,7 +28,7 @@ function isUrgent(lead) {
   return hoursFromCreation > 24;
 }
 
-export default function LeadsByStatus({ leads, isAdmin, currentUserId }) {
+export default function LeadsByStatus({ leads, isAdmin, currentUserId, statusCounts }) {
   // סינון לפי תפקיד
   const relevantLeads = isAdmin
     ? leads
@@ -40,11 +40,9 @@ export default function LeadsByStatus({ leads, isAdmin, currentUserId }) {
 
   const urgentLeads = openLeads.filter(isUrgent);
 
-  // קיבוץ לפי סטטוס
-  const byStatus = {};
-  openLeads.forEach(l => {
-    byStatus[l.status] = (byStatus[l.status] || 0) + 1;
-  });
+  // קיבוץ לפי סטטוס — מגיע מה-Dashboard כספירה מדויקת בצד השרת (aggregate),
+  // כי הלידים שהתקבלו כאן מוגבלים ל-200 האחרונים ולא תמיד משקפים את כל הלידים
+  const byStatus = statusCounts || {};
 
   return (
     <Card className="shadow-md">

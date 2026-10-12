@@ -45,6 +45,7 @@ export default function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [cancellations, setCancellations] = useState([]);
   const [revenueByRep, setRevenueByRep] = useState([]);
+  const [leadStatusCounts, setLeadStatusCounts] = useState({});
   const [monthTarget, setMonthTarget] = useState(null);
   const [showTargetModal, setShowTargetModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -60,7 +61,7 @@ export default function Dashboard() {
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
       const monthStart = format(new Date(now.getFullYear(), now.getMonth(), 1), "yyyy-MM-dd");
       const nextMonthStart = format(new Date(now.getFullYear(), now.getMonth() + 1, 1), "yyyy-MM-dd");
-      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData, repRevenueData, usersData] = await Promise.all([
+      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData, repRevenueData, usersData, leadStatusAgg] = await Promise.all([
         isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('due_date', 50) : Task.filter({ assigned_to: user.id }, 'due_date', 50),
@@ -76,7 +77,13 @@ export default function Dashboard() {
           groupBy: "created_by_id",
           sum: "amount"
         }) : Promise.resolve({ rows: [] }),
-        isAdmin ? base44.entities.User.list() : Promise.resolve([])
+        isAdmin ? base44.entities.User.list() : Promise.resolve([]),
+        // ספירת לידים לפי סטטוס בצד השרת — ה-200 לידים האחרונים (leadsData) לא
+        // מספיקים לספירה מדויקת כשיש יותר לידים, במיוחד בשלבים הישנים/תקועים
+        Lead.aggregate({
+          query: isAdmin ? {} : { agent_id: user.id },
+          groupBy: "status"
+        }),
       ]);
       setCustomers(customersData);
       setPayments(paymentsData);
@@ -91,6 +98,9 @@ export default function Dashboard() {
         name: userMap[r.created_by_id] || "לא מזוהה",
         amount: r.sum_amount || 0
       })));
+      setLeadStatusCounts(Object.fromEntries(
+        (leadStatusAgg.rows || []).map(r => [r.status, r.count])
+      ));
     } catch (e) {
       console.error("שגיאה בטעינת dashboard:", e);
     } finally {
@@ -176,7 +186,6 @@ export default function Dashboard() {
   };
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.user_category === "מנהל_ראשי";
-  const relevantLeads = isAdmin ? leads : leads.filter(l => l.agent_id === currentUser?.id);
 
   const PIPELINE_STAGES = [
     { key: "התקבל",                   label: "התקבל",       color: "bg-blue-400" },
@@ -185,6 +194,7 @@ export default function Dashboard() {
     { key: "נשלחה הצעת מחיר",        label: "הצעת מחיר",  color: "bg-indigo-400" },
     { key: "נסגר בהצלחה (שולם)",     label: "נסגר",        color: "bg-green-500" },
   ];
+  const pipelineTotal = PIPELINE_STAGES.reduce((s, stage) => s + (leadStatusCounts[stage.key] || 0), 0);
 
   const getGreeting = () => {
     const h = parseInt(new Date().toLocaleString('he-IL', { timeZone: 'Asia/Jerusalem', hour: 'numeric', hour12: false }));
@@ -351,7 +361,7 @@ export default function Dashboard() {
             <h2 className="font-bold text-gray-800 text-sm flex items-center gap-2">
               <UserPlus className="w-4 h-4 text-blue-600" />
               Pipeline לידים
-              <span className="text-xs font-normal text-gray-400">({relevantLeads.length} סה"כ)</span>
+              <span className="text-xs font-normal text-gray-400">({pipelineTotal} סה"כ)</span>
             </h2>
             <Link to={createPageUrl("Leads")}
               className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
@@ -363,8 +373,8 @@ export default function Dashboard() {
               <React.Fragment key={stage.key}>
                 <PipelineStage
                   label={stage.label}
-                  count={relevantLeads.filter(l => l.status === stage.key).length}
-                  total={relevantLeads.length}
+                  count={leadStatusCounts[stage.key] || 0}
+                  total={pipelineTotal}
                   color={stage.color}
                 />
                 {i < PIPELINE_STAGES.length - 1 && (
@@ -389,7 +399,7 @@ export default function Dashboard() {
             onTaskClick={(task) => navigate(createPageUrl("Calendar"), { state: { editTask: task } })}
             isPersonal={!isAdmin}
           />
-          <LeadsByStatus leads={leads} isAdmin={isAdmin} currentUserId={currentUser?.id} />
+          <LeadsByStatus leads={leads} isAdmin={isAdmin} currentUserId={currentUser?.id} statusCounts={leadStatusCounts} />
         </div>
       )}
 

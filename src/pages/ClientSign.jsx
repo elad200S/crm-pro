@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { CheckCircle, PenLine, RotateCcw, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -225,6 +225,20 @@ export default function ClientSign() {
   const [signing, setSigning] = useState(false);
   const [signError, setSignError] = useState(false);
 
+  // בדיקת מצב ההסכם האמיתי מול ה-DB לפני הצגת הטופס — קישור החתימה מכיל
+  // תמונת מצב סטטית מרגע היצירה, ולא יודע אם ההסכם כבר נחתם בינתיים או נמחק.
+  const [checkingQuote, setCheckingQuote] = useState(!!id);
+  const [liveQuote, setLiveQuote] = useState(null);
+  const [quoteMissing, setQuoteMissing] = useState(false);
+
+  useEffect(() => {
+    if (!id) { setCheckingQuote(false); return; }
+    base44.entities.Quote.get(id)
+      .then(q => setLiveQuote(q))
+      .catch(e => { console.error("טעינת ההסכם נכשלה:", e); setQuoteMissing(true); })
+      .finally(() => setCheckingQuote(false));
+  }, [id]);
+
   if (!docData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
@@ -232,6 +246,73 @@ export default function ClientSign() {
           <p className="text-4xl mb-3">❌</p>
           <h2 className="text-lg font-bold text-gray-700 mb-1">קישור לא תקין</h2>
           <p className="text-gray-400 text-sm">פנה ל-HEY Digital לקבל קישור מחודש</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (checkingQuote) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+        <div className="w-8 h-8 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (quoteMissing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
+        <div className="text-center p-8">
+          <p className="text-4xl mb-3">❌</p>
+          <h2 className="text-lg font-bold text-gray-700 mb-1">ההסכם לא נמצא</h2>
+          <p className="text-gray-400 text-sm">ייתכן שההסכם הוסר. פנה ל-HEY Digital לקבלת קישור מחודש</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ההסכם כבר נחתם בעבר — לא מציגים שוב טופס/חתימה, רק מאשרים ומאפשרים הורדת עותק
+  if (liveQuote?.client_signature) {
+    const signedClientData = {
+      "{customer-name}":     liveQuote.signing_client_name    || lead?.name  || "",
+      "{customer-email}":    liveQuote.signing_client_email   || "",
+      "{customer-phone}":    liveQuote.signing_client_phone   || "",
+      "{customer-business}": liveQuote.signing_client_company || "",
+      "{customer-id}":       liveQuote.signing_client_id      || "",
+      "{customer-address}":  liveQuote.signing_client_address || "",
+    };
+    const signedBody = substituteAll(rawBody || liveQuote.notes || "", signedClientData, liveQuote.amount ?? amount);
+    const signedDateLabel = liveQuote.signed_date
+      ? format(new Date(liveQuote.signed_date), "dd/MM/yyyy", { locale: he })
+      : todayStr();
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center p-4" dir="rtl">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-10 text-center">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="w-10 h-10 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-black text-gray-800 mb-2">ההסכם כבר נחתם</h2>
+          <p className="text-gray-500 text-sm mb-1">{title || liveQuote.title || "הסכם עבודה"}</p>
+          <p className="text-gray-400 text-xs">נחתם ב-{signedDateLabel}</p>
+
+          <div className="mt-5 bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mb-6">
+            ההסכם הזה כבר נחתם ונשמר במערכת.<br />
+            לא ניתן לחתום עליו שוב.
+          </div>
+
+          <Button
+            className="w-full bg-teal-700 hover:bg-teal-800 flex items-center justify-center gap-2"
+            onClick={() => printDoc({
+              title: title || liveQuote.title,
+              body: signedBody,
+              price: liveQuote.amount ?? amount,
+              clientData: signedClientData,
+              signatureDataUrl: liveQuote.client_signature,
+            })}
+          >
+            <Download className="w-4 h-4" />
+            הורד / הדפס עותק PDF
+          </Button>
         </div>
       </div>
     );

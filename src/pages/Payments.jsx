@@ -140,6 +140,11 @@ export default function Payments() {
 
   const handleSubmit = async (paymentData) => {
     try {
+      // טופס התשלום לא כולל שדה paid_date — בלעדיו, חשבונית שמסומנת "שולם" לא
+      // נספרת בהכנסות החודש בדשבורד (שם הסינון דורש גם status וגם paid_date)
+      if (paymentData.status === "שולם" && !paymentData.paid_date) {
+        paymentData = { ...paymentData, paid_date: new Date().toISOString().split("T")[0] };
+      }
       if (editingPayment) {
         if (!canEdit(editingPayment)) {
           alert("אין לך הרשאה לערוך תשלום זה");

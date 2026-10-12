@@ -70,7 +70,9 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
     lastCheckTime = Date.now();
     try {
       // בדיקת משימות שעבר זמנן או קרובות ל-24 שעות
-      const tasks = await Task.list('-due_date', 100);
+      // מיון מהקרובה/המאוחרת ביותר קודם — כדי שמשימות שכבר עברו את המועד לא
+      // "ייפלטו" מחלון ה-100 התוצאות כשיש הרבה משימות עתידיות
+      const tasks = await Task.list('due_date', 100);
       const now = new Date();
       
       for (const task of tasks) {
@@ -98,7 +100,11 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
                   type: notifType,
                   related_id: task.id,
                   related_type: "task",
-                  priority: task.priority === "קריטית" ? "urgent" : isOverdue ? "high" : "medium"
+                  priority: task.priority === "קריטית" ? "urgent" : isOverdue ? "high" : "medium",
+                  // קריטי: בלי user_id, ה-RLS של Notification מראה את ההתראה רק
+                  // למי שיצר אותה בפועל (מי שהדפדפן שלו הריץ את הסריקה) — לא
+                  // בהכרח המשתמש שאליו המשימה משויכת.
+                  user_id: task.assigned_to,
                 });
               }
             } catch (err) {

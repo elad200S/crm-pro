@@ -98,5 +98,25 @@
     "phone",
     "start_date",
     "status"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "user_category": "מנהל_ראשי" } }
+      ]
+    },
+    "update": {
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "user_category": "מנהל_ראשי" } }
+      ]
+    },
+    "delete": {
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "user_category": "מנהל_ראשי" } }
+      ]
+    }
+  }
 }
