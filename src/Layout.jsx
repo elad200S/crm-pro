@@ -77,6 +77,9 @@ const navigationItems = [
   }
 ];
 
+// דגל משותף לכל המופעים של ה-LAYOUT (נטען מחדש בכל מעבר דף)
+let lastLoginUpdatedThisSession = false;
+
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,35 +88,12 @@ export default function Layout({ children, currentPageName }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [visibleNavItems, setVisibleNavItems] = useState(navigationItems);
-  const [sidebarStats, setSidebarStats] = useState({ activeCustomers: null, pendingPayments: null, monthlyRevenue: null });
   const [swipeOffset, setSwipeOffset] = useState(0);
   const touchStartX = useRef(null);
 
   useEffect(() => {
     checkUserOnboarding();
   }, []);
-
-  useEffect(() => {
-    if (currentUser) loadSidebarStats();
-  }, [currentUser]);
-
-  const loadSidebarStats = async () => {
-    try {
-      const now = new Date();
-      const [customers, payments] = await Promise.all([
-        base44.entities.Customer.list('-created_date', 200),
-        base44.entities.Payment.list('-created_date', 200)
-      ]);
-      const activeCustomers = customers.filter(c => c.status === "פעיל").length;
-      const pendingPayments = payments.filter(p => p.status !== "שולם" && p.status !== "מבוטל").length;
-      const monthlyRevenue = payments
-        .filter(p => p.status === "שולם" && p.paid_date && new Date(p.paid_date).getMonth() === now.getMonth() && new Date(p.paid_date).getFullYear() === now.getFullYear())
-        .reduce((s, p) => s + (p.amount || 0), 0);
-      setSidebarStats({ activeCustomers, pendingPayments, monthlyRevenue });
-    } catch (e) {
-      console.error("טעינת נתוני סרגל צד נכשלה:", e);
-    }
-  };
 
   const checkUserOnboarding = async () => {
     try {
@@ -134,7 +114,9 @@ export default function Layout({ children, currentPageName }) {
         return;
       }
 
-      if (!needsOnboarding) {
+      // עדכון זמן התחברות אחרת — פעם בסשן ולא בכל מעבר דף (ה-LAYOUT נטען מחדש בכל ניווט)
+      if (!needsOnboarding && !lastLoginUpdatedThisSession) {
+        lastLoginUpdatedThisSession = true;
         await base44.auth.updateMe({
           last_login: new Date().toISOString()
         });

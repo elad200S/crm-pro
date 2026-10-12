@@ -12,6 +12,12 @@ import { Bell, X, CheckCheck } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
+// הדף מציג שני מופעים של הפעמון (דסקטופ + מובייל) — הסריקה הכבדה של יצירת התראות
+// רצה במשותף: רק מופע אחד בכל רגע נתון, ולכל היותר פעם ב-5 דקות, כדי לא לשרוף את מכסת הקריאות
+const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+let lastCheckTime = 0;
+let checkInProgress = false;
+
 const notificationIcons = {
   task_overdue: "🔴",
   payment_due: "💰", 
@@ -59,6 +65,9 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
   };
 
   const checkAndCreateNotifications = async () => {
+    if (checkInProgress || Date.now() - lastCheckTime < CHECK_INTERVAL_MS) return;
+    checkInProgress = true;
+    lastCheckTime = Date.now();
     try {
       // בדיקת משימות שעבר זמנן או קרובות ל-24 שעות
       const tasks = await Task.list('-due_date', 100);
@@ -170,6 +179,8 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
       await loadNotifications();
     } catch (error) {
       // תעלם משגיאות בשקט
+    } finally {
+      checkInProgress = false;
     }
   };
 

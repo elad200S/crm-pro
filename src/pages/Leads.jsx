@@ -48,6 +48,18 @@ export default function Leads() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [viewMode, setViewMode] = useState(() => localStorage.getItem("leads_view") || "cards");
 
+  // ניסיון חוזר אוטומטי כשנתקלים בהגבלת קצב (Rate limit) — כדי שהדף לא יישבר בטעינה
+  const withRetry = async (fn, attempts = 3) => {
+    for (let i = 0; ; i++) {
+      try {
+        return await fn();
+      } catch (e) {
+        if (i >= attempts - 1 || !String(e?.message || e).includes("Rate limit")) throw e;
+        await new Promise(r => setTimeout(r, 1500 * (i + 1)));
+      }
+    }
+  };
+
   const accountId = currentUser?.id || "default";
 
   const exportToCSV = () => {
@@ -69,30 +81,39 @@ export default function Leads() {
   useEffect(() => { init(); }, []);
 
   const init = async () => {
-    const user = await base44.auth.me();
-    setCurrentUser(user);
-    const [leadsData, usersData] = await Promise.all([
-      base44.entities.Lead.list("-created_date", 200),
-      base44.entities.User.list()
-    ]);
-    // השלמת מספרים ללידים ותיקים שנוצרו לפני מנגנון המספור
-    const missingNum = leadsData.filter(l => !l.lead_number).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
-    if (missingNum.length) {
-      let next = leadsData.reduce((max, l) => Math.max(max, parseInt(l.lead_number) || 0), 0);
-      for (const l of missingNum) {
-        next += 1;
-        l.lead_number = String(next).padStart(3, '0');
-        await base44.entities.Lead.update(l.id, { lead_number: l.lead_number }).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
+    try {
+      const user = await base44.auth.me();
+      setCurrentUser(user);
+      const [leadsData, usersData] = await Promise.all([
+        withRetry(() => base44.entities.Lead.list("-created_date", 200)),
+        withRetry(() => base44.entities.User.list())
+      ]);
+      // השלמת מספרים ללידים ותיקים שנוצרו לפני מנגנון המספור — עדכון באצווה אחת במקום קריאה בודדת לכל ליד
+      const missingNum = leadsData.filter(l => !l.lead_number).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+      if (missingNum.length) {
+        let next = leadsData.reduce((max, l) => Math.max(max, parseInt(l.lead_number) || 0), 0);
+        const updates = missingNum.map(l => {
+          next += 1;
+          return { id: l.id, lead_number: String(next).padStart(3, '0') };
+        });
+        await base44.entities.Lead.bulkUpdate(updates).catch(e => console.error("פעולת רקע נכשלה (לא חוסם):", e));
+        updates.forEach(u => {
+          const l = leadsData.find(x => x.id === u.id);
+          if (l) l.lead_number = u.lead_number;
+        });
       }
-    }
-    setLeads(leadsData);
-    setUsers(usersData);
-    setLoading(false);
-    // דיפ-לינק: /Leads?lead=<id> פותח ישר את כרטיס הליד (למשל בלחיצה על משימה)
-    const openLeadId = new URLSearchParams(window.location.search).get("lead");
-    if (openLeadId) {
-      const found = leadsData.find(l => l.id === openLeadId);
-      if (found) setSelectedLead(found);
+      setLeads(leadsData);
+      setUsers(usersData);
+      // דיפ-לינק: /Leads?lead=<id> פותח ישר את כרטיס הליד (למשל בלחיצה על משימה)
+      const openLeadId = new URLSearchParams(window.location.search).get("lead");
+      if (openLeadId) {
+        const found = leadsData.find(l => l.id === openLeadId);
+        if (found) setSelectedLead(found);
+      }
+    } catch (e) {
+      console.error("טעינת לידים נכשלה:", e);
+    } finally {
+      setLoading(false);
     }
   };
 
