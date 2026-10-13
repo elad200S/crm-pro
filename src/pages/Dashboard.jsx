@@ -37,13 +37,13 @@ function PipelineStage({ label, count, total, color }) {
 }
 
 export default function Dashboard() {
-  const [customers, setCustomers] = useState([]);
+  const [activeCustomersCount, setActiveCustomersCount] = useState(0);
   const [payments, setPayments] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [leads, setLeads] = useState([]);
   const [quotes, setQuotes] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [cancellations, setCancellations] = useState([]);
+  const [monthlyExpensesTotal, setMonthlyExpensesTotal] = useState(0);
+  const [cancellationsThisMonthCount, setCancellationsThisMonthCount] = useState(0);
   const [revenueByRep, setRevenueByRep] = useState([]);
   const [leadStatusCounts, setLeadStatusCounts] = useState({});
   const [monthTarget, setMonthTarget] = useState(null);
@@ -61,15 +61,23 @@ export default function Dashboard() {
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
       const monthStart = format(new Date(now.getFullYear(), now.getMonth(), 1), "yyyy-MM-dd");
       const nextMonthStart = format(new Date(now.getFullYear(), now.getMonth() + 1, 1), "yyyy-MM-dd");
-      const [customersData, paymentsData, tasksData, leadsData, quotesData, expensesData, cancellationsData, targetsData, repRevenueData, usersData, leadStatusAgg] = await Promise.all([
-        isAdmin ? Customer.list('-created_date', 100) : Customer.filter({ created_by_id: user.id }, '-created_date', 100),
+      // customers/expenses/cancellations משמשים כאן רק למספרים (כמה לקוחות
+      // פעילים, סה"כ הוצאות/ביטולים החודש) — לא לרשימה מוצגת, אז נשלפים כ-
+      // count/aggregate בצד השרת במקום למשוך מאות רשומות גולמיות רק כדי לסכום אותן
+      const [activeCustomersData, paymentsData, tasksData, leadsData, quotesData, monthlyExpensesAgg, cancellationsThisMonthData, targetsData, repRevenueData, usersData, leadStatusAgg] = await Promise.all([
+        isAdmin
+          ? Customer.count({ status: "פעיל" })
+          : Customer.count({ status: "פעיל", created_by_id: user.id }),
         isAdmin ? Payment.list('-created_date', 500) : Payment.filter({ created_by_id: user.id }, '-created_date', 500),
         isAdmin ? Task.list('due_date', 50) : Task.filter({ assigned_to: user.id }, 'due_date', 50),
         Lead.list('-created_date', 200),
         Quote.list('-valid_until', 500),
         // הוצאות, ביטולים ויעדים הם מידע ניהולי של מנהלים בלבד — לא רלוונטי (ולא נגיש ל-RLS) למי שאינו מנהל
-        isAdmin ? Expense.list('-expense_date', 500) : Promise.resolve([]),
-        isAdmin ? Cancellation.list('-cancelled_date', 200) : Promise.resolve([]),
+        isAdmin ? Expense.aggregate({
+          query: { expense_date: { $gte: monthStart, $lt: nextMonthStart } },
+          sum: "amount"
+        }) : Promise.resolve({ rows: [] }),
+        isAdmin ? Cancellation.count({ cancelled_date: { $gte: monthStart, $lt: nextMonthStart } }) : Promise.resolve(0),
         isAdmin ? Target.filter({ month: monthKey }) : Promise.resolve([]),
         // הכנסות החודש לפי נציג (מנהלים בלבד) — חישוב בצד השרת לפי מי שרשם את התשלום
         isAdmin ? Payment.aggregate({
@@ -85,13 +93,13 @@ export default function Dashboard() {
           groupBy: "status"
         }),
       ]);
-      setCustomers(customersData);
+      setActiveCustomersCount(activeCustomersData);
       setPayments(paymentsData);
       setTasks(tasksData);
       setLeads(leadsData);
       setQuotes(quotesData);
-      setExpenses(expensesData);
-      setCancellations(cancellationsData);
+      setMonthlyExpensesTotal(monthlyExpensesAgg.rows?.[0]?.sum_amount || 0);
+      setCancellationsThisMonthCount(cancellationsThisMonthData);
       setMonthTarget(targetsData[0] || null);
       const userMap = Object.fromEntries(usersData.map(u => [u.id, u.full_name]));
       setRevenueByRep((repRevenueData.rows || []).map(r => ({
@@ -119,7 +127,7 @@ export default function Dashboard() {
   const dealsTarget = monthTarget?.deals_target || 10;
   const revenueTarget = monthTarget?.revenue_target || null;
 
-  const activeCustomers = customers.filter(c => c.status === "פעיל").length;
+  const activeCustomers = activeCustomersCount;
 
   const monthlyRevenue = payments
     .filter(p => p.status === "שולם" && p.paid_date &&
@@ -160,19 +168,9 @@ export default function Dashboard() {
   });
 
   // תמונת מצב פיננסית (מנהלים בלבד) — הכנסות מול הוצאות, ותזרים נטו של החודש
-  const monthlyExpenses = expenses
-    .filter(e => {
-      const d = new Date(e.expense_date);
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-    })
-    .reduce((s, e) => s + (e.amount || 0), 0);
+  const monthlyExpenses = monthlyExpensesTotal;
 
   const netCashFlow = monthlyRevenue - monthlyExpenses;
-
-  const cancellationsThisMonth = cancellations.filter(c => {
-    const d = new Date(c.cancelled_date);
-    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  });
 
   // "גיל" החוב הפתוח — כמה זמן כבר עבר מאז מועד התשלום שנקבע
   const overduePayments = payments.filter(p =>
@@ -345,7 +343,7 @@ export default function Dashboard() {
           monthlyExpenses={monthlyExpenses}
           netCashFlow={netCashFlow}
           aging={aging}
-          cancellationsThisMonth={cancellationsThisMonth.length}
+          cancellationsThisMonth={cancellationsThisMonthCount}
         />
       )}
 

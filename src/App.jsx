@@ -3,7 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Outlet, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -16,28 +16,26 @@ const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
 // כל עמוד אחר (כולל "/") ממשיך לדרוש התחברות, גם אם הגישה הציבורית לאפליקציה פתוחה ברמת Base44.
 const PUBLIC_PAGES = new Set(["ClientSign"]);
 
-const LayoutWrapper = ({ children, currentPageName }) => Layout ?
-  <Layout currentPageName={currentPageName}>{children}</Layout>
-  : <>{children}</>;
+// עוטף את כל העמודים המחוברים (למעט "*") בתור route-אב משותף אחד, כדי ש-
+// ה-Layout (כולל בדיקת המשתמש והפעמון) יישאר מחובר (mount) לאורך כל הניווט
+// באפליקציה, במקום להיטען מחדש בכל מעבר דף — שם ה"עמוד הנוכחי" מחושב כאן
+// מה-URL, בדיוק כמו ב-currentPath של AuthenticatedApp למטה.
+const LayoutRoute = () => {
+  const location = useLocation();
+  const currentPageName = decodeURIComponent(location.pathname.replace(/^\//, "")) || mainPageKey;
+  return Layout
+    ? <Layout currentPageName={currentPageName}><Outlet /></Layout>
+    : <Outlet />;
+};
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={
-      <LayoutWrapper currentPageName={mainPageKey}>
-        <MainPage />
-      </LayoutWrapper>
-    } />
-    {Object.entries(Pages).map(([path, Page]) => (
-      <Route
-        key={path}
-        path={`/${path}`}
-        element={
-          <LayoutWrapper currentPageName={path}>
-            <Page />
-          </LayoutWrapper>
-        }
-      />
-    ))}
+    <Route element={<LayoutRoute />}>
+      <Route path="/" element={<MainPage />} />
+      {Object.entries(Pages).map(([path, Page]) => (
+        <Route key={path} path={`/${path}`} element={<Page />} />
+      ))}
+    </Route>
     <Route path="*" element={<PageNotFound />} />
   </Routes>
 );

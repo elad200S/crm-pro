@@ -91,6 +91,8 @@ export default function Layout({ children, currentPageName }) {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const touchStartX = useRef(null);
 
+  // ה-LAYOUT נשאר מחובר (mount) לאורך כל הניווט באפליקציה כעת — אז שליפת
+  // המשתמש רצה פעם אחת בלבד, לא בכל מעבר דף
   useEffect(() => {
     checkUserOnboarding();
   }, []);
@@ -107,27 +109,33 @@ export default function Layout({ children, currentPageName }) {
       ));
 
       const needsOnboarding = !user.phone || !user.job_title || !user.department || !user.user_category;
-      
-      if (needsOnboarding && currentPageName !== "Onboarding") {
-        navigate(createPageUrl("Onboarding"));
-        setLoading(false);
-        return;
-      }
 
-      // עדכון זמן התחברות אחרת — פעם בסשן ולא בכל מעבר דף (ה-LAYOUT נטען מחדש בכל ניווט)
+      // עדכון זמן התחברות אחרת — פעם בסשן בלבד
       if (!needsOnboarding && !lastLoginUpdatedThisSession) {
         lastLoginUpdatedThisSession = true;
         await base44.auth.updateMe({
           last_login: new Date().toISOString()
         });
       }
-
-      setLoading(false);
     } catch (error) {
       console.error("שגיאה בבדיקת משתמש:", error);
+    } finally {
       setLoading(false);
     }
   };
+
+  const needsOnboarding = !!currentUser && (
+    !currentUser.phone || !currentUser.job_title || !currentUser.department || !currentUser.user_category
+  );
+
+  // הבדיקה הזו רצה בנפרד מהטעינה החד-פעמית למעלה — כי ה-LAYOUT כבר לא נטען
+  // מחדש בכל מעבר דף, צריך לבדוק מחדש בכל ניווט (בלי קריאת רשת נוספת) שמשתמש
+  // שטרם השלים onboarding לא יכול לנווט משם לפני שהשלים אותו
+  useEffect(() => {
+    if (needsOnboarding && currentPageName !== "Onboarding") {
+      navigate(createPageUrl("Onboarding"));
+    }
+  }, [needsOnboarding, currentPageName]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -162,7 +170,7 @@ export default function Layout({ children, currentPageName }) {
     }
   };
 
-  if (currentPageName === "Onboarding" || currentPageName === "ClientSign" || loading) {
+  if (currentPageName === "Onboarding" || currentPageName === "ClientSign" || loading || needsOnboarding) {
     return children;
   }
 
