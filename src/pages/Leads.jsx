@@ -463,7 +463,8 @@ export default function Leads() {
           onEdit={handleEdit}
           onDelete={setDeleteTarget}
           onWhatsApp={handleWhatsApp}
-          onQuote={setQuoteTarget}
+          onQuote={(lead, template) => { setQuoteTarget(lead); setQuoteTemplate(template || null); }}
+          onViewQuote={(quote) => { setPreviewDoc({ quote, lead: selectedLead }); setSelectedLead(null); }}
           onConvert={handleConvertClick}
           onAddTask={setTaskTarget}
         />

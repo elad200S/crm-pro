@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check, ArrowLeft } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check, ArrowLeft, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -15,6 +15,13 @@ const STATUS_GRADIENT = {
   "נשלחה הצעת מחיר":     "from-indigo-500 to-indigo-700",
   "לא רלוונטי":           "from-gray-400 to-gray-600",
   "נסגר בהצלחה (שולם)":  "from-green-500 to-emerald-700",
+};
+
+const QUOTE_STATUS_CONFIG = {
+  "טיוטה": { label: "טיוטה", color: "bg-gray-100 text-gray-700", icon: FileText },
+  "נשלח":  { label: "נשלח",  color: "bg-blue-100 text-blue-800", icon: Clock },
+  "אושר":  { label: "אושר",  color: "bg-green-100 text-green-800", icon: CheckCircle },
+  "בוטל":  { label: "בוטל",  color: "bg-red-100 text-red-700", icon: XCircle },
 };
 
 // כפתור פעולה בראש הכרטיס — פיל שקוף על גבי הגרדיאנט, כדי שכל הפעולות
@@ -130,16 +137,16 @@ function SectionTitle({ icon: Icon, children, count }) {
   );
 }
 
-export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onConvert, onAddTask }) {
+export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete, onWhatsApp, onQuote, onViewQuote, onConvert, onAddTask }) {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
-  const [signedQuotes, setSignedQuotes] = useState([]);
+  const [leadQuotes, setLeadQuotes] = useState([]);
 
   useEffect(() => {
     if (lead?.id) {
       loadTasks();
-      loadSignedQuotes();
+      loadLeadQuotes();
     }
   }, [lead?.id]);
 
@@ -155,15 +162,15 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
     }
   };
 
-  // הסכמים חתומים ללקוח הזה — נתוני החתימה (client_signature, signed_date)
-  // כבר נשמרים על ה-Quote בזמן החתימה; כאן רק שולפים ומציגים על כרטיס הליד.
-  const loadSignedQuotes = async () => {
+  // כל המסמכים שנוצרו לליד הזה — לא רק חתומים, כדי שאפשר יהיה לראות גם
+  // טיוטות/מסמכים שנשלחו ועדיין לא נחתמו, ולא רק אחרי שהחתימה כבר בוצעה.
+  const loadLeadQuotes = async () => {
     try {
-      const all = await base44.entities.Quote.list("-signed_date", 100);
-      setSignedQuotes(all.filter(q => q.lead_id === lead.id && q.client_signature));
+      const all = await base44.entities.Quote.list("-created_date", 100);
+      setLeadQuotes(all.filter(q => q.lead_id === lead.id));
     } catch (e) {
-      console.error("טעינת הסכמים חתומים לליד נכשלה:", e);
-      setSignedQuotes([]);
+      console.error("טעינת מסמכי הליד נכשלה:", e);
+      setLeadQuotes([]);
     }
   };
 
@@ -298,24 +305,40 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
             {/* עמודה שמאלית: מסמכים חתומים, משימות */}
             <div className="space-y-4">
               <div>
-                <SectionTitle icon={PenLine}>מסמכים</SectionTitle>
-                {signedQuotes.length > 0 ? (
-                  <div className="p-3 rounded-xl bg-green-50 border border-green-100">
-                    <p className="text-[10px] text-green-700 font-semibold mb-1.5 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" /> הסכם חתום
-                    </p>
-                    <div className="space-y-1">
-                      {signedQuotes.map(q => (
-                        <p key={q.id} className="text-sm text-gray-700">
-                          {q.title || "הסכם"}
-                          {q.signed_date && ` — נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`}
-                          {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
-                        </p>
-                      ))}
-                    </div>
+                <SectionTitle icon={PenLine} count={leadQuotes.length}>מסמכים</SectionTitle>
+                {leadQuotes.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {leadQuotes.map(q => {
+                      const signed = !!q.client_signature;
+                      const cfg = QUOTE_STATUS_CONFIG[q.status] || QUOTE_STATUS_CONFIG["טיוטה"];
+                      const Icon = signed ? CheckCircle : cfg.icon;
+                      return (
+                        <button
+                          key={q.id}
+                          type="button"
+                          onClick={() => onViewQuote && onViewQuote(q)}
+                          className={`w-full text-right p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-colors ${
+                            signed ? "bg-green-50 border-green-100 hover:bg-green-100" : "bg-gray-50 border-gray-100 hover:bg-gray-100"
+                          }`}
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm text-gray-800 truncate">{q.title || "מסמך ללא כותרת"}</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5">
+                              {signed && q.signed_date
+                                ? `נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`
+                                : format(new Date(q.created_date), "dd/MM/yyyy", { locale: he })}
+                              {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
+                            </p>
+                          </div>
+                          <span className={`flex-shrink-0 text-[10px] font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${signed ? "bg-green-100 text-green-700" : cfg.color}`}>
+                            <Icon className="w-3 h-3" /> {signed ? "נחתם" : cfg.label}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 py-2">אין הסכמים חתומים לליד זה</p>
+                  <p className="text-xs text-gray-400 py-2">אין מסמכים לליד זה</p>
                 )}
               </div>
 
