@@ -130,63 +130,22 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   };
 
   const [linkCopied, setLinkCopied] = useState(false);
-  const [shortLinkCache, setShortLinkCache] = useState(null);
-  const [shorteningLink, setShorteningLink] = useState(false);
 
-  const buildRawLink = () => {
-    const data = {
-      id: quote?.id,
-      lead_id: quote?.lead_id || "",
-      customer_id: quote?.customer_id || "",
-      title: quote?.title,
-      rawBody: quote?.notes,
-      amount: quote?.amount,
-      valid_until: quote?.valid_until,
-      lead: {
-        name: lead?.full_name,
-        phone: lead?.phone,
-        email: lead?.email,
-        company: lead?.company_name,
-        id_number: lead?.id_number || "",
-        business_address: lead?.business_address || "",
-      }
-    };
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-    return `${window.location.origin}/ClientSign?q=${encoded}`;
-  };
+  // הקישור נושא רק את מזהה ההסכם — קצר מטבעו, בלי תלות בקיצור קישורים חיצוני
+  // (שלא עבד בפועל: גם TinyURL וגם is.gd חוסמים קריאות דפדפן ב-CORS, אז
+  // הקישור תמיד נפל חזרה לגרסה הארוכה). הדף שולף את שאר הפרטים מה-DB בעצמו.
+  const buildSignLink = () => `${window.location.origin}/ClientSign?id=${quote?.id}`;
 
-  const getSignLink = async () => {
-    if (shortLinkCache) return shortLinkCache;
-    const longUrl = buildRawLink();
-    setShorteningLink(true);
-    try {
-      const resp = await fetch(
-        `https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`,
-        { signal: AbortSignal.timeout(5000) }
-      );
-      const short = await resp.text();
-      if (short.startsWith("https://is.gd/")) {
-        setShortLinkCache(short);
-        setShorteningLink(false);
-        return short;
-      }
-    } catch (e) {
-      console.error("קיצור קישור נכשל, משתמשים בקישור המלא:", e);
-    }
-    setShorteningLink(false);
-    return longUrl;
-  };
-
-  const handleCopyLink = async () => {
-    const link = await getSignLink();
+  const handleCopyLink = () => {
+    const link = buildSignLink();
     navigator.clipboard.writeText(link).then(() => {
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2500);
     });
   };
 
-  const handleSendLinkWhatsApp = async () => {
-    const link = await getSignLink();
+  const handleSendLinkWhatsApp = () => {
+    const link = buildSignLink();
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const msg = encodeURIComponent(
@@ -265,16 +224,15 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
               <Printer className="w-4 h-4" /> הדפסה / PDF
             </button>
             {lead?.phone && (
-              <button onClick={handleSendLinkWhatsApp} disabled={shorteningLink}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors disabled:opacity-60">
-                <MessageCircle className="w-4 h-4" />
-                {shorteningLink ? "מכין קישור..." : "שלח קישור לחתימה"}
+              <button onClick={handleSendLinkWhatsApp}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">
+                <MessageCircle className="w-4 h-4" /> שלח קישור לחתימה
               </button>
             )}
-            <button onClick={handleCopyLink} disabled={shorteningLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-60">
+            <button onClick={handleCopyLink}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors">
               <Link2 className="w-4 h-4" />
-              {linkCopied ? "✓ הועתק!" : shorteningLink ? "מקצר..." : "העתק קישור"}
+              {linkCopied ? "✓ הועתק!" : "העתק קישור"}
             </button>
             {lead?.email && (
               <button onClick={handleEmail}

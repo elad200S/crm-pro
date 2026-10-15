@@ -192,54 +192,93 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
 // ─── דף ראשי ─────────────────────────────────────────────────────────────────
 export default function ClientSign() {
   const params = new URLSearchParams(window.location.search);
-  const encoded = params.get("q");
+  const qParam = params.get("q");
+  const idParam = params.get("id");
 
-  let docData = null;
-  try {
-    docData = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-  } catch (e) {
-    console.error("קישור חתימה לא תקין — נכשל בפענוח:", e);
+  // קישורים ישנים (q=...) מכילים תמונת מצב מקודדת של כל ההסכם בתוך ה-URL עצמו
+  // — זה מה שהפך אותם לענקיים. קישורים חדשים (id=...) שולחים רק את מזהה
+  // ההסכם, קצר בהרבה, והדף שולף את כל השאר (תוכן, פרטי ליד/לקוח) מה-DB.
+  let legacyData = null;
+  if (qParam) {
+    try {
+      legacyData = JSON.parse(decodeURIComponent(escape(atob(qParam))));
+    } catch (e) {
+      console.error("קישור חתימה לא תקין — נכשל בפענוח:", e);
+    }
   }
 
-  const { id, lead_id, customer_id, title, rawBody, amount, valid_until, lead } = docData || {};
-  const price = parseFloat(amount) || 0;
+  const id = legacyData?.id || idParam || null;
 
-  // מילוי מוקדם מנתוני הליד ב-URL
-  const initData = {};
-  ALL_VARS.forEach(v => {
-    const val = lead?.[v.leadField] || "";
-    if (val) initData[v.key] = val;
-  });
-
-  // שדות הטופס: 4 שדות החובה מופיעים תמיד, ובנוסף כל שדה שהסוכן שילב במסמך.
-  // כולם חובה — המסמך לא נפתח לפני שהלקוח מילא ואישר את כל הפרטים.
-  const computeFormVars = () =>
-    ALL_VARS.filter(v => v.core || (rawBody || "").includes(v.key));
-
-  const [clientData, setClientData] = useState(initData);
-  // רשימת השדות קבועה מראש כדי שלא ייעלמו תוך כדי הקלדה; הטופס תמיד מוצג
-  // קודם, גם אם הפרטים מולאו מראש — כדי שהלקוח יוודא שהם נכונים
-  const [formVars] = useState(computeFormVars);
+  const [clientData, setClientData] = useState({});
+  const [formVars, setFormVars] = useState([]);
   const [step, setStep] = useState("form");
   const [signature, setSignature] = useState(null);
   const [signing, setSigning] = useState(false);
   const [signError, setSignError] = useState(false);
 
-  // בדיקת מצב ההסכם האמיתי מול ה-DB לפני הצגת הטופס — קישור החתימה מכיל
-  // תמונת מצב סטטית מרגע היצירה, ולא יודע אם ההסכם כבר נחתם בינתיים או נמחק.
+  // בדיקת מצב ההסכם מול ה-DB — גם כדי לוודא שהוא לא נחתם/נמחק בינתיים, וגם
+  // (בקישור הקצר) כדי לשלוף ממנו את כל תוכן ההסכם ופרטי הליד/לקוח
   const [checkingQuote, setCheckingQuote] = useState(!!id);
   const [liveQuote, setLiveQuote] = useState(null);
+  const [liveLead, setLiveLead] = useState(null);
   const [quoteMissing, setQuoteMissing] = useState(false);
 
   useEffect(() => {
     if (!id) { setCheckingQuote(false); return; }
-    base44.entities.Quote.get(id)
-      .then(q => setLiveQuote(q))
-      .catch(e => { console.error("טעינת ההסכם נכשלה:", e); setQuoteMissing(true); })
-      .finally(() => setCheckingQuote(false));
+    (async () => {
+      try {
+        const q = await base44.entities.Quote.get(id);
+        setLiveQuote(q);
+        if (!legacyData) {
+          if (q.lead_id) {
+            const l = await base44.entities.Lead.get(q.lead_id).catch(() => null);
+            if (l) setLiveLead({
+              name: l.full_name, phone: l.phone, email: l.email,
+              company: l.company_name, id_number: l.id_number, business_address: l.business_address,
+            });
+          } else if (q.customer_id) {
+            const c = await base44.entities.Customer.get(q.customer_id).catch(() => null);
+            if (c) setLiveLead({
+              name: `${c.first_name || ""} ${c.last_name || ""}`.trim(), phone: c.phone, email: c.email,
+              company: c.company, id_number: c.id_number, business_address: c.business_address,
+            });
+          }
+        }
+      } catch (e) {
+        console.error("טעינת ההסכם נכשלה:", e);
+        setQuoteMissing(true);
+      } finally {
+        setCheckingQuote(false);
+      }
+    })();
   }, [id]);
 
-  if (!docData) {
+  // שדות המסמך — מהקישור הישן אם יש (כדי לא לשנות התנהגות לקישורים שכבר
+  // נשלחו), אחרת מהנתונים החיים שנשלפו מה-DB
+  const lead_id = legacyData?.lead_id || liveQuote?.lead_id || "";
+  const customer_id = legacyData?.customer_id || liveQuote?.customer_id || "";
+  const title = legacyData?.title ?? liveQuote?.title;
+  const rawBody = legacyData?.rawBody ?? liveQuote?.notes;
+  const amount = legacyData?.amount ?? liveQuote?.amount;
+  const valid_until = legacyData?.valid_until ?? liveQuote?.valid_until;
+  const lead = legacyData?.lead || liveLead;
+  const price = parseFloat(amount) || 0;
+
+  // מילוי הטופס רץ פעם אחת כשהטעינה מסתיימת (לא תלוי ב-lead/rawBody בכוונה)
+  // — כדי לא לדרוס מה שהלקוח כבר הקליד אם משהו גורם לרנדור נוסף אחר כך
+  useEffect(() => {
+    if (checkingQuote) return;
+    const initData = {};
+    ALL_VARS.forEach(v => {
+      const val = lead?.[v.leadField] || "";
+      if (val) initData[v.key] = val;
+    });
+    setClientData(initData);
+    // 4 שדות החובה מופיעים תמיד, ובנוסף כל שדה שהסוכן שילב בתוכן המסמך
+    setFormVars(ALL_VARS.filter(v => v.core || (rawBody || "").includes(v.key)));
+  }, [checkingQuote]);
+
+  if (!id) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50" dir="rtl">
         <div className="text-center p-8">
