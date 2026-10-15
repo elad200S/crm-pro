@@ -3,6 +3,7 @@ import { CheckCircle, PenLine, RotateCcw, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { base44 } from "@/api/base44Client";
@@ -215,6 +216,13 @@ export default function ClientSign() {
   const [signature, setSignature] = useState(null);
   const [signing, setSigning] = useState(false);
   const [signError, setSignError] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+
+  // בפופ-אפ: סוגר אוטומטית רק כשבאמת אושרה חתימה, לא כשרק נוקה הציור
+  const handleSignConfirmed = (dataUrl) => {
+    setSignature(dataUrl);
+    if (dataUrl) setShowSignatureModal(false);
+  };
 
   // בדיקת מצב ההסכם מול ה-DB — גם כדי לוודא שהוא לא נחתם/נמחק בינתיים, וגם
   // (בקישור הקצר) כדי לשלוף ממנו את כל תוכן ההסכם ופרטי הליד/לקוח
@@ -523,11 +531,44 @@ export default function ClientSign() {
                 <PenLine className="w-4 h-4 text-teal-700" /> חתימה דיגיטלית
               </h3>
               <p className="text-xs text-gray-400 mb-3">
-                קראתי את ההסכם ואני מסכים/ה לכל תנאיו — אנא חתום/י למטה ולחץ "אשר חתימה"
+                קראתי את ההסכם ואני מסכים/ה לכל תנאיו — לחץ/י למטה כדי לחתום
               </p>
-              <SignaturePad onSignConfirmed={setSignature} />
+              {signature ? (
+                <button
+                  type="button"
+                  onClick={() => setShowSignatureModal(true)}
+                  className="w-full border-2 border-dashed border-teal-200 rounded-xl bg-teal-50 p-4 flex flex-col items-center gap-2 hover:bg-teal-100 transition-colors"
+                >
+                  <img src={signature} alt="" className="h-16" />
+                  <span className="text-xs text-teal-700 flex items-center gap-1">
+                    <PenLine className="w-3 h-3" /> לחץ לשינוי החתימה
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowSignatureModal(true)}
+                  className="w-full border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 p-8 flex flex-col items-center gap-2 hover:bg-gray-100 transition-colors"
+                >
+                  <PenLine className="w-6 h-6 text-gray-400" />
+                  <span className="text-sm text-gray-500">לחץ כאן לחתימה</span>
+                </button>
+              )}
             </div>
           </div>
+
+          {showSignatureModal && (
+            <Dialog open onOpenChange={setShowSignatureModal}>
+              <DialogContent className="max-w-lg" dir="rtl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <PenLine className="w-4 h-4 text-teal-700" /> חתימה דיגיטלית
+                  </DialogTitle>
+                </DialogHeader>
+                <SignaturePad onSignConfirmed={handleSignConfirmed} />
+              </DialogContent>
+            </Dialog>
+          )}
 
           <div className="px-10 pb-4">
             <div className="flex gap-16 items-end">
