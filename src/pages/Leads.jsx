@@ -283,12 +283,13 @@ export default function Leads() {
   };
 
   const handleConvertClick = async (lead) => {
-    // check existing customer
-    const customers = await base44.entities.Customer.list();
-    const existing = customers.find(c =>
-      (lead.phone && c.phone === lead.phone) || (lead.email && c.email === lead.email)
-    );
-    setExistingCustomerForConvert(existing || null);
+    // check existing customer — חיפוש ממוקד לפי טלפון/מייל, לא משיכת כל טבלת הלקוחות
+    const orClauses = [
+      ...(lead.phone ? [{ phone: lead.phone }] : []),
+      ...(lead.email ? [{ email: lead.email }] : []),
+    ];
+    const matches = orClauses.length ? await base44.entities.Customer.filter({ $or: orClauses }) : [];
+    setExistingCustomerForConvert(matches[0] || null);
     setConvertTarget(lead);
   };
 
@@ -298,7 +299,9 @@ export default function Leads() {
     const nameParts = (lead.full_name || "").trim().split(" ");
     const firstName = nameParts[0] || "ליד";
     const lastName = nameParts.slice(1).join(" ") || "מומר";
-    const allCustomers = await base44.entities.Customer.list();
+    // מספר הלקוח הבא — customer_number הוא שדה טקסט (מרופד), אז לא ניתן
+    // לסמוך על מיון לקסיקוגרפי מעל 999 לקוחות; נשאר עם מעבר על כל הרשימה
+    const allCustomers = await base44.entities.Customer.list('-created_date', 2000);
     const maxCustNum = allCustomers.reduce((max, c) => Math.max(max, parseInt(c.customer_number) || 0), 0);
     const customer = await base44.entities.Customer.create({
       customer_number: String(maxCustNum + 1).padStart(3, '0'),

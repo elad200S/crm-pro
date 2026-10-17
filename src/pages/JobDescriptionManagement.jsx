@@ -73,7 +73,7 @@ export default function JobDescriptionManagement() {
 
   const loadTemplates = async () => {
     try {
-      const data = await JobDescriptionTemplate.list('-created_date');
+      const data = await JobDescriptionTemplate.list('-created_date', 2000);
       setTemplates(data);
     } catch (error) {
       console.error("שגיאה בטעינת תבניות:", error);

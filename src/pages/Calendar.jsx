@@ -48,9 +48,9 @@ export default function Calendar() {
   const loadData = async () => {
     try {
       const [tasksData, customersData, leadsData] = await Promise.all([
-        base44.entities.Task.list('-created_date'),
-        base44.entities.Customer.list(),
-        base44.entities.Lead.list()
+        base44.entities.Task.list('-created_date', 2000),
+        base44.entities.Customer.list('-created_date', 2000),
+        base44.entities.Lead.list('-created_date', 2000)
       ]);
       setTasks(tasksData);
       setCustomers(customersData);

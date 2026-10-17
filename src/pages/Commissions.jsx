@@ -10,6 +10,7 @@ const isAdmin = (user) => user?.role === "admin" || user?.user_category === "מ�
 const monthKeyOf = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 
 export default function Commissions() {
+  const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [payments, setPayments] = useState([]);
   const [quotes, setQuotes] = useState([]);
@@ -21,11 +22,15 @@ export default function Commissions() {
   const [rateEdits, setRateEdits] = useState({});
   const [saving, setSaving] = useState(null);
 
+  // תשלומים נשלפים לפי החודש הנבחר בלבד — לא "1000 האחרונים" בלי קשר אליו
+  // (שגם היה יכול לפספס חודשים ישנים אם יש יותר מ-1000 תשלומים בסה"כ)
   const loadData = useCallback(async () => {
     try {
+      const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1).toISOString().split("T")[0];
+      const nextMonthStart = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1).toISOString().split("T")[0];
       const [usersData, paymentsData, quotesData, leadsData, customersData] = await Promise.all([
         User.list("-created_date", 200),
-        Payment.list("-paid_date", 1000),
+        Payment.filter({ status: "שולם", paid_date: { $gte: monthStart, $lt: nextMonthStart } }, "-paid_date", 2000),
         Quote.list("-created_date", 1000),
         Lead.list("-created_date", 1000),
         Customer.list("-created_date", 1000),
@@ -40,7 +45,7 @@ export default function Commissions() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [monthDate]);
 
   useEffect(() => {
     const init = async () => {
@@ -51,14 +56,18 @@ export default function Commissions() {
           setLoading(false);
           return;
         }
-        await loadData();
+        setCurrentUser(user);
       } catch (e) {
         console.error("שגיאה באתחול:", e);
         setLoading(false);
       }
     };
     init();
-  }, [loadData]);
+  }, []);
+
+  useEffect(() => {
+    if (currentUser) loadData();
+  }, [currentUser, loadData]);
 
   if (accessDenied) {
     return (

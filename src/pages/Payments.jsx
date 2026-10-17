@@ -69,13 +69,13 @@ export default function Payments() {
 
       if (isAdmin(user)) {
         [paymentsData, customersData] = await Promise.all([
-          Payment.list('-created_date'),
-          Customer.list()
+          Payment.list('-created_date', 2000),
+          Customer.list('-created_date', 2000)
         ]);
       } else {
         [paymentsData, customersData] = await Promise.all([
-          Payment.filter({ created_by: user.email }, '-created_date'),
-          Customer.filter({ created_by: user.email })
+          Payment.filter({ created_by: user.email }, '-created_date', 2000),
+          Customer.filter({ created_by: user.email }, '-created_date', 2000)
         ]);
       }
 

@@ -114,7 +114,7 @@ export default function UserManagement() {
 
   const loadUsers = async () => {
     try {
-      const data = await User.list('-created_date');
+      const data = await User.list('-created_date', 2000);
       setUsers(data);
     } catch (error) {
       console.error("שגיאה בטעינת משתמשים:", error);

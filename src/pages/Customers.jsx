@@ -77,7 +77,7 @@ export default function Customers() {
 
   const loadCustomers = useCallback(async () => {
     try {
-      const data = await Customer.list('-created_date');
+      const data = await Customer.list('-created_date', 2000);
       // השלמת מספרים ללקוחות ותיקים שנוצרו לפני מנגנון המספור
       const missingNum = data.filter(c => !c.customer_number).sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
       if (missingNum.length) {
