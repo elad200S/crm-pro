@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus, PenLine, Receipt } from "lucide-react";
+import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus, PenLine, Receipt, Files } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { logActivity } from "@/lib/activityLog";
@@ -150,7 +150,15 @@ export default function Quotes() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card className="border-l-4 border-l-purple-500">
+          <CardContent className="pt-5 pb-4">
+            <div className="text-2xl font-bold text-purple-700">{stats.total}</div>
+            <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+              <Files className="w-3.5 h-3.5" /> סה"כ מסמכים
+            </div>
+          </CardContent>
+        </Card>
         <Card className="border-l-4 border-l-gray-400">
           <CardContent className="pt-5 pb-4">
             <div className="text-2xl font-bold text-gray-700">{stats.draft}</div>

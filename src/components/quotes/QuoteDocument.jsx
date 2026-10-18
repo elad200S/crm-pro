@@ -39,7 +39,9 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   const neededVars = CLIENT_FILL_VARS.filter(v => rawBody.includes(v.key));
   const [clientData, setClientData] = useState({});
   const [gateSubmitted, setGateSubmitted] = useState(true);
-  const [approved, setApproved] = useState(false);
+  // אם ההסכם כבר נחתם/אושר בעבר (למשל נפתח שוב מכרטיס הליד), להראות את זה
+  // מיד — לא את כפתור "אשר" כאילו עדיין לא טופל
+  const [approved, setApproved] = useState(!!quote?.client_signature || quote?.status === "אושר");
 
   const body = substituteAll(rawBody, lead, quote?.amount, clientData);
 
