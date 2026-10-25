@@ -9,6 +9,14 @@ const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
 const curr = (n) => `₪${(parseFloat(n) || 0).toLocaleString()}`;
 
+// הגנה מפני XSS: שדות כמו שם/כתובת/חברה של הלקוח מגיעים מטופס החתימה
+// הציבורי (ClientSign) — כל אחד עם קישור יכול למלא שם משתמש זדוני, וזה
+// נשמר גולמי. בלי בריחה, קוד כזה היה רץ כש-HTML הזה מוצג/נפתח כאן בתוך
+// ההתחברות של איש הצוות.
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
+  { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+));
+
 export default function QuotePriceDocument({ quote, customer, onClose, onSent }) {
   const printRef = useRef();
   const [sending, setSending] = useState(false);
@@ -44,8 +52,8 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
             <p style="font-size:12px;opacity:.75;">אלעד חנינה • 054-710-8219</p>
           </div>
           <div style="text-align:left;font-size:12.5px;">
-            <h2 style="font-size:17px;font-weight:700;margin:0;">${quote?.title || "הצעת מחיר"}</h2>
-            <p style="opacity:.8;margin:3px 0 0;">מספר: ${quote?.quote_number || ""}</p>
+            <h2 style="font-size:17px;font-weight:700;margin:0;">${esc(quote?.title) || "הצעת מחיר"}</h2>
+            <p style="opacity:.8;margin:3px 0 0;">מספר: ${esc(quote?.quote_number)}</p>
             <p style="opacity:.8;margin:3px 0 0;">תאריך: ${todayStr()}</p>
             ${quote?.valid_until ? `<p style="opacity:.8;margin:3px 0 0;">בתוקף עד: ${format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}</p>` : ""}
           </div>
@@ -53,11 +61,11 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
 
         <div style="padding:28px 36px;">
           <div style="background:#f7faf9;border:1px solid #d8ebe7;border-radius:12px;padding:14px 20px;margin-bottom:24px;font-size:13px;line-height:1.9;">
-            <strong>${clientName}</strong>${quote?.signing_client_company ? ` — ${quote.signing_client_company}` : ""}<br/>
-            ${clientEmail ? `מייל: ${clientEmail}<br/>` : ""}
-            ${clientPhone ? `טלפון: ${clientPhone}<br/>` : ""}
-            ${quote?.signing_client_id ? `ח"פ/ת"ז: ${quote.signing_client_id}<br/>` : ""}
-            ${quote?.signing_client_address ? `כתובת: ${quote.signing_client_address}` : ""}
+            <strong>${esc(clientName)}</strong>${quote?.signing_client_company ? ` — ${esc(quote.signing_client_company)}` : ""}<br/>
+            ${clientEmail ? `מייל: ${esc(clientEmail)}<br/>` : ""}
+            ${clientPhone ? `טלפון: ${esc(clientPhone)}<br/>` : ""}
+            ${quote?.signing_client_id ? `ח"פ/ת"ז: ${esc(quote.signing_client_id)}<br/>` : ""}
+            ${quote?.signing_client_address ? `כתובת: ${esc(quote.signing_client_address)}` : ""}
           </div>
 
           <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">
@@ -72,8 +80,8 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
             <tbody>
               ${items.map(i => `
                 <tr>
-                  <td style="padding:9px 12px;border-bottom:1px solid #e5efec;">${i.description}</td>
-                  <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:center;">${i.quantity}</td>
+                  <td style="padding:9px 12px;border-bottom:1px solid #e5efec;">${esc(i.description)}</td>
+                  <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:center;">${esc(i.quantity)}</td>
                   <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:left;">${curr(i.unit_price)}</td>
                   <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:left;font-weight:600;">${curr(i.total)}</td>
                 </tr>`).join("")}
@@ -87,7 +95,7 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
             <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#e8f7f4;border-radius:10px;margin-top:8px;font-size:16px;font-weight:800;color:#0A8E7F;"><span>סה"כ לתשלום</span><span>${curr(total)}</span></div>
           </div>
 
-          ${quote?.notes ? `<div style="font-size:12.5px;line-height:1.9;color:#3a4a44;white-space:pre-wrap;background:#f7faf9;border-radius:10px;padding:12px 18px;margin-bottom:28px;">${quote.notes}</div>` : ""}
+          ${quote?.notes ? `<div style="font-size:12.5px;line-height:1.9;color:#3a4a44;white-space:pre-wrap;background:#f7faf9;border-radius:10px;padding:12px 18px;margin-bottom:28px;">${esc(quote.notes)}</div>` : ""}
 
           <div style="display:flex;gap:60px;margin-top:14px;align-items:flex-end;">
             <div style="flex:1;text-align:center;font-size:11px;color:#5f7a6c;"><div style="border-top:1px solid #5f7a6c;padding-top:8px;">אישור וחתימת הלקוח</div></div>
@@ -141,7 +149,7 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
     const win = window.open("", "_blank");
     win.document.write(`
       <html dir="rtl">
-        <head><meta charset="utf-8"/><title>${quote?.title || "הצעת מחיר"}</title>
+        <head><meta charset="utf-8"/><title>${esc(quote?.title) || "הצעת מחיר"}</title>
         <style>
           * { box-sizing: border-box; margin: 0; padding: 0; }
           html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }

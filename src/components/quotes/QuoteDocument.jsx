@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 
 const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
+// הגנה מפני XSS: שדות חתימת הלקוח מגיעים מטופס ציבורי (ClientSign) — בלי
+// בריחה, קוד זדוני ששם שם היה רץ כשאיש צוות פותח/מדפיס את המסמך כאן.
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => (
+  { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+));
+
 // משתנים שהלקוח חייב למלא (לא ניתן לאחזר מהליד)
 const CLIENT_FILL_VARS = [
   { key: "{customer-id}",      label: 'ח"פ / ת"ז' },
@@ -85,15 +91,15 @@ export default function QuoteDocument({ quote, lead, onClose }) {
               <p>eladauto66@gmail.com</p>
             </div>
             <div class="doc-meta">
-              <h2>${quote?.title || "הסכם עבודה"}</h2>
+              <h2>${esc(quote?.title) || "הסכם עבודה"}</h2>
               <p>תאריך: ${todayStr()}</p>
               ${quote?.valid_until ? `<p>בתוקף עד: ${format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}</p>` : ""}
             </div>
           </div>
-          <div class="body-text">${body.replace(/\n/g, "<br/>")}</div>
+          <div class="body-text">${esc(body).replace(/\n/g, "<br/>")}</div>
           ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
-            <div class="sig-line">${quote?.client_signature ? `<img src="${quote.client_signature}" style="max-height:52px;" />` : ""}<div class="line">${quote?.client_signature ? `${quote?.signing_client_name || lead?.full_name || ""}${quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}` : "חתימת הלקוח ותאריך"}</div></div>
+            <div class="sig-line">${quote?.client_signature ? `<img src="${quote.client_signature}" style="max-height:52px;" />` : ""}<div class="line">${quote?.client_signature ? `${esc(quote?.signing_client_name || lead?.full_name)}${quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}` : "חתימת הלקוח ותאריך"}</div></div>
             <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
           </div>
           <div class="footer"><span>HEY Digital • eladauto66@gmail.com</span><span>הופק: ${todayStr()}</span></div>
