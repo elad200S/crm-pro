@@ -316,7 +316,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                         <button
                           key={q.id}
                           type="button"
-                          onClick={() => onViewQuote && onViewQuote(q)}
+                          onClick={() => { alert("נלחץ!"); onViewQuote && onViewQuote(q); }}
                           className={`w-full text-right p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-colors ${
                             signed ? "bg-green-50 border-green-100 hover:bg-green-100" : "bg-gray-50 border-gray-100 hover:bg-gray-100"
                           }`}
