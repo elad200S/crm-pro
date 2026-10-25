@@ -7,13 +7,23 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus, PenLine, Receipt, Files } from "lucide-react";
+import { FileText, Search, Edit, TrendingUp, Clock, CheckCircle2, XCircle, Eye, Plus, PenLine, Receipt, Files, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { logActivity } from "@/lib/activityLog";
 import QuoteEditModal from "../components/quotes/QuoteEditModal";
 import QuoteDocument from "../components/quotes/QuoteDocument";
 import DocumentModal from "../components/quotes/DocumentModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const STATUS_CONFIG = {
   "טיוטה":  { label: "טיוטה",  color: "bg-gray-100 text-gray-700",    icon: FileText },
@@ -36,6 +46,7 @@ export default function Quotes() {
   const [editingDoc, setEditingDoc] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("הכל");
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => { loadData(); }, []);
 
@@ -77,6 +88,12 @@ export default function Quotes() {
     }
     await base44.entities.Quote.update(editingQuote.id, data);
     setEditingQuote(null);
+    await loadData();
+  };
+
+  const handleDeleteConfirm = async () => {
+    await base44.entities.Quote.delete(deleteTarget.id);
+    setDeleteTarget(null);
     await loadData();
   };
 
@@ -320,6 +337,15 @@ export default function Quotes() {
                           <Edit className="w-3.5 h-3.5 ml-1" />
                           עריכה
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setDeleteTarget(quote)}
+                          className="text-red-600 hover:text-red-800 border-red-200"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 ml-1" />
+                          מחיקה
+                        </Button>
                         {quote.status === "אושר" && (() => {
                           const linkedPayment = getLinkedPayment(quote.id);
                           if (linkedPayment) {
@@ -402,6 +428,23 @@ export default function Quotes() {
           onClose={() => setEditingDoc(null)}
         />
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>מחיקת מסמך</AlertDialogTitle>
+            <AlertDialogDescription>
+              האם אתה בטוח שברצונך למחוק את המסמך "{deleteTarget?.title || "ללא כותרת"}"? פעולה זו לא ניתנת לביטול.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700">
+              מחיקה
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

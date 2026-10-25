@@ -75,6 +75,7 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
 
   // שדות ידניים שהמשתמש ימלא
   const [manualVars, setManualVars] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const setVar = (k, v) => setManualVars(m => ({ ...m, [k]: v }));
@@ -99,24 +100,31 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
     }, 0);
   };
 
-  const handleSubmit = () => {
-    if (!form.title.trim()) return;
+  const handleSubmit = async () => {
+    // מונע יצירת מסמכים כפולים מלחיצה חוזרת בזמן שהשמירה הקודמת עוד
+    // מתבצעת ברקע (Quote.create + עדכון ליד + webhook + התראה — כמה שניות)
+    if (!form.title.trim() || submitting) return;
+    setSubmitting(true);
     // שמור את הערכים הידניים בתוך הטקסט לפני שמירה
     let finalBody = form.body;
     Object.entries(manualVars).forEach(([key, val]) => {
       if (val) finalBody = finalBody.replaceAll(key, val);
     });
-    onSubmit({
-      title: form.title,
-      notes: finalBody,
-      amount: parseFloat(form.price) || 0,
-      valid_until: form.valid_until,
-      status: "טיוטה",
-      items: [],
-      discount: 0,
-      vat_included: false,
-      currency: "ILS",
-    });
+    try {
+      await onSubmit({
+        title: form.title,
+        notes: finalBody,
+        amount: parseFloat(form.price) || 0,
+        valid_until: form.valid_until,
+        status: "טיוטה",
+        items: [],
+        discount: 0,
+        vat_included: false,
+        currency: "ILS",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -256,9 +264,9 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
           <Button
             className="bg-blue-600 hover:bg-blue-700"
             onClick={handleSubmit}
-            disabled={!form.title.trim()}
+            disabled={!form.title.trim() || submitting}
           >
-            {isNew ? "צור מסמך" : "שמור"}
+            {submitting ? "שומר..." : isNew ? "צור מסמך" : "שמור"}
           </Button>
         </DialogFooter>
       </DialogContent>
