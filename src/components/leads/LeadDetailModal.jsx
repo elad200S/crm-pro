@@ -150,6 +150,18 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
     }
   }, [lead?.id]);
 
+  // אבחון זמני: מראה באיזה אלמנט המגע הראשון בחלון הזה באמת פגע — לבדיקת
+  // תקלת "לחיצה לא מגיבה" במובייל. יוסר אחרי שנאתר את הסיבה.
+  useEffect(() => {
+    const handler = (e) => {
+      const t = e.touches ? e.touches[0] : e;
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      alert("נגעת ב: " + (el ? el.outerHTML.slice(0, 300) : "כלום"));
+    };
+    document.addEventListener("touchstart", handler, { once: true, capture: true });
+    return () => document.removeEventListener("touchstart", handler, true);
+  }, []);
+
   const loadTasks = async () => {
     try {
       const all = await base44.entities.Task.list("-created_date", 100);
@@ -316,7 +328,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                         <button
                           key={q.id}
                           type="button"
-                          onClick={() => { alert("נלחץ!"); onViewQuote && onViewQuote(q); }}
+                          onClick={() => onViewQuote && onViewQuote(q)}
                           className={`w-full text-right p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-colors ${
                             signed ? "bg-green-50 border-green-100 hover:bg-green-100" : "bg-gray-50 border-gray-100 hover:bg-gray-100"
                           }`}
