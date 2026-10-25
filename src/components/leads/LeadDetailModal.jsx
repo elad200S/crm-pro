@@ -150,17 +150,14 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
     }
   }, [lead?.id]);
 
-  // אבחון זמני: מראה באיזה אלמנט המגע הראשון בחלון הזה באמת פגע — לבדיקת
-  // תקלת "לחיצה לא מגיבה" במובייל. יוסר אחרי שנאתר את הסיבה.
-  useEffect(() => {
-    const handler = (e) => {
-      const t = e.touches ? e.touches[0] : e;
-      const el = document.elementFromPoint(t.clientX, t.clientY);
-      alert("נגעת ב: " + (el ? el.outerHTML.slice(0, 300) : "כלום"));
-    };
-    document.addEventListener("touchstart", handler, { once: true, capture: true });
-    return () => document.removeEventListener("touchstart", handler, true);
-  }, []);
+  // אבחון זמני: מראה באיזה אלמנט המגע באזור "מסמכים" באמת פגע — לבדיקת
+  // תקלת "לחיצה לא מגיבה" במובייל. מוגבל לאזור הזה בלבד (לא לכל הדף), כדי
+  // שגלילה במקומות אחרים לא "תצרוך" את הבדיקה. יוסר אחרי שנאתר את הסיבה.
+  const diagnoseTouch = (e) => {
+    const t = e.touches ? e.touches[0] : e;
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    alert("נגעת ב: " + (el ? el.outerHTML.slice(0, 300) : "כלום"));
+  };
 
   const loadTasks = async () => {
     try {
@@ -319,7 +316,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
               <div>
                 <SectionTitle icon={PenLine} count={leadQuotes.length}>מסמכים</SectionTitle>
                 {leadQuotes.length > 0 ? (
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5" onTouchStartCapture={diagnoseTouch}>
                     {leadQuotes.map(q => {
                       const signed = !!q.client_signature;
                       const cfg = QUOTE_STATUS_CONFIG[q.status] || QUOTE_STATUS_CONFIG["טיוטה"];
