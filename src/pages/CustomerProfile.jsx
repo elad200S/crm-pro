@@ -6,12 +6,15 @@ import { he } from "date-fns/locale";
 import {
   ArrowRight, Phone, Mail, Edit,
   MessageCircle, FileText, Clock,
-  CreditCard, CheckCircle, Building2, XCircle
+  CreditCard, CheckCircle, Building2, XCircle, FilePlus2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { createPageUrl } from "@/utils";
 import { logActivity } from "@/lib/activityLog";
 import CancelCustomerModal from "../components/customers/CancelCustomerModal";
+import QuoteBuilderModal from "@/components/customers/QuoteBuilderModal";
+import QuotePriceDocument from "@/components/quotes/QuotePriceDocument";
 
 const STATUS_COLORS = {
   "פעיל":      "bg-green-100 text-green-700",
@@ -44,6 +47,8 @@ export default function CustomerProfile() {
   const [quotes, setQuotes] = useState([]);
   const [cancellation, setCancellation] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showQuoteBuilder, setShowQuoteBuilder] = useState(false);
+  const [quoteToView, setQuoteToView] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -150,6 +155,9 @@ export default function CustomerProfile() {
               <FileText className="w-4 h-4 text-blue-600" />
               <h3 className="font-bold text-gray-800 text-sm">מסמכים</h3>
               <span className="mr-auto text-xs text-gray-400">{quotes.length} סה"כ</span>
+              <Button size="sm" onClick={() => setShowQuoteBuilder(true)} className="h-7 bg-blue-600 hover:bg-blue-700 text-xs">
+                <FilePlus2 className="w-3.5 h-3.5 ml-1" /> הצעת מחיר
+              </Button>
             </div>
             <div className="p-4 space-y-2">
               {loading ? <Skeleton /> : quotes.length === 0 ? (
@@ -289,6 +297,12 @@ export default function CustomerProfile() {
                 </button>
               )}
               <button
+                onClick={() => setShowQuoteBuilder(true)}
+                title="הצעת מחיר מנתוני הלקוח"
+                className="w-10 h-10 bg-white/20 border border-white/30 rounded-xl flex items-center justify-center hover:bg-white/30 transition-colors">
+                <FilePlus2 className="w-4 h-4" />
+              </button>
+              <button
                 onClick={() => navigate(createPageUrl("Customers"), { state: { editCustomer: customer } })}
                 title="עריכה"
                 className="w-10 h-10 bg-white/20 border border-white/30 rounded-xl flex items-center justify-center hover:bg-white/30 transition-colors">
@@ -380,6 +394,27 @@ export default function CustomerProfile() {
           customer={customer}
           onConfirm={handleCancelConfirm}
           onClose={() => setShowCancelModal(false)}
+        />
+      )}
+
+      {showQuoteBuilder && (
+        <QuoteBuilderModal
+          customer={customer}
+          onClose={() => setShowQuoteBuilder(false)}
+          onCreated={(created) => {
+            setShowQuoteBuilder(false);
+            setQuoteToView(created);
+            loadData(customer);
+          }}
+        />
+      )}
+
+      {quoteToView && (
+        <QuotePriceDocument
+          quote={quoteToView}
+          customer={customer}
+          onClose={() => setQuoteToView(null)}
+          onSent={() => loadData(customer)}
         />
       )}
     </div>

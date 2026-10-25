@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Phone, Mail, Trash2 } from "lucide-react";
+import { Edit, Phone, Mail, Trash2, FilePlus2 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -15,7 +15,7 @@ const statusColors = {
   "סגור": "bg-gray-100 text-gray-800"
 };
 
-export default function CustomerTable({ customers, loading, onEdit, onDelete, isAdmin, onRowClick }) {
+export default function CustomerTable({ customers, loading, onEdit, onDelete, onQuote, isAdmin, onRowClick }) {
   if (loading) {
     return (
       <Card>
@@ -100,6 +100,15 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, is
                  </TableCell>
                  <TableCell className="text-right" onClick={e => e.stopPropagation()}>
                    <div className="flex gap-1 justify-end">
+                     <Button
+                       variant="ghost"
+                       size="icon"
+                       title="הצעת מחיר מנתוני הלקוח"
+                       onClick={() => onQuote && onQuote(customer)}
+                       className="text-teal-700 hover:text-teal-900"
+                     >
+                       <FilePlus2 className="w-4 h-4" />
+                     </Button>
                      <Button
                        variant="ghost"
                        size="icon"

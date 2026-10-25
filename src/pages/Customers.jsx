@@ -20,6 +20,8 @@ import {
 import CustomerForm from "../components/customers/CustomerForm";
 import CustomerTable from "../components/customers/CustomerTable";
 import CustomerFilters from "../components/customers/CustomerFilters";
+import QuoteBuilderModal from "@/components/customers/QuoteBuilderModal";
+import QuotePriceDocument from "@/components/quotes/QuotePriceDocument";
 
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -33,6 +35,8 @@ export default function Customers() {
     source: "הכל"
   });
   const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [quoteCustomer, setQuoteCustomer] = useState(null);
+  const [quoteToView, setQuoteToView] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
@@ -245,10 +249,30 @@ export default function Customers() {
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
+          onQuote={(c) => setQuoteCustomer(c)}
           isAdmin={currentUser?.role === 'admin'}
           onRowClick={(c) => navigate(`${createPageUrl("CustomerProfile")}?customer=${c.id}`, { state: { customer: c } })}
         />
       </div>
+
+      {quoteCustomer && (
+        <QuoteBuilderModal
+          customer={quoteCustomer}
+          onClose={() => setQuoteCustomer(null)}
+          onCreated={(created) => {
+            setQuoteCustomer(null);
+            setQuoteToView(created);
+          }}
+        />
+      )}
+
+      {quoteToView && (
+        <QuotePriceDocument
+          quote={quoteToView}
+          customer={quoteCustomer || customers.find(c => c.id === quoteToView.customer_id)}
+          onClose={() => setQuoteToView(null)}
+        />
+      )}
 
       <AlertDialog open={!!customerToDelete} onOpenChange={() => setCustomerToDelete(null)}>
         <AlertDialogContent>
