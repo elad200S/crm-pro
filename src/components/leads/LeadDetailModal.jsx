@@ -150,15 +150,6 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
     }
   }, [lead?.id]);
 
-  // אבחון זמני: מראה באיזה אלמנט המגע באזור "מסמכים" באמת פגע — לבדיקת
-  // תקלת "לחיצה לא מגיבה" במובייל. מוגבל לאזור הזה בלבד (לא לכל הדף), כדי
-  // שגלילה במקומות אחרים לא "תצרוך" את הבדיקה. יוסר אחרי שנאתר את הסיבה.
-  const diagnoseTouch = (e) => {
-    const t = e.touches ? e.touches[0] : e;
-    const el = document.elementFromPoint(t.clientX, t.clientY);
-    alert("נגעת ב: " + (el ? el.outerHTML.slice(0, 300) : "כלום"));
-  };
-
   const loadTasks = async () => {
     try {
       const all = await base44.entities.Task.list("-created_date", 100);
@@ -176,13 +167,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
   const loadLeadQuotes = async () => {
     try {
       const all = await base44.entities.Quote.list("-created_date", 100);
-      const mine = all.filter(q => q.lead_id === lead.id);
-      setLeadQuotes(mine);
-      // אבחון זמני: מציג בדיוק אילו מסמכים נטענו לליד הזה — לבדיקת תקלת
-      // המגע שפוגע במסמך הלא-נכון. יוסר אחרי שנאתר את הסיבה.
-      alert("נטענו " + mine.length + " מסמכים:\n" + mine.map((q, i) =>
-        `#${i}: id=${q.id} title="${q.title || ""}" signed=${!!q.client_signature} status=${q.status}`
-      ).join("\n"));
+      setLeadQuotes(all.filter(q => q.lead_id === lead.id));
     } catch (e) {
       console.error("טעינת מסמכי הליד נכשלה:", e);
       setLeadQuotes([]);
@@ -322,7 +307,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
               <div>
                 <SectionTitle icon={PenLine} count={leadQuotes.length}>מסמכים</SectionTitle>
                 {leadQuotes.length > 0 ? (
-                  <div className="space-y-1.5" onTouchStartCapture={diagnoseTouch}>
+                  <div className="space-y-1.5">
                     {leadQuotes.map(q => {
                       const signed = !!q.client_signature;
                       const cfg = QUOTE_STATUS_CONFIG[q.status] || QUOTE_STATUS_CONFIG["טיוטה"];
