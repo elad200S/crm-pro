@@ -4,9 +4,19 @@ import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check, ArrowLeft, XCircle } from "lucide-react";
+import { Phone, Mail, Building2, MessageCircle, Edit, Trash2, FileText, UserCheck, CheckCircle, Clock, Plus, ChevronDown, PenLine, Briefcase, StickyNote, Copy, Check, ArrowLeft, XCircle, Send } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const STATUS_GRADIENT = {
   "התקבל":                "from-blue-500 to-blue-700",
@@ -142,6 +152,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
   const [tasks, setTasks] = useState([]);
   const [loadingTasks, setLoadingTasks] = useState(true);
   const [leadQuotes, setLeadQuotes] = useState([]);
+  const [deleteQuoteTarget, setDeleteQuoteTarget] = useState(null);
 
   useEffect(() => {
     if (lead?.id) {
@@ -172,6 +183,24 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
       console.error("טעינת מסמכי הליד נכשלה:", e);
       setLeadQuotes([]);
     }
+  };
+
+  const handleDeleteQuoteConfirm = async () => {
+    await base44.entities.Quote.delete(deleteQuoteTarget.id);
+    setDeleteQuoteTarget(null);
+    loadLeadQuotes();
+  };
+
+  // שליחת קישור חתימה לליד דרך וואטסאפ — ישירות מרשימת המסמכים, בלי
+  // לפתוח קודם את התצוגה המלאה של המסמך.
+  const sendQuoteLink = (q) => {
+    const link = `${window.location.origin}/ClientSign?id=${q.id}`;
+    const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
+    const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
+    const msg = encodeURIComponent(
+      `שלום ${lead?.full_name || ""},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_HEY Digital_`
+    );
+    window.open(`https://wa.me/${intlPhone}?text=${msg}`, "_blank");
   };
 
   const markDone = async (taskId) => {
@@ -313,27 +342,49 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                       const cfg = QUOTE_STATUS_CONFIG[q.status] || QUOTE_STATUS_CONFIG["טיוטה"];
                       const Icon = signed ? CheckCircle : cfg.icon;
                       return (
-                        <button
+                        <div
                           key={q.id}
-                          type="button"
-                          onClick={() => onViewQuote && onViewQuote(q)}
-                          className={`w-full text-right p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-colors ${
+                          className={`w-full rounded-xl border flex items-center gap-1 transition-colors ${
                             signed ? "bg-green-50 border-green-100 hover:bg-green-100" : "bg-gray-50 border-gray-100 hover:bg-gray-100"
                           }`}
                         >
-                          <div className="min-w-0">
-                            <p className="text-sm text-gray-800 truncate">{q.title || "מסמך ללא כותרת"}</p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">
-                              {signed && q.signed_date
-                                ? `נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`
-                                : format(new Date(q.created_date), "dd/MM/yyyy", { locale: he })}
-                              {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
-                            </p>
-                          </div>
-                          <span className={`flex-shrink-0 text-[10px] font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${signed ? "bg-green-100 text-green-700" : cfg.color}`}>
-                            <Icon className="w-3 h-3" /> {signed ? "נחתם" : cfg.label}
-                          </span>
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => onViewQuote && onViewQuote(q)}
+                            className="flex-1 min-w-0 text-right p-2.5 flex items-center justify-between gap-2"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm text-gray-800 truncate">{q.title || "מסמך ללא כותרת"}</p>
+                              <p className="text-[10px] text-gray-400 mt-0.5">
+                                {signed && q.signed_date
+                                  ? `נחתם ב-${format(new Date(q.signed_date), "dd/MM/yyyy", { locale: he })}`
+                                  : format(new Date(q.created_date), "dd/MM/yyyy", { locale: he })}
+                                {q.amount ? ` · ₪${q.amount.toLocaleString()}` : ""}
+                              </p>
+                            </div>
+                            <span className={`flex-shrink-0 text-[10px] font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${signed ? "bg-green-100 text-green-700" : cfg.color}`}>
+                              <Icon className="w-3 h-3" /> {signed ? "נחתם" : cfg.label}
+                            </span>
+                          </button>
+                          {!signed && lead?.phone && (
+                            <button
+                              type="button"
+                              title="שלח לחתימה בוואטסאפ"
+                              onClick={() => sendQuoteLink(q)}
+                              className="flex-shrink-0 p-2 mr-1 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors"
+                            >
+                              <Send className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            title="מחיקת מסמך"
+                            onClick={() => setDeleteQuoteTarget(q)}
+                            className="flex-shrink-0 p-2 ml-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -379,6 +430,23 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={!!deleteQuoteTarget} onOpenChange={() => setDeleteQuoteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>מחיקת מסמך</AlertDialogTitle>
+            <AlertDialogDescription>
+              האם אתה בטוח שברצונך למחוק את המסמך "{deleteQuoteTarget?.title || "ללא כותרת"}"? פעולה זו לא ניתנת לביטול.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteQuoteConfirm} className="bg-red-600 hover:bg-red-700">
+              מחיקה
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
