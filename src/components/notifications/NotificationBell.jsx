@@ -18,6 +18,11 @@ const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 let lastCheckTime = 0;
 let checkInProgress = false;
 
+// אותה הגנה כמו checkAndCreateNotifications, אבל לבקשה הפשוטה (טעינת הרשימה) —
+// שני המופעים (דסקטופ + מובייל) קוראים לזה בו-זמנית, ובלי זה כל אחד שולח
+// בקשה משלו ל-API. כך הם חולקים בקשה אחת בפועל.
+let notificationsPromise = null;
+
 const notificationIcons = {
   task_overdue: "🔴",
   payment_due: "💰", 
@@ -56,7 +61,11 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
 
   const loadNotifications = async () => {
     try {
-      const data = await Notification.list('-created_date', 50);
+      if (!notificationsPromise) {
+        notificationsPromise = Notification.list('-created_date', 50)
+          .finally(() => { notificationsPromise = null; });
+      }
+      const data = await notificationsPromise;
       setNotifications(data);
       setUnreadCount(data.filter(n => !n.is_read).length);
     } catch (error) {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 const { Customer, Payment, Task, Lead, Quote, Expense, Cancellation, Target } = base44.entities;
 import { format } from "date-fns";
@@ -37,30 +38,38 @@ function PipelineStage({ label, count, total, color }) {
 }
 
 export default function Dashboard() {
-  const [activeCustomersCount, setActiveCustomersCount] = useState(0);
-  const [payments, setPayments] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [leads, setLeads] = useState([]);
-  const [quotes, setQuotes] = useState([]);
-  const [monthlyExpensesTotal, setMonthlyExpensesTotal] = useState(0);
-  const [cancellationsThisMonthCount, setCancellationsThisMonthCount] = useState(0);
-  const [revenueByRep, setRevenueByRep] = useState([]);
-  const [leadStatusCounts, setLeadStatusCounts] = useState({});
-  const [monthTarget, setMonthTarget] = useState(null);
   const [showTargetModal, setShowTargetModal] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => { loadData(); }, []);
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
+  const monthLabel = format(now, "MMMM yyyy", { locale: he });
 
-  const loadData = async () => {
-    try {
+  // כל הנתונים נטענים דרך React Query במקום useEffect+useState ידני — כך
+  // ניווט הלוך-חזור לדשבורד תוך כמה דקות לא שולח מחדש את כל 11 הבקשות
+  // במקביל (זה מה שגרם לעבור את מגבלת ה-API: 15 בקשות/דקה למשתמש).
+  const { data, isLoading: loading, refetch } = useQuery({
+    queryKey: ["dashboard", monthKey],
+    queryFn: async () => {
+      try {
+        return await loadDashboardData();
+      } catch (e) {
+        console.error("שגיאה בטעינת dashboard:", e);
+        throw e;
+      }
+    },
+    staleTime: 2 * 60 * 1000,
+  });
+
+  async function loadDashboardData() {
       const user = await base44.auth.me();
-      setCurrentUser(user);
       const isAdmin = user.role === 'admin' || user.user_category === "מנהל_ראשי";
-      const monthStart = format(new Date(now.getFullYear(), now.getMonth(), 1), "yyyy-MM-dd");
-      const nextMonthStart = format(new Date(now.getFullYear(), now.getMonth() + 1, 1), "yyyy-MM-dd");
+      const monthStart = format(new Date(currentYear, currentMonth, 1), "yyyy-MM-dd");
+      const nextMonthStart = format(new Date(currentYear, currentMonth + 1, 1), "yyyy-MM-dd");
       // customers/expenses/cancellations משמשים כאן רק למספרים (כמה לקוחות
       // פעילים, סה"כ הוצאות/ביטולים החודש) — לא לרשימה מוצגת, אז נשלפים כ-
       // count/aggregate בצד השרת במקום למשוך מאות רשומות גולמיות רק כדי לסכום אותן
@@ -93,36 +102,40 @@ export default function Dashboard() {
           groupBy: "status"
         }),
       ]);
-      setActiveCustomersCount(activeCustomersData);
-      setPayments(paymentsData);
-      setTasks(tasksData);
-      setLeads(leadsData);
-      setQuotes(quotesData);
-      setMonthlyExpensesTotal(monthlyExpensesAgg.rows?.[0]?.sum_amount || 0);
-      setCancellationsThisMonthCount(cancellationsThisMonthData);
-      setMonthTarget(targetsData[0] || null);
       const userMap = Object.fromEntries(usersData.map(u => [u.id, u.full_name]));
-      setRevenueByRep((repRevenueData.rows || []).map(r => ({
-        name: userMap[r.created_by_id] || "לא מזוהה",
-        amount: r.sum_amount || 0
-      })));
-      setLeadStatusCounts(Object.fromEntries(
-        (leadStatusAgg.rows || []).map(r => [r.status, r.count])
-      ));
-    } catch (e) {
-      console.error("שגיאה בטעינת dashboard:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return {
+        currentUser: user,
+        activeCustomersCount: activeCustomersData,
+        payments: paymentsData,
+        tasks: tasksData,
+        leads: leadsData,
+        quotes: quotesData,
+        monthlyExpensesTotal: monthlyExpensesAgg.rows?.[0]?.sum_amount || 0,
+        cancellationsThisMonthCount: cancellationsThisMonthData,
+        monthTarget: targetsData[0] || null,
+        revenueByRep: (repRevenueData.rows || []).map(r => ({
+          name: userMap[r.created_by_id] || "לא מזוהה",
+          amount: r.sum_amount || 0
+        })),
+        leadStatusCounts: Object.fromEntries(
+          (leadStatusAgg.rows || []).map(r => [r.status, r.count])
+        ),
+      };
+  }
 
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-  const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-  const monthKey = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
-  const monthLabel = format(now, "MMMM yyyy", { locale: he });
+  const {
+    currentUser = null,
+    activeCustomersCount = 0,
+    payments = [],
+    tasks = [],
+    leads = [],
+    quotes = [],
+    monthlyExpensesTotal = 0,
+    cancellationsThisMonthCount = 0,
+    monthTarget = null,
+    revenueByRep = [],
+    leadStatusCounts = {},
+  } = data || {};
   // ברירת מחדל כשאין יעד מוגדר לחודש — מנהל יכול לקבוע יעד אמיתי דרך "ערוך יעד"
   const dealsTarget = monthTarget?.deals_target || 10;
   const revenueTarget = monthTarget?.revenue_target || null;
@@ -217,7 +230,7 @@ export default function Dashboard() {
         amount: data.revenue_target,
       });
       setShowTargetModal(false);
-      loadData();
+      refetch();
     } catch (e) {
       console.error("שמירת יעד נכשלה:", e);
       alert("שמירת היעד נכשלה. נסה שוב.");
