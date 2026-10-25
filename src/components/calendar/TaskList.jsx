@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Edit, CheckCircle, Trash2, AlertTriangle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, User, Edit, CheckCircle, Trash2, AlertTriangle, ImagePlus } from "lucide-react";
 import { format, differenceInHours, isToday, isTomorrow } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -22,8 +24,33 @@ const statusColors = {
   "דחוי": "bg-gray-100 text-gray-800"
 };
 
-export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, onDelete, onStatusChange }) {
+const TASK_STATUSES = ["פתוח", "בטיפול", "הושלם", "דחוי"];
+
+export default function TaskList({ tasks, title, getCustomerName, getLeadName, onEdit, onDelete, onStatusChange }) {
   const navigate = useNavigate();
+  const [uploadingTaskId, setUploadingTaskId] = useState(null);
+
+  // העלאת תמונה או וידאו למשימה בלחיצת כפתור אחת
+  const uploadMedia = async (task, file) => {
+    setUploadingTaskId(task.id);
+    try {
+      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+      await base44.entities.FileAttachment.create({
+        filename: file.name,
+        file_url: file_uri,
+        file_size: file.size,
+        file_type: file.type,
+        related_id: task.id,
+        related_type: "task",
+        description: "תמונה/וידאו שהועלו מרשימת המשימות"
+      });
+    } catch (error) {
+      console.error("שגיאה בהעלאת קובץ מדיה:", error);
+      alert("שגיאה בהעלאת הקובץ");
+    } finally {
+      setUploadingTaskId(null);
+    }
+  };
 
   // לחיצה על משימה שמקושרת לליד מעבירה ישר לכרטיס הליד
   const openLead = (task) => {
@@ -51,7 +78,7 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calendar className="w-5 h-5" />
-          משימות קרובות
+          {title || "משימות קרובות"}
           {tasks.some(t => isOverdue(t.due_date, t.status)) && (
             <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-normal">
               {tasks.filter(t => isOverdue(t.due_date, t.status)).length} באיחור
@@ -78,9 +105,19 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
                     <Badge className={`text-xs ${priorityColors[task.priority]}`}>
                       {task.priority}
                     </Badge>
-                    <Badge className={`text-xs ${statusColors[task.status]}`}>
-                      {task.status}
-                    </Badge>
+                    {/* עדכון סטטוס בלחיצה אחת — בלי להיכנס לפרטי הלקוח */}
+                    <span onClick={(e) => e.stopPropagation()}>
+                      <Select value={task.status} onValueChange={(value) => onStatusChange(task.id, value)}>
+                        <SelectTrigger className="h-6 w-auto min-w-[70px] text-xs px-2 py-0 border-0 shadow-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TASK_STATUSES.map(s => (
+                            <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-1 flex-shrink-0">
@@ -95,6 +132,23 @@ export default function TaskList({ tasks, getCustomerName, getLeadName, onEdit, 
                       <CheckCircle className="w-4 h-4" />
                     </Button>
                   )}
+                  <label
+                    className="h-7 w-7 flex items-center justify-center cursor-pointer text-blue-600 hover:text-blue-800"
+                    title={uploadingTaskId === task.id ? "מעלה..." : "העלאת תמונה/וידאו"}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ImagePlus className="w-4 h-4" />
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*,video/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadMedia(task, file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
                   <Button
                     variant="ghost"
                     size="icon"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-const { Payment, Customer, User, Quote } = base44.entities;
+const { Payment, Customer, User, Quote, FileAttachment } = base44.entities;
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import {
@@ -138,6 +138,17 @@ export default function Payments() {
   const canEdit = (payment) =>
     isAdmin(currentUser) || payment.created_by === currentUser?.email;
 
+  // אוטומציה: שליחת מייל ללקוח כשחשבונית עוברת לסטטוס "נשלד" — גוף המייל כולל
+  // את שם הלקוח וסכום התשלום מהמערכת
+  const sendInvoiceEmail = async (payment, customer) => {
+    if (!customer?.email) return;
+    await base44.integrations.Core.SendEmail({
+      to: customer.email,
+      subject: `חשבונית ${payment.invoice_number || ""} - סך ₪${(payment.amount || 0).toLocaleString()}`,
+      body: `שלום ${customer.first_name},\n\nחשבונית מספר ${payment.invoice_number} בסך ₪${(payment.amount || 0).toLocaleString()} נשלחה אליך לתשלום.\nתיאור השירות: ${payment.service_description}\nמועד אחרון לתשלום: ${payment.due_date}\n${payment.payment_link ? `קישור לתשלום: ${payment.payment_link}\n` : ""}\nתודה,\nצוות החברה`
+    });
+  };
+
   const handleSubmit = async (paymentData) => {
     try {
       // טופס התשלום לא כולל שדה paid_date — בלעדיו, חשבונית שמסומנת "שולם" לא
@@ -151,6 +162,10 @@ export default function Payments() {
           return;
         }
         await Payment.update(editingPayment.id, paymentData);
+        if (paymentData.status === "נשלד" && editingPayment.status !== "נשלד") {
+          const customer = customers.find(c => c.id === paymentData.customer_id || c.id === editingPayment.customer_id);
+          if (customer) await sendInvoiceEmail({ ...editingPayment, ...paymentData }, customer);
+        }
         if (paymentData.status === "שולם" && editingPayment.status !== "שולם") {
           logActivity({
             entity_type: "payment", entity_id: editingPayment.id, action: "paid",
@@ -178,6 +193,10 @@ export default function Payments() {
           summary: `נוצרה חשבונית ${invoiceNumber} על סך ₪${(paymentData.amount || 0).toLocaleString()}`,
           amount: paymentData.amount,
         });
+        if (paymentData.status === "נשלד") {
+          const customer = customers.find(c => c.id === paymentData.customer_id);
+          if (customer) await sendInvoiceEmail({ ...created, ...paymentData }, customer);
+        }
         if (paymentData.status === "שולם") {
           const customer = customers.find(c => c.id === paymentData.customer_id);
           if (customer) {
@@ -259,6 +278,38 @@ export default function Payments() {
     return customer ? `${customer.first_name} ${customer.last_name}` : "לא ידוע";
   };
 
+  // העלאת חשבונית ישירות ללקוח: העלאה לאחסון + שמירה כקובץ מצורף + שליחה במייל ללקוח
+  const uploadInvoiceToCustomer = async (payment, file) => {
+    try {
+      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+      await FileAttachment.create({
+        filename: file.name,
+        file_url: file_uri,
+        file_size: file.size,
+        file_type: file.type,
+        related_id: payment.id,
+        related_type: "payment",
+        description: "חשבונית שהועלתה ישירות ללקוח"
+      });
+      const customer = customers.find(c => c.id === payment.customer_id);
+      if (customer?.email) {
+        await base44.integrations.Core.SendEmail({
+          to: customer.email,
+          subject: `חשבונית ${payment.invoice_number || ""} - סך ₪${(payment.amount || 0).toLocaleString()}`,
+          body: `שלום ${customer.first_name},\n\nמצורפת חשבונית מספר ${payment.invoice_number} בסך ₪${(payment.amount || 0).toLocaleString()}.\nתיאור השירות: ${payment.service_description}\nמועד אחרון לתשלום: ${payment.due_date}\n\nתודה,\nצוות החברה`,
+          attachments: [{ filename: file.name, file_url: file_uri }]
+        });
+        alert("החשבונית הועלתה ונשלחה ללקוח במייל");
+      } else {
+        alert("החשבונית הועלתה, אך ללקוח אין כתובת אימייל במערכת");
+      }
+      loadData(currentUser);
+    } catch (error) {
+      console.error("שגיאה בהעלאת חשבונית:", error);
+      alert("שגיאה בהעלאת החשבונית");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -310,6 +361,7 @@ export default function Payments() {
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
           onSendReminder={sendReminder}
+          onUploadInvoice={uploadInvoiceToCustomer}
           isAdmin={isAdmin(currentUser)}
         />
       </div>

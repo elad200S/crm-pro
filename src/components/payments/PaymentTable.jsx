@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Mail, ExternalLink, Trash2 } from "lucide-react";
+import { Edit, Mail, ExternalLink, Trash2, Upload } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
@@ -17,7 +16,7 @@ const statusColors = {
   "מבוטל": "bg-gray-100 text-gray-800"
 };
 
-export default function PaymentTable({ payments, getCustomerName, loading, onEdit, onDelete, onSendReminder }) {
+export default function PaymentTable({ payments, getCustomerName, loading, onEdit, onDelete, onSendReminder, onUploadInvoice }) {
   if (loading) {
     return (
       <Card>
@@ -100,6 +99,30 @@ export default function PaymentTable({ payments, getCustomerName, loading, onEdi
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
+                      {onUploadInvoice && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-purple-600 hover:text-purple-800"
+                          title="העלאת חשבונית ושליחה ללקוח"
+                          onClick={() => document.getElementById(`invoice-file-${payment.id}`)?.click()}
+                        >
+                          <Upload className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {onUploadInvoice && (
+                        <input
+                          id={`invoice-file-${payment.id}`}
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) onUploadInvoice(payment, file);
+                            e.target.value = "";
+                          }}
+                        />
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"

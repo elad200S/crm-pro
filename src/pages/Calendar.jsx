@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { format } from "date-fns";
 import { useLocation } from "react-router-dom";
 import {
@@ -28,6 +35,7 @@ export default function Calendar() {
   const [editingTask, setEditingTask] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [taskFilters, setTaskFilters] = useState({ priority: "הכל", status: "הכל" });
   
   const location = useLocation();
 
@@ -134,6 +142,14 @@ export default function Calendar() {
     task.status !== "הושלם"
   ).slice(0, 10);
 
+  // סינון לפי דחיפות וסטטוס — כשסינון פעיל מוצגות כל המשימות התואמות (ולא רק הקרובות)
+  const filtersActive = taskFilters.priority !== "הכל" || taskFilters.status !== "הכל";
+  const filteredTasks = tasks.filter(task =>
+    (taskFilters.priority === "הכל" || task.priority === taskFilters.priority) &&
+    (taskFilters.status === "הכל" || task.status === taskFilters.status)
+  );
+  const listTasks = filtersActive ? filteredTasks : upcomingTasks;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -148,16 +164,54 @@ export default function Calendar() {
               {todayTasks.length} משימות להיום • {upcomingTasks.length} משימות קרובות
             </p>
           </div>
-          <Button 
-            onClick={() => {
-              setEditingTask(null);
-              setShowForm(true);
-            }}
-            className="bg-blue-600 hover:bg-blue-700 shadow-md"
-          >
-            <Plus className="w-5 h-5 ml-2" />
-            משימה חדשה
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* סינון לפי דחיפות וסטטוס */}
+            <div className="flex items-center gap-2 border rounded-lg px-3 py-1.5 bg-white">
+              <Filter className="w-4 h-4 text-gray-400" />
+              <Select
+                value={taskFilters.priority}
+                onValueChange={(value) => setTaskFilters(f => ({ ...f, priority: value }))}
+              >
+                <SelectTrigger className="h-8 w-[130px] text-sm border-0 p-0 focus:ring-0 shadow-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="הכל">כל הדחיפויות</SelectItem>
+                  <SelectItem value="נמוכה">נמוכה</SelectItem>
+                  <SelectItem value="בינונית">בינונית</SelectItem>
+                  <SelectItem value="גבוהה">גבוהה</SelectItem>
+                  <SelectItem value="קריטית">קריטית</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2 border rounded-lg px-3 py-1.5 bg-white">
+              <Select
+                value={taskFilters.status}
+                onValueChange={(value) => setTaskFilters(f => ({ ...f, status: value }))}
+              >
+                <SelectTrigger className="h-8 w-[120px] text-sm border-0 p-0 focus:ring-0 shadow-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="הכל">כל הסטטוסים</SelectItem>
+                  <SelectItem value="פתוח">פתוח</SelectItem>
+                  <SelectItem value="בטיפול">בטיפול</SelectItem>
+                  <SelectItem value="הושלם">הושלם</SelectItem>
+                  <SelectItem value="דחוי">דחוי</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button 
+              onClick={() => {
+                setEditingTask(null);
+                setShowForm(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 shadow-md"
+            >
+              <Plus className="w-5 h-5 ml-2" />
+              משימה חדשה
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -191,7 +245,8 @@ export default function Calendar() {
         
         <div className="bg-white rounded-lg border shadow-sm">
           <TaskList
-            tasks={upcomingTasks}
+            tasks={listTasks}
+            title={filtersActive ? `משימות מסוננות (${listTasks.length})` : "משימות קרובות"}
             getCustomerName={getCustomerName}
             getLeadName={getLeadName}
             onEdit={handleEdit}
