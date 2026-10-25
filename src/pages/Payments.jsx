@@ -183,10 +183,14 @@ export default function Payments() {
         }
       } else {
         const invoiceNumber = `INV-${Date.now()}`;
+        // סוכן אחראי על התשלום — יורש מהלקוח, כדי שנציג שאחראי על הלקוח יוכל
+        // לראות את התשלומים שלו גם אם לא הוא זה שרשם אותם
+        const customerForPayment = customers.find(c => c.id === paymentData.customer_id);
         const created = await Payment.create({
           ...paymentData,
           invoice_number: invoiceNumber,
-          invoice_date: new Date().toISOString().split('T')[0]
+          invoice_date: new Date().toISOString().split('T')[0],
+          agent_id: customerForPayment?.agent_id || "",
         });
         logActivity({
           entity_type: "payment", entity_id: created.id, action: "created",

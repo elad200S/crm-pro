@@ -38,6 +38,7 @@ export default function Customers() {
   const [quoteCustomer, setQuoteCustomer] = useState(null);
   const [quoteToView, setQuoteToView] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   const exportToCSV = () => {
@@ -105,6 +106,7 @@ export default function Customers() {
     try {
       const user = await base44.auth.me();
       setCurrentUser(user);
+      base44.entities.User.list().then(setUsers).catch(e => console.error("טעינת משתמשים נכשלה:", e));
       await loadCustomers();
     } catch (error) {
       console.error("שגיאה באתחול:", error);
@@ -234,6 +236,8 @@ export default function Customers() {
       {showForm && (
         <CustomerForm
           customer={editingCustomer}
+          users={users}
+          currentUser={currentUser}
           onSubmit={handleSubmit}
           onCancel={() => {
             setShowForm(false);

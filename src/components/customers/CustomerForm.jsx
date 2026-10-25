@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Save } from "lucide-react";
 
-export default function CustomerForm({ customer, onSubmit, onCancel }) {
+export default function CustomerForm({ customer, users = [], currentUser, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     first_name: customer?.first_name || "",
     last_name: customer?.last_name || "",
@@ -18,7 +18,8 @@ export default function CustomerForm({ customer, onSubmit, onCancel }) {
     id_number: customer?.id_number || "",
     business_address: customer?.business_address || "",
     source: customer?.source || "אתר",
-    notes: customer?.notes || ""
+    notes: customer?.notes || "",
+    agent_id: customer?.agent_id || currentUser?.id || ""
   });
 
   const handleSubmit = (e) => {
@@ -105,6 +106,15 @@ export default function CustomerForm({ customer, onSubmit, onCancel }) {
                 onChange={(e) => handleChange("business_address", e.target.value)}
                 placeholder="רחוב, עיר"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="agent_id">סוכן מטפל</Label>
+              <Select value={formData.agent_id} onValueChange={(value) => handleChange("agent_id", value)}>
+                <SelectTrigger><SelectValue placeholder="בחר סוכן" /></SelectTrigger>
+                <SelectContent>
+                  {users.map(u => <SelectItem key={u.id} value={u.id}>{u.full_name}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="status">סטטוס</Label>

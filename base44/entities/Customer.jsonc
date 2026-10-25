@@ -79,6 +79,10 @@
     "source_from_lead_id": {
       "type": "string",
       "description": "\u05de\u05d6\u05d4\u05d4 \u05dc\u05d9\u05d3 \u05de\u05e7\u05d5\u05e8 (\u05d0\u05dd \u05d4\u05dc\u05e7\u05d5\u05d7 \u05d4\u05d5\u05de\u05e8 \u05de\u05dc\u05d9\u05d3)"
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "\u05e1\u05d5\u05db\u05df \u05de\u05d8\u05e4\u05dc"
     }
   },
   "required": [
@@ -106,6 +110,9 @@
           "created_by_id": "{{user.id}}"
         },
         {
+          "data.agent_id": "{{user.id}}"
+        },
+        {
           "user_condition": {
             "role": "admin"
           }
@@ -116,6 +123,9 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.agent_id": "{{user.id}}"
         },
         {
           "user_condition": {

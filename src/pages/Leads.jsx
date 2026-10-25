@@ -314,6 +314,7 @@ export default function Leads() {
       source: "הפניה",
       status: "חדש",
       source_from_lead_id: lead.id,
+      agent_id: lead.agent_id || "",
       registration_date: new Date().toISOString().split("T")[0]
     });
     await base44.entities.Lead.update(lead.id, { is_converted: true, converted_customer_id: customer.id, status: "נסגר בהצלחה (שולם)" });
