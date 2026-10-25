@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,19 +17,28 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
     email: "",
     company_name: "",
     id_number: "",
-    business_address: "",
-    service_requested: "",
     lead_source: "ידני",
-    source_details: "",
     notes: "",
     status: "התקבל",
     agent_id: currentUser?.id || "",
-    last_contact_at: "",
     next_followup_at: "",
     ...lead
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const canSubmit = form.full_name.trim() && form.phone.trim() && !submitting;
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!canSubmit) return;
+    setSubmitting(true);
+    try {
+      await onSubmit(form);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <Card className="border-blue-200 border-2 shadow-lg">
@@ -38,15 +47,15 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
         <Button variant="ghost" size="icon" onClick={onCancel}><X className="w-4 h-4" /></Button>
       </CardHeader>
       <CardContent className="pt-6">
-        <form onSubmit={e => { e.preventDefault(); onSubmit(form); }} className="space-y-4">
+        <form onSubmit={submit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label>שם מלא</Label>
-              <Input value={form.full_name} onChange={e => set("full_name", e.target.value)} placeholder="ישראל ישראלי" />
+              <Label>שם מלא *</Label>
+              <Input required value={form.full_name} onChange={e => set("full_name", e.target.value)} placeholder="ישראל ישראלי" />
             </div>
             <div className="space-y-1">
-              <Label>טלפון</Label>
-              <Input value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="050-0000000" />
+              <Label>טלפון *</Label>
+              <Input required value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="050-0000000" />
             </div>
             <div className="space-y-1">
               <Label>אימייל</Label>
@@ -59,10 +68,6 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
             <div className="space-y-1">
               <Label>ח"פ / ת"ז</Label>
               <Input value={form.id_number} onChange={e => set("id_number", e.target.value)} placeholder="מספר ח״פ או ת״ז" />
-            </div>
-            <div className="space-y-1">
-              <Label>כתובת העסק</Label>
-              <Input value={form.business_address} onChange={e => set("business_address", e.target.value)} placeholder="רחוב, עיר" />
             </div>
             <div className="space-y-1">
               <Label>מקור ליד *</Label>
@@ -88,21 +93,9 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
               </Select>
             </div>
             <div className="space-y-1">
-              <Label>שירות מבוקש</Label>
-              <Input value={form.service_requested} onChange={e => set("service_requested", e.target.value)} />
-            </div>
-            <div className="space-y-1">
-              <Label>קשר אחרון</Label>
-              <Input type="datetime-local" value={form.last_contact_at} onChange={e => set("last_contact_at", e.target.value)} />
-            </div>
-            <div className="space-y-1">
               <Label>מעקב הבא</Label>
               <Input type="datetime-local" value={form.next_followup_at} onChange={e => set("next_followup_at", e.target.value)} />
             </div>
-          </div>
-          <div className="space-y-1">
-            <Label>פרטי מקור</Label>
-            <Input value={form.source_details} onChange={e => set("source_details", e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label>הערות</Label>
@@ -110,7 +103,9 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
           </div>
           <div className="flex justify-end gap-3 pt-2 border-t">
             <Button type="button" variant="outline" onClick={onCancel}>ביטול</Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">{lead ? "עדכן" : "צור ליד"}</Button>
+            <Button type="submit" disabled={!canSubmit} className="bg-blue-600 hover:bg-blue-700">
+              {submitting ? "שומר..." : lead ? "עדכן" : "צור ליד"}
+            </Button>
           </div>
         </form>
       </CardContent>
