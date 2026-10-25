@@ -5,7 +5,6 @@ import { he } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
 
 const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
@@ -30,7 +29,7 @@ const substituteAll = (text, lead, price, clientData = {}) => {
     .replace(/\{signature\}/g,         "________________________");
 };
 
-export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
+export default function QuoteDocument({ quote, lead, onClose }) {
   const printRef = useRef();
   const rawBody  = quote?.notes || "";
   const price    = parseFloat(quote?.amount) || 0;
@@ -39,27 +38,11 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
   const neededVars = CLIENT_FILL_VARS.filter(v => rawBody.includes(v.key));
   const [clientData, setClientData] = useState({});
   const [gateSubmitted, setGateSubmitted] = useState(true);
-  // אם ההסכם כבר נחתם/אושר בעבר (למשל נפתח שוב מכרטיס הליד), להראות את זה
-  // מיד — לא את כפתור "אשר" כאילו עדיין לא טופל
-  const [approved, setApproved] = useState(!!quote?.client_signature || quote?.status === "אושר");
+  const approved = !!quote?.client_signature || quote?.status === "אושר";
 
   const body = substituteAll(rawBody, lead, quote?.amount, clientData);
 
   const allFilled = neededVars.every(v => (clientData[v.key] || "").trim() !== "");
-
-  const handleApprove = async () => {
-    try {
-      if (quote?.id) {
-        await base44.entities.Quote.update(quote.id, { status: "אושר" });
-      }
-      setApproved(true);
-      if (onApprove) onApprove();
-    } catch (e) {
-      // אל תראה "אושר" אם השמירה בפועל נכשלה
-      console.error("אישור ההסכם נכשל:", e);
-      alert("אישור ההסכם נכשל. נסה שוב.");
-    }
-  };
 
   const handlePrint = () => {
     const win = window.open("", "_blank");
@@ -313,21 +296,18 @@ export default function QuoteDocument({ quote, lead, onClose, onApprove }) {
           </div>
         </div>
 
-        {/* אישור הסכם */}
+        {/* סטטוס חתימה — רק תצוגה, לא ניתן לאשר/לחתום מכאן. החתימה היחידה
+            שקובעת היא זו של הלקוח עצמו דרך קישור החתימה (ClientSign). */}
         <div className="px-8 pb-8">
           {approved ? (
             <div className="flex items-center justify-center gap-2 bg-green-50 border border-green-200 rounded-xl p-4 text-green-700 font-semibold">
-              <CheckCircle className="w-5 h-5" /> ההסכם אושר ונחתם — {todayStr()}
+              <CheckCircle className="w-5 h-5" />
+              ההסכם נחתם דיגיטלית על ידי הלקוח
+              {quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}
             </div>
           ) : (
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
-              <p className="text-sm text-gray-600 mb-3">קראתי את ההסכם ואני מסכים לתנאיו</p>
-              <Button
-                onClick={handleApprove}
-                className="bg-green-600 hover:bg-green-700 text-white px-8"
-              >
-                <CheckCircle className="w-4 h-4 ml-2" /> אישור וחתימה
-              </Button>
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center text-sm text-gray-500">
+              ממתין לחתימת הלקוח — שלח לו את קישור החתימה למעלה
             </div>
           )}
         </div>
