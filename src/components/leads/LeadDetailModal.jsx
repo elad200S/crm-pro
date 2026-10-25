@@ -176,7 +176,13 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
   const loadLeadQuotes = async () => {
     try {
       const all = await base44.entities.Quote.list("-created_date", 100);
-      setLeadQuotes(all.filter(q => q.lead_id === lead.id));
+      const mine = all.filter(q => q.lead_id === lead.id);
+      setLeadQuotes(mine);
+      // אבחון זמני: מציג בדיוק אילו מסמכים נטענו לליד הזה — לבדיקת תקלת
+      // המגע שפוגע במסמך הלא-נכון. יוסר אחרי שנאתר את הסיבה.
+      alert("נטענו " + mine.length + " מסמכים:\n" + mine.map((q, i) =>
+        `#${i}: id=${q.id} title="${q.title || ""}" signed=${!!q.client_signature} status=${q.status}`
+      ).join("\n"));
     } catch (e) {
       console.error("טעינת מסמכי הליד נכשלה:", e);
       setLeadQuotes([]);
