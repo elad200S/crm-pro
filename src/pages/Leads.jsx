@@ -318,6 +318,20 @@ export default function Leads() {
     });
     await base44.entities.Lead.update(lead.id, { is_converted: true, converted_customer_id: customer.id, status: "נסגר בהצלחה (שולם)" });
 
+    // קישור כל המסמכים והמשימות שכבר נוצרו לליד הזה גם ללקוח החדש (customer_id
+    // בנוסף ל-lead_id הקיים) — אחרת הם נשארים "תלויים" על הליד ולא מופיעים
+    // בכלל בכרטיס הלקוח, כאילו ההיסטוריה נמחקה.
+    const [leadQuotesToLink, leadTasksToLink] = await Promise.all([
+      base44.entities.Quote.list("-created_date", 200).then(all => all.filter(q => q.lead_id === lead.id)),
+      base44.entities.Task.list("-created_date", 200).then(all => all.filter(t => t.lead_id === lead.id)),
+    ]);
+    await Promise.all([
+      ...leadQuotesToLink.map(q => base44.entities.Quote.update(q.id, { customer_id: customer.id })
+        .catch(e => console.error(`קישור מסמך ${q.id} ללקוח נכשל:`, e))),
+      ...leadTasksToLink.map(t => base44.entities.Task.update(t.id, { customer_id: customer.id })
+        .catch(e => console.error(`קישור משימה ${t.id} ללקוח נכשל:`, e))),
+    ]);
+
     // notifications to admin + agent
     await base44.entities.Notification.create({
       type: "lead_converted",

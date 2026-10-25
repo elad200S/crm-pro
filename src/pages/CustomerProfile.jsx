@@ -6,7 +6,7 @@ import { he } from "date-fns/locale";
 import {
   ArrowRight, Phone, Mail, Edit,
   MessageCircle, FileText, Clock,
-  CreditCard, CheckCircle, Building2, XCircle, FilePlus2
+  CreditCard, CheckCircle, Building2, XCircle, FilePlus2, Trash2, Send
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,16 @@ import { logActivity } from "@/lib/activityLog";
 import CancelCustomerModal from "../components/customers/CancelCustomerModal";
 import QuoteBuilderModal from "@/components/customers/QuoteBuilderModal";
 import QuotePriceDocument from "@/components/quotes/QuotePriceDocument";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const STATUS_COLORS = {
   "פעיל":      "bg-green-100 text-green-700",
@@ -51,6 +61,7 @@ export default function CustomerProfile() {
   const [quoteToView, setQuoteToView] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [deleteQuoteTarget, setDeleteQuoteTarget] = useState(null);
 
   useEffect(() => {
     const init = async () => {
@@ -124,6 +135,22 @@ export default function CustomerProfile() {
   const totalPending = payments.filter(p => p.status !== "שולם" && p.status !== "מבוטל").reduce((s, p) => s + (p.amount || 0), 0);
   const openTasks    = tasks.filter(t => t.status !== "הושלם").length;
 
+  const handleDeleteQuoteConfirm = async () => {
+    await base44.entities.Quote.delete(deleteQuoteTarget.id);
+    setDeleteQuoteTarget(null);
+    loadData(customer);
+  };
+
+  const sendQuoteLink = (q) => {
+    const link = `${window.location.origin}/ClientSign?id=${q.id}`;
+    const phone = (customer.phone || "").replace(/\D/g, "");
+    const intl = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
+    const msg = encodeURIComponent(
+      `שלום ${fullName},\n\nמצורף הסכם העבודה שלנו לחתימה:\n👇 לחץ/י על הקישור למילוי פרטים וחתימה דיגיטלית:\n\n${link}\n\n_HEY Digital_`
+    );
+    window.open(`https://wa.me/${intl}?text=${msg}`, "_blank");
+  };
+
   const whatsapp = () => {
     const phone = (customer.phone || "").replace(/\D/g, "");
     const intl = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
@@ -162,25 +189,52 @@ export default function CustomerProfile() {
             <div className="p-4 space-y-2">
               {loading ? <Skeleton /> : quotes.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-6">אין מסמכים</p>
-              ) : quotes.map(q => (
-                <div key={q.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{q.title || "מסמך ללא כותרת"}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {q.created_date ? format(new Date(q.created_date), "dd MMM yyyy", { locale: he }) : ""}
-                    </p>
+              ) : quotes.map(q => {
+                const signed = !!q.client_signature;
+                return (
+                  <div key={q.id} className="flex items-center gap-1 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => setQuoteToView(q)}
+                      className="flex-1 min-w-0 text-right flex items-center justify-between p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">{q.title || "מסמך ללא כותרת"}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {q.created_date ? format(new Date(q.created_date), "dd MMM yyyy", { locale: he }) : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {q.amount > 0 && <span className="text-sm font-bold text-gray-700">₪{q.amount.toLocaleString()}</span>}
+                        <Badge className={
+                          q.status === "אושר" ? "bg-green-100 text-green-700" :
+                          q.status === "בוטל" ? "bg-red-100 text-red-600" :
+                          q.status === "נשלח" ? "bg-blue-100 text-blue-700" :
+                          "bg-gray-100 text-gray-600"
+                        }>{q.status || "טיוטה"}</Badge>
+                      </div>
+                    </button>
+                    {!signed && customer.phone && (
+                      <button
+                        type="button"
+                        title="שלח לחתימה בוואטסאפ"
+                        onClick={() => sendQuoteLink(q)}
+                        className="flex-shrink-0 p-2 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      title="מחיקת מסמך"
+                      onClick={() => setDeleteQuoteTarget(q)}
+                      className="flex-shrink-0 p-2 ml-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {q.amount > 0 && <span className="text-sm font-bold text-gray-700">₪{q.amount.toLocaleString()}</span>}
-                    <Badge className={
-                      q.status === "אושר" ? "bg-green-100 text-green-700" :
-                      q.status === "בוטל" ? "bg-red-100 text-red-600" :
-                      q.status === "נשלח" ? "bg-blue-100 text-blue-700" :
-                      "bg-gray-100 text-gray-600"
-                    }>{q.status || "טיוטה"}</Badge>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -417,6 +471,23 @@ export default function CustomerProfile() {
           onSent={() => loadData(customer)}
         />
       )}
+
+      <AlertDialog open={!!deleteQuoteTarget} onOpenChange={() => setDeleteQuoteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>מחיקת מסמך</AlertDialogTitle>
+            <AlertDialogDescription>
+              האם אתה בטוח שברצונך למחוק את המסמך "{deleteQuoteTarget?.title || "ללא כותרת"}"? פעולה זו לא ניתנת לביטול.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>ביטול</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteQuoteConfirm} className="bg-red-600 hover:bg-red-700">
+              מחיקה
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
