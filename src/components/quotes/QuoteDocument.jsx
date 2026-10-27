@@ -46,7 +46,20 @@ export default function QuoteDocument({ quote, lead, onClose }) {
   const [gateSubmitted, setGateSubmitted] = useState(true);
   const approved = !!quote?.client_signature || quote?.status === "אושר";
 
-  const body = substituteAll(rawBody, lead, quote?.amount, clientData);
+  // אחרי חתימה, הפרטים שקובעים הם מה שהלקוח עצמו אישר וחתם עליו (נשמר על
+  // ה-Quote) — לא פרטי הליד הנוכחיים, שעלולים להשתנות או לא להיות מסונכרנים.
+  const signedFields = quote?.client_signature ? {
+    full_name:    quote.signing_client_name    || lead?.full_name,
+    email:        quote.signing_client_email   || lead?.email,
+    phone:        quote.signing_client_phone   || lead?.phone,
+    company_name: quote.signing_client_company || lead?.company_name,
+  } : lead;
+  const signedClientData = quote?.client_signature ? {
+    "{customer-id}":      quote.signing_client_id      || "",
+    "{customer-address}": quote.signing_client_address || "",
+    ...clientData,
+  } : clientData;
+  const body = substituteAll(rawBody, signedFields, quote?.amount, signedClientData);
 
   const allFilled = neededVars.every(v => (clientData[v.key] || "").trim() !== "");
 
