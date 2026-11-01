@@ -316,7 +316,7 @@ ${user.manager_email ? `👤 מנהל ישיר: ${user.manager_email}` : ''}
             onClick={() => setShowForm(true)}
             className="bg-blue-600 hover:bg-blue-700 shadow-md"
           >
-            <Plus className="w-5 h-5 ml-2" />
+            <Plus className="w-5 h-5 ms-2" />
             משתמש חדש
           </Button>
         </div>

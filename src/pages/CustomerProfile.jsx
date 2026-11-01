@@ -181,9 +181,9 @@ export default function CustomerProfile() {
             <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
               <FileText className="w-4 h-4 text-blue-600" />
               <h3 className="font-bold text-gray-800 text-sm">מסמכים</h3>
-              <span className="mr-auto text-xs text-gray-400">{quotes.length} סה"כ</span>
+              <span className="me-auto text-xs text-gray-400">{quotes.length} סה"כ</span>
               <Button size="sm" onClick={() => setShowQuoteBuilder(true)} className="h-7 bg-blue-600 hover:bg-blue-700 text-xs">
-                <FilePlus2 className="w-3.5 h-3.5 ml-1" /> הצעת מחיר
+                <FilePlus2 className="w-3.5 h-3.5 ms-1" /> הצעת מחיר
               </Button>
             </div>
             <div className="p-4 space-y-2">
@@ -196,7 +196,7 @@ export default function CustomerProfile() {
                     <button
                       type="button"
                       onClick={() => setQuoteToView(q)}
-                      className="flex-1 min-w-0 text-right flex items-center justify-between p-3"
+                      className="flex-1 min-w-0 text-end flex items-center justify-between p-3"
                     >
                       <div>
                         <p className="text-sm font-semibold text-gray-800">{q.title || "מסמך ללא כותרת"}</p>
@@ -228,7 +228,7 @@ export default function CustomerProfile() {
                       type="button"
                       title="מחיקת מסמך"
                       onClick={() => setDeleteQuoteTarget(q)}
-                      className="flex-shrink-0 p-2 ml-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                      className="flex-shrink-0 p-2 ms-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -243,7 +243,7 @@ export default function CustomerProfile() {
             <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
               <Clock className="w-4 h-4 text-purple-600" />
               <h3 className="font-bold text-gray-800 text-sm">משימות</h3>
-              <span className="mr-auto text-xs text-gray-400">{tasks.length} סה"כ · {openTasks} פתוחות</span>
+              <span className="me-auto text-xs text-gray-400">{tasks.length} סה"כ · {openTasks} פתוחות</span>
             </div>
             <div className="p-4 space-y-2">
               {loading ? <Skeleton /> : tasks.length === 0 ? (
@@ -275,7 +275,7 @@ export default function CustomerProfile() {
             <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
               <CreditCard className="w-4 h-4 text-green-600" />
               <h3 className="font-bold text-gray-800 text-sm">תשלומים</h3>
-              <span className="mr-auto text-xs text-gray-400">{payments.length} סה"כ</span>
+              <span className="me-auto text-xs text-gray-400">{payments.length} סה"כ</span>
             </div>
             <div className="p-4 space-y-2">
               {loading ? <Skeleton /> : payments.length === 0 ? (

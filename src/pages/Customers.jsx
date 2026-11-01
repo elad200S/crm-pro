@@ -202,14 +202,14 @@ export default function Customers() {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={exportToCSV}>
-              <Download className="w-4 h-4 ml-2" />
+              <Download className="w-4 h-4 ms-2" />
               ייצוא לאקסל
             </Button>
             <Button 
               onClick={() => setShowForm(true)}
               className="bg-blue-600 hover:bg-blue-700 shadow-md"
             >
-              <Plus className="w-5 h-5 ml-2" />
+              <Plus className="w-5 h-5 ms-2" />
               לקוח חדש
             </Button>
           </div>

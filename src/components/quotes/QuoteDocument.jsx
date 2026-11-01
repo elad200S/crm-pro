@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { X, Printer, Mail, MessageCircle, CheckCircle, Link2 } from "lucide-react";
+import { X, Printer, Mail, MessageCircle, CheckCircle, Link2, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { Input } from "@/components/ui/input";
@@ -35,7 +35,7 @@ const substituteAll = (text, lead, price, clientData = {}) => {
     .replace(/\{signature\}/g,         "________________________");
 };
 
-export default function QuoteDocument({ quote, lead, onClose }) {
+export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
   const printRef = useRef();
   const rawBody  = quote?.notes || "";
   const price    = parseFloat(quote?.amount) || 0;
@@ -245,9 +245,17 @@ export default function QuoteDocument({ quote, lead, onClose }) {
               </button>
             )}
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors">
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <button onClick={onDelete}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 text-red-600 text-sm rounded-lg hover:bg-red-50 transition-colors">
+                <Trash2 className="w-4 h-4" /> מחיקה
+              </button>
+            )}
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors">
+              <X className="w-4 h-4 text-gray-500" />
+            </button>
+          </div>
         </div>
 
         {/* Document */}
@@ -261,7 +269,7 @@ export default function QuoteDocument({ quote, lead, onClose }) {
               <p className="text-[10px] mt-2 tracking-widest" style={{ color: "#5DF5D1" }}>AUTOMATE. GROW. SUCCEED.</p>
               <p className="text-xs opacity-75 mt-1">אלעד חנינה • 054-710-8219</p>
             </div>
-            <div className="text-left">
+            <div className="text-start">
               <h2 className="text-lg font-bold">{quote?.title || "הסכם עבודה"}</h2>
               <p className="text-xs mt-1 opacity-80">תאריך: {todayStr()}</p>
               {quote?.valid_until && (

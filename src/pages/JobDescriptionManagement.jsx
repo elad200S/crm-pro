@@ -211,7 +211,7 @@ export default function JobDescriptionManagement() {
             onClick={() => setShowForm(true)}
             className="bg-blue-600 hover:bg-blue-700 shadow-md"
           >
-            <Plus className="w-5 h-5 ml-2" />
+            <Plus className="w-5 h-5 ms-2" />
             תבנית חדשה
           </Button>
         </div>
@@ -357,7 +357,7 @@ export default function JobDescriptionManagement() {
                   onClick={() => handleEdit(template)}
                   className="flex-1"
                 >
-                  <Edit className="w-4 h-4 ml-1" />
+                  <Edit className="w-4 h-4 ms-1" />
                   ערוך
                 </Button>
                 <Button
@@ -366,7 +366,7 @@ export default function JobDescriptionManagement() {
                   onClick={() => window.open(template.file_url, '_blank')}
                   className="flex-1"
                 >
-                  <Download className="w-4 h-4 ml-1" />
+                  <Download className="w-4 h-4 ms-1" />
                   הורד
                 </Button>
                 <Button
@@ -388,7 +388,7 @@ export default function JobDescriptionManagement() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">אין תבניות עדיין</h3>
             <p className="text-gray-600 mb-4">צור תבנית ראשונה כדי להתחיל לשלוח קבצים למשתמשים חדשים</p>
             <Button onClick={() => setShowForm(true)}>
-              <Plus className="w-4 h-4 ml-2" />
+              <Plus className="w-4 h-4 ms-2" />
               צור תבנית ראשונה
             </Button>
           </Card>

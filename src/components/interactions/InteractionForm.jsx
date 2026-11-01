@@ -151,7 +151,7 @@ export default function InteractionForm({ customerId, onSaved, onCancel, interac
               ביטול
             </Button>
             <Button type="submit">
-              <Save className="w-4 h-4 ml-2" />
+              <Save className="w-4 h-4 ms-2" />
               שמור
             </Button>
           </div>

@@ -106,17 +106,17 @@ export default function PaymentForm({ payment, prefill, customers, onSubmit, onC
               <Label className="font-semibold">פריטים</Label>
               <Button type="button" variant="outline" size="sm"
                 onClick={() => set("items", [...formData.items, emptyItem()])}>
-                <Plus className="w-3.5 h-3.5 ml-1" /> הוסף שורה
+                <Plus className="w-3.5 h-3.5 ms-1" /> הוסף שורה
               </Button>
             </div>
             <div className="border rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-right p-2.5 font-medium text-gray-500">תיאור</th>
-                    <th className="text-right p-2.5 font-medium text-gray-500 w-16">כמות</th>
-                    <th className="text-right p-2.5 font-medium text-gray-500 w-28">מחיר יחידה</th>
-                    <th className="text-right p-2.5 font-medium text-gray-500 w-24">סה"כ</th>
+                    <th className="text-end p-2.5 font-medium text-gray-500">תיאור</th>
+                    <th className="text-end p-2.5 font-medium text-gray-500 w-16">כמות</th>
+                    <th className="text-end p-2.5 font-medium text-gray-500 w-28">מחיר יחידה</th>
+                    <th className="text-end p-2.5 font-medium text-gray-500 w-24">סה"כ</th>
                     <th className="w-8" />
                   </tr>
                 </thead>
@@ -175,7 +175,7 @@ export default function PaymentForm({ payment, prefill, customers, onSubmit, onC
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onCancel}>ביטול</Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              <Save className="w-4 h-4 ml-2" /> שמירה
+              <Save className="w-4 h-4 ms-2" /> שמירה
             </Button>
           </div>
         </form>

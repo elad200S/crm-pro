@@ -114,7 +114,7 @@ export default function InteractionList({ customerId }) {
               יומן אינטראקציות ({interactions.length})
             </CardTitle>
             <Button onClick={() => setShowForm(true)}>
-              <Plus className="w-4 h-4 ml-2" />
+              <Plus className="w-4 h-4 ms-2" />
               אינטראקציה חדשה
             </Button>
           </div>

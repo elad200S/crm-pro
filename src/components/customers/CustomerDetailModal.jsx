@@ -88,7 +88,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
               <CreditCard className="w-3.5 h-3.5" />
               תשלומים
               {payments.length > 0 && (
-                <span className="mr-1 bg-blue-100 text-blue-700 text-xs rounded-full px-1.5 py-0.5 font-semibold">
+                <span className="me-1 bg-blue-100 text-blue-700 text-xs rounded-full px-1.5 py-0.5 font-semibold">
                   {payments.length}
                 </span>
               )}
@@ -157,7 +157,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
                 className="text-blue-600 border-blue-300 hover:bg-blue-100"
                 onClick={() => alert("תשתית סליקה — יוטמע בקרוב (Grow, Cardcom, iCredit)")}
               >
-                <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                <ExternalLink className="w-3.5 h-3.5 ms-1" />
                 שלח קישור תשלום
               </Button>
             </div>
@@ -195,7 +195,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="text-right">
+                        <div className="text-end">
                           <div className="font-bold text-gray-900">₪{(payment.amount || 0).toLocaleString()}</div>
                           <Badge className={`text-xs ${cfg.color}`}>{payment.status}</Badge>
                         </div>
@@ -221,7 +221,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
                 className="w-full border-dashed text-gray-500 hover:text-blue-600 hover:border-blue-400"
                 onClick={() => { onAddPayment(customer); onClose(); }}
               >
-                <Plus className="w-4 h-4 ml-1" /> הוסף תשלום
+                <Plus className="w-4 h-4 ms-1" /> הוסף תשלום
               </Button>
             )}
           </TabsContent>
@@ -232,11 +232,11 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => { onEdit(customer); onClose(); }}
               className="text-blue-600 border-blue-200 hover:bg-blue-50">
-              <Edit className="w-4 h-4 ml-1" /> עריכה
+              <Edit className="w-4 h-4 ms-1" /> עריכה
             </Button>
             <Button variant="outline" size="sm" onClick={() => { onDelete(customer); onClose(); }}
               className="text-red-600 border-red-200 hover:bg-red-50">
-              <Trash2 className="w-4 h-4 ml-1" /> מחיקה
+              <Trash2 className="w-4 h-4 ms-1" /> מחיקה
             </Button>
           </div>
         </div>

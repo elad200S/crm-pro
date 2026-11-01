@@ -164,17 +164,17 @@ export default function QuoteBuilderModal({ customer, onClose, onCreated }) {
             <div className="flex items-center justify-between mb-2">
               <Label className="font-semibold">פריטים</Label>
               <Button type="button" variant="outline" size="sm" onClick={() => set("items", [...form.items, emptyItem()])}>
-                <Plus className="w-3.5 h-3.5 ml-1" /> הוסף שורה
+                <Plus className="w-3.5 h-3.5 ms-1" /> הוסף שורה
               </Button>
             </div>
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-right p-2 font-medium text-gray-500 w-1/2">תיאור</th>
-                    <th className="text-right p-2 font-medium text-gray-500 w-14">כמות</th>
-                    <th className="text-right p-2 font-medium text-gray-500 w-24">מחיר</th>
-                    <th className="text-right p-2 font-medium text-gray-500 w-24">סה"כ</th>
+                    <th className="text-end p-2 font-medium text-gray-500 w-1/2">תיאור</th>
+                    <th className="text-end p-2 font-medium text-gray-500 w-14">כמות</th>
+                    <th className="text-end p-2 font-medium text-gray-500 w-24">מחיר</th>
+                    <th className="text-end p-2 font-medium text-gray-500 w-24">סה"כ</th>
                     <th className="w-8" />
                   </tr>
                 </thead>

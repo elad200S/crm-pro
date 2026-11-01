@@ -170,7 +170,7 @@ export default function TaskForm({ task, customers, leads = [], onSubmit, onCanc
                   variant="destructive"
                   onClick={() => onDelete(task)}
                 >
-                  <Trash2 className="w-4 h-4 ml-2" />
+                  <Trash2 className="w-4 h-4 ms-2" />
                   מחק משימה
                 </Button>
               )}
@@ -180,7 +180,7 @@ export default function TaskForm({ task, customers, leads = [], onSubmit, onCanc
                 ביטול
               </Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                <Save className="w-4 h-4 ml-2" />
+                <Save className="w-4 h-4 ms-2" />
                 שמירה
               </Button>
             </div>

@@ -70,7 +70,7 @@ function ContactChip({ icon: Icon, value, href }) {
   };
 
   return (
-    <div className="flex items-center gap-1 bg-white/15 border border-white/25 rounded-full py-1 pl-1 pr-2.5 text-xs">
+    <div className="flex items-center gap-1 bg-white/15 border border-white/25 rounded-full py-1 ps-1 pe-2.5 text-xs">
       <a href={href} className="flex items-center gap-1.5 text-white hover:underline min-w-0">
         <Icon className="w-3.5 h-3.5 flex-shrink-0" />
         <span className="truncate max-w-[170px]">{value}</span>
@@ -116,18 +116,18 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
         <ChevronDown className="w-3 h-3" />
       </HeaderAction>
       {open && (
-        <div className="absolute top-full mt-1.5 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px] text-right">
+        <div className="absolute top-full mt-1.5 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px] text-end">
           {templates.length === 0 ? (
             <p className="text-xs text-gray-400 px-3 py-2">אין תבניות</p>
           ) : templates.map(t => (
             <button key={t.id} onClick={() => pick(t)}
-              className="w-full text-right px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
+              className="w-full text-end px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
               {t.title || "מסמך ללא כותרת"}
             </button>
           ))}
           <div className="border-t border-gray-100 mt-1 pt-1">
             <button onClick={() => pick(null)}
-              className="w-full text-right px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
+              className="w-full text-end px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
               + מסמך חדש (ריק)
             </button>
           </div>
@@ -236,7 +236,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold leading-tight">
                 {lead.full_name || lead.phone || "ליד ללא שם"}
-                {lead.lead_number && <span className="text-sm text-white/70 font-mono font-normal mr-2">L-{lead.lead_number}</span>}
+                {lead.lead_number && <span className="text-sm text-white/70 font-mono font-normal me-2">L-{lead.lead_number}</span>}
               </h2>
               {(lead.phone || lead.email) && (
                 <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -351,7 +351,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                           <button
                             type="button"
                             onClick={() => onViewQuote && onViewQuote(q)}
-                            className="flex-1 min-w-0 text-right p-2.5 flex items-center justify-between gap-2"
+                            className="flex-1 min-w-0 text-end p-2.5 flex items-center justify-between gap-2"
                           >
                             <div className="min-w-0">
                               <p className="text-sm text-gray-800 truncate">{q.title || "מסמך ללא כותרת"}</p>
@@ -371,7 +371,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                               type="button"
                               title="שלח לחתימה בוואטסאפ"
                               onClick={() => sendQuoteLink(q)}
-                              className="flex-shrink-0 p-2 mr-1 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors"
+                              className="flex-shrink-0 p-2 me-1 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors"
                             >
                               <Send className="w-3.5 h-3.5" />
                             </button>
@@ -380,7 +380,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                             type="button"
                             title="מחיקת מסמך"
                             onClick={() => setDeleteQuoteTarget(q)}
-                            className="flex-shrink-0 p-2 ml-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                            className="flex-shrink-0 p-2 ms-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>

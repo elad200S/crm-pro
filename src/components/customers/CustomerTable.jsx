@@ -35,20 +35,20 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-white dark:bg-gray-950"> {/* Added sticky header */}
               <TableRow className="bg-gray-50">
-                <TableHead className="text-right w-16">#</TableHead>
-                <TableHead className="text-right">שם מלא</TableHead>
-                <TableHead className="text-right">פרטי קשר</TableHead>
-                <TableHead className="text-right">חברה</TableHead>
-                <TableHead className="text-right">סטטוס</TableHead>
-                <TableHead className="text-right">מקור הגעה</TableHead>
-                <TableHead className="text-right">תאריך רישום</TableHead>
-                <TableHead className="text-right">פעולות</TableHead>
+                <TableHead className="text-end w-16">#</TableHead>
+                <TableHead className="text-end">שם מלא</TableHead>
+                <TableHead className="text-end">פרטי קשר</TableHead>
+                <TableHead className="text-end">חברה</TableHead>
+                <TableHead className="text-end">סטטוס</TableHead>
+                <TableHead className="text-end">מקור הגעה</TableHead>
+                <TableHead className="text-end">תאריך רישום</TableHead>
+                <TableHead className="text-end">פעולות</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {customers.map((customer) => (
                 <TableRow key={customer.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => onRowClick && onRowClick(customer)}>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    {customer.customer_number ? (
                      <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
                        #{customer.customer_number}
@@ -57,7 +57,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
                      <span className="text-xs text-gray-300">—</span>
                    )}
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    <div className="font-semibold text-gray-900">
                      {customer.first_name} {customer.last_name}
                    </div>
@@ -67,7 +67,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
                      </div>
                    )}
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    <div className="space-y-1 text-sm">
                      <div className="flex items-center justify-end gap-2">
                        <span>{customer.phone}</span>
@@ -79,18 +79,18 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
                      </div>
                    </div>
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    <span className="text-sm">{customer.company || "-"}</span>
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    <Badge className={statusColors[customer.status]}>
                      {customer.status}
                    </Badge>
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    <span className="text-sm">{customer.source || "-"}</span>
                  </TableCell>
-                 <TableCell className="text-right">
+                 <TableCell className="text-end">
                    <span className="text-sm">
                      {customer.registration_date ? 
                        format(new Date(customer.registration_date), "dd/MM/yyyy", { locale: he }) : 
@@ -98,7 +98,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
                      }
                    </span>
                  </TableCell>
-                 <TableCell className="text-right" onClick={e => e.stopPropagation()}>
+                 <TableCell className="text-end" onClick={e => e.stopPropagation()}>
                    <div className="flex gap-1 justify-end">
                      <Button
                        variant="ghost"

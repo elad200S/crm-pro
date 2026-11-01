@@ -84,7 +84,7 @@ export default function PaymentTable({ payments, getCustomerName, loading, onEdi
                       {payment.status}
                     </Badge>
                     {isOverdue(payment.due_date, payment.status) && (
-                      <Badge className="bg-red-100 text-red-800 mr-2">
+                      <Badge className="bg-red-100 text-red-800 me-2">
                         באיחור
                       </Badge>
                     )}

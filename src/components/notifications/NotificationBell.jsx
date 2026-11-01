@@ -273,7 +273,7 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
             <h3 className="font-semibold">התראות</h3>
             {unreadCount > 0 && (
               <Button variant="ghost" size="sm" onClick={markAllAsRead}>
-                <CheckCheck className="w-4 h-4 ml-1" />
+                <CheckCheck className="w-4 h-4 ms-1" />
                 סמן הכל כנקרא
               </Button>
             )}

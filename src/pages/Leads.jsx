@@ -373,7 +373,7 @@ export default function Leads() {
               {viewMode === "cards" && <><LayoutGrid className="w-3.5 h-3.5" /> כרטיסים</>}
               {viewMode === "kanban" && <><Kanban className="w-3.5 h-3.5" /> קנבן</>}
               {viewMode === "table" && <><List className="w-3.5 h-3.5" /> רשימה</>}
-              <ChevronDown className="w-3.5 h-3.5 text-gray-400 mr-0.5" />
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400 me-0.5" />
             </button>
             <div className="absolute top-full mt-1 left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-50 min-w-[130px] py-1 hidden group-focus-within:block group-hover:block">
               {[
@@ -396,7 +396,7 @@ export default function Leads() {
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={exportToCSV}>
-            <Download className="w-4 h-4 ml-1.5" />
+            <Download className="w-4 h-4 ms-1.5" />
             ייצוא
           </Button>
           <Button
@@ -404,7 +404,7 @@ export default function Leads() {
             className="bg-blue-600 hover:bg-blue-700"
             onClick={() => { setEditingLead(null); setShowForm(true); }}
           >
-            <UserPlus className="w-4 h-4 ml-1.5" />
+            <UserPlus className="w-4 h-4 ms-1.5" />
             ליד חדש
           </Button>
         </div>

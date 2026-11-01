@@ -51,7 +51,7 @@ export default function TaskList({ tasks, onTaskClick, isPersonal }) {
         <Link to={createPageUrl("Calendar")}>
           <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
             צפה בכל המשימות
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeft className="w-4 h-4 me-1" />
           </Button>
         </Link>
       </CardHeader>

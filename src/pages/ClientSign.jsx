@@ -125,12 +125,12 @@ function SignaturePad({ onSignConfirmed }) {
           <RotateCcw className="w-3 h-3" /> נקה
         </button>
         {signed && !confirmed && (
-          <button onClick={confirm} className="mr-auto px-4 py-1.5 text-sm bg-teal-700 text-white rounded-lg hover:bg-teal-800">
+          <button onClick={confirm} className="me-auto px-4 py-1.5 text-sm bg-teal-700 text-white rounded-lg hover:bg-teal-800">
             אשר חתימה ✓
           </button>
         )}
         {confirmed && (
-          <span className="mr-auto text-sm text-green-600 font-medium flex items-center gap-1">
+          <span className="me-auto text-sm text-green-600 font-medium flex items-center gap-1">
             <CheckCircle className="w-4 h-4" /> החתימה אושרה
           </span>
         )}
@@ -506,7 +506,7 @@ export default function ClientSign() {
             <div>
               <img src="/logo-hey.png" alt="HEY Digital" className="h-8" />
             </div>
-            <div className="text-left text-white/80 text-sm">
+            <div className="text-start text-white/80 text-sm">
               <p className="font-bold text-white text-base">{title || "הסכם עבודה"}</p>
               <p className="text-xs mt-0.5">תאריך: {todayStr()}</p>
               {valid_until && <p className="text-xs">בתוקף עד: {valid_until}</p>}
@@ -598,7 +598,7 @@ export default function ClientSign() {
               disabled={!signature || signing}
               onClick={handleSign}
             >
-              <CheckCircle className="w-5 h-5 ml-2" />
+              <CheckCircle className="w-5 h-5 ms-2" />
               {signing ? "שומר..." : "אשר וחתום על ההסכם"}
             </Button>
             {!signature && (

@@ -128,17 +128,17 @@ export default function QuoteEditModal({ quote, leadName, customerName, isNew, o
             <div className="flex items-center justify-between mb-2">
               <Label className="text-base font-semibold">פריטים</Label>
               <Button type="button" variant="outline" size="sm" onClick={addItem}>
-                <Plus className="w-4 h-4 ml-1" /> הוסף שורה
+                <Plus className="w-4 h-4 ms-1" /> הוסף שורה
               </Button>
             </div>
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-right p-2 font-semibold text-gray-600 w-1/2">תיאור</th>
-                    <th className="text-right p-2 font-semibold text-gray-600 w-16">כמות</th>
-                    <th className="text-right p-2 font-semibold text-gray-600 w-28">מחיר יחידה</th>
-                    <th className="text-right p-2 font-semibold text-gray-600 w-28">סה"כ</th>
+                    <th className="text-end p-2 font-semibold text-gray-600 w-1/2">תיאור</th>
+                    <th className="text-end p-2 font-semibold text-gray-600 w-16">כמות</th>
+                    <th className="text-end p-2 font-semibold text-gray-600 w-28">מחיר יחידה</th>
+                    <th className="text-end p-2 font-semibold text-gray-600 w-28">סה"כ</th>
                     <th className="w-10" />
                   </tr>
                 </thead>

@@ -168,7 +168,7 @@ export default function Quotes() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="border-l-4 border-l-purple-500">
+        <Card className="border-r-4 border-r-purple-500">
           <CardContent className="pt-5 pb-4">
             <div className="text-2xl font-bold text-purple-700">{stats.total}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
@@ -176,7 +176,7 @@ export default function Quotes() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-gray-400">
+        <Card className="border-r-4 border-r-gray-400">
           <CardContent className="pt-5 pb-4">
             <div className="text-2xl font-bold text-gray-700">{stats.draft}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
@@ -184,7 +184,7 @@ export default function Quotes() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-blue-400">
+        <Card className="border-r-4 border-r-blue-400">
           <CardContent className="pt-5 pb-4">
             <div className="text-2xl font-bold text-blue-600">{stats.sent}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
@@ -192,7 +192,7 @@ export default function Quotes() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="border-r-4 border-r-green-500">
           <CardContent className="pt-5 pb-4">
             <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
@@ -200,7 +200,7 @@ export default function Quotes() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-emerald-500">
+        <Card className="border-r-4 border-r-emerald-500">
           <CardContent className="pt-5 pb-4">
             <div className="text-2xl font-bold text-emerald-700">₪{stats.totalApproved.toLocaleString()}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
@@ -308,7 +308,7 @@ export default function Quotes() {
 
                     {/* Right: amount + actions */}
                     <div className="flex items-center gap-3 flex-shrink-0 pt-3 border-t">
-                      <div className="text-right">
+                      <div className="text-end">
                         <div className="text-2xl font-bold text-gray-900">
                           {currSymbol}{(quote.amount || 0).toLocaleString()}
                         </div>
@@ -325,7 +325,7 @@ export default function Quotes() {
                           onClick={() => setPreviewQuote(quote)}
                           className="text-gray-600 hover:text-gray-800"
                         >
-                          <Eye className="w-3.5 h-3.5 ml-1" />
+                          <Eye className="w-3.5 h-3.5 ms-1" />
                           צפה
                         </Button>
                         <Button
@@ -334,7 +334,7 @@ export default function Quotes() {
                           onClick={() => setEditingDoc(quote)}
                           className="text-blue-600 hover:text-blue-800 border-blue-200"
                         >
-                          <Edit className="w-3.5 h-3.5 ml-1" />
+                          <Edit className="w-3.5 h-3.5 ms-1" />
                           עריכה
                         </Button>
                         <Button
@@ -343,7 +343,7 @@ export default function Quotes() {
                           onClick={() => setDeleteTarget(quote)}
                           className="text-red-600 hover:text-red-800 border-red-200"
                         >
-                          <Trash2 className="w-3.5 h-3.5 ml-1" />
+                          <Trash2 className="w-3.5 h-3.5 ms-1" />
                           מחיקה
                         </Button>
                         {quote.status === "אושר" && (() => {
@@ -352,7 +352,7 @@ export default function Quotes() {
                             return (
                               <Link to={createPageUrl("Payments")}>
                                 <Button variant="outline" size="sm" className="text-emerald-700 hover:text-emerald-800 border-emerald-200">
-                                  <Receipt className="w-3.5 h-3.5 ml-1" />
+                                  <Receipt className="w-3.5 h-3.5 ms-1" />
                                   חשבונית: {linkedPayment.status}
                                 </Button>
                               </Link>
@@ -360,7 +360,7 @@ export default function Quotes() {
                           }
                           if (!quote.customer_id) {
                             return (
-                              <span className="text-[11px] text-gray-400 max-w-[120px] text-left">
+                              <span className="text-[11px] text-gray-400 max-w-[120px] text-start">
                                 יש להמיר לליד ללקוח כדי להפיק חשבונית
                               </span>
                             );
@@ -368,7 +368,7 @@ export default function Quotes() {
                           return (
                             <Link to={`${createPageUrl("Payments")}?quote=${quote.id}`}>
                               <Button variant="outline" size="sm" className="text-emerald-700 hover:text-emerald-800 border-emerald-200">
-                                <Receipt className="w-3.5 h-3.5 ml-1" />
+                                <Receipt className="w-3.5 h-3.5 ms-1" />
                                 צור חשבונית
                               </Button>
                             </Link>
@@ -406,6 +406,7 @@ export default function Quotes() {
           quote={previewQuote}
           lead={leads.find(l => l.id === previewQuote.lead_id) || null}
           onClose={() => setPreviewQuote(null)}
+          onDelete={() => { setDeleteTarget(previewQuote); setPreviewQuote(null); }}
         />
       )}
 

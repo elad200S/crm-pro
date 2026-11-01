@@ -72,7 +72,7 @@ function QuoteDropdown({ lead, onQuote }) {
             <button
               key={t.id}
               onClick={() => { onQuote(lead, t); setOpen(false); }}
-              className="w-full text-right px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+              className="w-full text-end px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
             >
               {t.title || "מסמך ללא כותרת"}
             </button>
@@ -80,7 +80,7 @@ function QuoteDropdown({ lead, onQuote }) {
           <div className="border-t border-gray-100 mt-1 pt-1">
             <button
               onClick={() => { onQuote(lead, null); setOpen(false); }}
-              className="w-full text-right px-3 py-2 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
+              className="w-full text-end px-3 py-2 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
             >
               + מסמך חדש (ריק)
             </button>
@@ -143,7 +143,7 @@ export default function LeadCards({ leads, users, onEdit, onDelete, onWhatsApp, 
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-gray-900 text-sm leading-snug truncate">
                     {lead.full_name || lead.phone}
-                    {lead.lead_number && <span className="text-[11px] text-gray-400 font-mono font-normal mr-1.5">L-{lead.lead_number}</span>}
+                    {lead.lead_number && <span className="text-[11px] text-gray-400 font-mono font-normal me-1.5">L-{lead.lead_number}</span>}
                   </h3>
                   <span className={`flex-shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.text}`}>
                     {lead.status || "חדש"}

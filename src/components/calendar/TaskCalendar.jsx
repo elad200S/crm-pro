@@ -163,7 +163,7 @@ export default function TaskCalendar({ tasks, selectedDate, onDateSelect, onTask
                 {/* התאריך הלועזי */}
                 <div className={`font-semibold text-sm mb-1 ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
                   {format(day, "d")}
-                  {isToday && <span className="text-xs mr-1">•</span>}
+                  {isToday && <span className="text-xs me-1">•</span>}
                 </div>
                 
                 {/* התאריך העברי באותיות */}

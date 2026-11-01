@@ -139,7 +139,7 @@ export default function Expenses() {
             <p className="text-gray-600">{filteredExpenses.length} הוצאות מתוך {expenses.length} סה"כ</p>
           </div>
           <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-blue-600 hover:bg-blue-700 shadow-md">
-            <Plus className="w-5 h-5 ml-2" /> הוצאה חדשה
+            <Plus className="w-5 h-5 ms-2" /> הוצאה חדשה
           </Button>
         </div>
       </div>

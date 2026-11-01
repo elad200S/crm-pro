@@ -214,16 +214,16 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden" dir="rtl">
             <TabsList className="flex-shrink-0 w-full rounded-none border-b bg-white px-4 justify-start gap-1 h-12">
               <TabsTrigger value="details" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
-                <User className="w-4 h-4 ml-1.5" /> פרטים
+                <User className="w-4 h-4 ms-1.5" /> פרטים
               </TabsTrigger>
               <TabsTrigger value="tasks" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
-                <Calendar className="w-4 h-4 ml-1.5" /> משימות {tasks.length > 0 && <span className="mr-1 w-4 h-4 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center justify-center">{tasks.length}</span>}
+                <Calendar className="w-4 h-4 ms-1.5" /> משימות {tasks.length > 0 && <span className="me-1 w-4 h-4 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center justify-center">{tasks.length}</span>}
               </TabsTrigger>
               <TabsTrigger value="payments" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
-                <CreditCard className="w-4 h-4 ml-1.5" /> תשלומים {payments.length > 0 && <span className="mr-1 w-4 h-4 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center justify-center">{payments.length}</span>}
+                <CreditCard className="w-4 h-4 ms-1.5" /> תשלומים {payments.length > 0 && <span className="me-1 w-4 h-4 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center justify-center">{payments.length}</span>}
               </TabsTrigger>
               <TabsTrigger value="interactions" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
-                <MessageSquare className="w-4 h-4 ml-1.5" /> היסטוריה
+                <MessageSquare className="w-4 h-4 ms-1.5" /> היסטוריה
               </TabsTrigger>
             </TabsList>
 
@@ -415,7 +415,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
                                   {interaction.outcome === "positive" ? "חיובי" : interaction.outcome === "negative" ? "שלילי" : interaction.outcome === "neutral" ? "ניטרלי" : "נדרש המשך"}
                                 </span>
                               )}
-                              <span className="text-xs text-gray-400 mr-auto">
+                              <span className="text-xs text-gray-400 me-auto">
                                 {interaction.interaction_date
                                   ? format(new Date(interaction.interaction_date), "dd/MM/yyyy HH:mm", { locale: he })
                                   : ""}

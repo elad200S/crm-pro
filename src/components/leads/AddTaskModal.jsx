@@ -143,7 +143,7 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
             <DialogFooter>
               <Button variant="outline" onClick={onClose}>ביטול</Button>
               <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleParse} disabled={!text.trim()}>
-                <Sparkles className="w-3.5 h-3.5 ml-1.5" /> המשך
+                <Sparkles className="w-3.5 h-3.5 ms-1.5" /> המשך
               </Button>
             </DialogFooter>
           </>

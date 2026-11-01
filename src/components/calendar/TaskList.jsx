@@ -99,7 +99,7 @@ export default function TaskList({ tasks, title, getCustomerName, getLeadName, o
               }`}
             >
               <div className="flex items-start justify-between mb-2">
-                <div className="flex-1 ml-2">
+                <div className="flex-1 ms-2">
                   <h4 className="font-semibold text-gray-900 text-sm">{task.title}</h4>
                   <div className="flex flex-wrap gap-1 mt-1">
                     <Badge className={`text-xs ${priorityColors[task.priority]}`}>
