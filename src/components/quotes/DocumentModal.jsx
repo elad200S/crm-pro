@@ -132,7 +132,7 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
-            <FileText className="w-5 h-5 text-blue-600" />
+            <FileText className="w-5 h-5 text-brand-600" />
             {isNew ? "מסמך חדש" : "עריכת מסמך"}
             {entityName && <span className="text-sm font-normal text-gray-400">— {entityName}</span>}
           </DialogTitle>
@@ -202,8 +202,8 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
 
           {/* משתנים זמינים (כשלא יש ליד — עורכים תבנית) */}
           {!hasLead && (
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
-              <p className="text-xs font-semibold text-blue-600 flex items-center gap-1 mb-2">
+            <div className="bg-brand-50 border border-brand-100 rounded-xl p-3">
+              <p className="text-xs font-semibold text-brand-600 flex items-center gap-1 mb-2">
                 <Tag className="w-3.5 h-3.5" /> משתנים — לחץ להוספה בטקסט
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -212,13 +212,13 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
                     key={v.key}
                     type="button"
                     onClick={() => insertVar(v.key)}
-                    className="px-2 py-1 text-xs bg-white border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-mono"
+                    className="px-2 py-1 text-xs bg-white border border-brand-200 text-brand-700 rounded-lg hover:bg-brand-100 transition-colors font-mono"
                   >
                     {v.key} <span className="text-gray-400 font-sans">({v.label})</span>
                   </button>
                 ))}
               </div>
-              <p className="text-[10px] text-blue-400 mt-2">ערכים אלו יתמלאו אוטומטית מנתוני הליד בעת יצירת מסמך ללקוח</p>
+              <p className="text-[10px] text-brand-400 mt-2">ערכים אלו יתמלאו אוטומטית מנתוני הליד בעת יצירת מסמך ללקוח</p>
             </div>
           )}
 
@@ -262,7 +262,7 @@ export default function DocumentModal({ doc, lead, onSubmit, onClose }) {
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>ביטול</Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-brand-600 hover:bg-brand-700"
             onClick={handleSubmit}
             disabled={!form.title.trim() || submitting}
           >

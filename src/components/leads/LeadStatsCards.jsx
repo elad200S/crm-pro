@@ -25,7 +25,7 @@ export default function LeadStatsCards({ leads }) {
   const topSource = Object.entries(sourceMap).sort((a, b) => b[1] - a[1])[0];
 
   const stats = [
-    { label: "לידים חדשים היום", value: newToday, icon: UserPlus, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "לידים חדשים היום", value: newToday, icon: UserPlus, color: "text-brand-600", bg: "bg-brand-50" },
     { label: "לידים פתוחים", value: openLeads, icon: AlertCircle, color: "text-orange-600", bg: "bg-orange-50" },
     { label: 'נשלחה הצעת מחיר', value: quoteSent, icon: FileText, color: "text-purple-600", bg: "bg-purple-50" },
     { label: "מקור מוביל", value: topSource ? `${topSource[0]} (${topSource[1]})` : "—", icon: PieChart, color: "text-green-600", bg: "bg-green-50" },

@@ -35,7 +35,7 @@ const STATUS_COLORS = {
 };
 
 const GRADIENTS = [
-  "from-blue-500 to-blue-700",
+  "from-brand-500 to-brand-700",
   "from-purple-500 to-purple-700",
   "from-emerald-500 to-emerald-700",
   "from-rose-500 to-rose-700",
@@ -179,10 +179,10 @@ export default function CustomerProfile() {
           {/* Documents */}
           <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
             <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
-              <FileText className="w-4 h-4 text-blue-600" />
+              <FileText className="w-4 h-4 text-brand-600" />
               <h3 className="font-bold text-gray-800 text-sm">מסמכים</h3>
               <span className="me-auto text-xs text-gray-400">{quotes.length} סה"כ</span>
-              <Button size="sm" onClick={() => setShowQuoteBuilder(true)} className="h-7 bg-blue-600 hover:bg-blue-700 text-xs">
+              <Button size="sm" onClick={() => setShowQuoteBuilder(true)} className="h-7 bg-brand-600 hover:bg-brand-700 text-xs">
                 <FilePlus2 className="w-3.5 h-3.5 ms-1" /> הצעת מחיר
               </Button>
             </div>
@@ -209,7 +209,7 @@ export default function CustomerProfile() {
                         <Badge className={
                           q.status === "אושר" ? "bg-green-100 text-green-700" :
                           q.status === "בוטל" ? "bg-red-100 text-red-600" :
-                          q.status === "נשלח" ? "bg-blue-100 text-blue-700" :
+                          q.status === "נשלח" ? "bg-brand-100 text-brand-700" :
                           "bg-gray-100 text-gray-600"
                         }>{q.status || "טיוטה"}</Badge>
                       </div>
@@ -219,7 +219,7 @@ export default function CustomerProfile() {
                         type="button"
                         title="שלח לחתימה בוואטסאפ"
                         onClick={() => sendQuoteLink(q)}
-                        className="flex-shrink-0 p-2 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors"
+                        className="flex-shrink-0 p-2 rounded-lg text-brand-600 hover:bg-brand-100 transition-colors"
                       >
                         <Send className="w-3.5 h-3.5" />
                       </button>
@@ -392,7 +392,7 @@ export default function CustomerProfile() {
           {/* Contact info */}
           <div className="bg-white rounded-2xl border shadow-sm p-4 space-y-3">
             {[
-              customer.phone   && { icon: <Phone className="w-4 h-4 text-blue-500" />,    bg: "bg-blue-50",   label: "טלפון",       value: customer.phone },
+              customer.phone   && { icon: <Phone className="w-4 h-4 text-brand-500" />,    bg: "bg-brand-50",   label: "טלפון",       value: customer.phone },
               customer.email   && { icon: <Mail className="w-4 h-4 text-purple-500" />,   bg: "bg-purple-50", label: "אימייל",      value: customer.email },
               customer.id_number && { icon: <span className="text-[10px] font-black text-gray-500">ח"פ</span>, bg: "bg-gray-50", label: 'ח"פ / ת"ז', value: customer.id_number },
               customer.registration_date && {
@@ -426,9 +426,9 @@ export default function CustomerProfile() {
                 <p className="text-sm font-black text-amber-700">₪{totalPending.toLocaleString()}</p>
                 <p className="text-[10px] text-amber-600 mt-0.5">ממתין</p>
               </div>
-              <div className="bg-blue-50 rounded-xl p-3">
-                <p className="text-sm font-black text-blue-700">{openTasks}</p>
-                <p className="text-[10px] text-blue-600 mt-0.5">משימות</p>
+              <div className="bg-brand-50 rounded-xl p-3">
+                <p className="text-sm font-black text-brand-700">{openTasks}</p>
+                <p className="text-[10px] text-brand-600 mt-0.5">משימות</p>
               </div>
             </div>
           </div>

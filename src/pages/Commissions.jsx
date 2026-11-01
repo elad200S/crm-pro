@@ -183,7 +183,7 @@ export default function Commissions() {
       <div className="bg-white rounded-lg border shadow-sm overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
           </div>
         ) : rows.length === 0 ? (
           <p className="text-center py-12 text-gray-500">אין עסקאות ששולמו בחודש זה</p>

@@ -199,7 +199,7 @@ export default function Dashboard() {
   const isAdmin = currentUser?.role === 'admin' || currentUser?.user_category === "מנהל_ראשי";
 
   const PIPELINE_STAGES = [
-    { key: "התקבל",                   label: "התקבל",       color: "bg-blue-400" },
+    { key: "התקבל",                   label: "התקבל",       color: "bg-brand-400" },
     { key: "שיחה חוזרת",              label: "שיחה חוזרת",  color: "bg-yellow-400" },
     { key: "בוצע איפיון",             label: "איפיון",      color: "bg-purple-400" },
     { key: "נשלחה הצעת מחיר",        label: "הצעת מחיר",  color: "bg-indigo-400" },
@@ -252,7 +252,7 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Button size="sm" variant="outline" onClick={() => navigate(createPageUrl("Leads"))}
-            className="text-blue-600 border-blue-200 hover:bg-blue-50 gap-1.5 h-8">
+            className="text-brand-600 border-brand-200 hover:bg-brand-50 gap-1.5 h-8">
             <Plus className="w-3.5 h-3.5" /> ליד חדש
           </Button>
           <Button size="sm" variant="outline" onClick={() => navigate(createPageUrl("Calendar"))}
@@ -370,12 +370,12 @@ export default function Dashboard() {
         <div className="bg-white rounded-2xl border shadow-sm px-6 py-5">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-bold text-gray-800 text-sm flex items-center gap-2">
-              <UserPlus className="w-4 h-4 text-blue-600" />
+              <UserPlus className="w-4 h-4 text-brand-600" />
               Pipeline לידים
               <span className="text-xs font-normal text-gray-400">({pipelineTotal} סה"כ)</span>
             </h2>
             <Link to={createPageUrl("Leads")}
-              className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
+              className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-0.5">
               כל הלידים <ChevronLeft className="w-3.5 h-3.5" />
             </Link>
           </div>

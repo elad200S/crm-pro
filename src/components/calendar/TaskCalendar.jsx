@@ -95,7 +95,7 @@ export default function TaskCalendar({ tasks, selectedDate, onDateSelect, onTask
   };
 
   const priorityColors = {
-    "נמוכה": "bg-blue-200",
+    "נמוכה": "bg-brand-200",
     "בינונית": "bg-yellow-200", 
     "גבוהה": "bg-orange-200",
     "קריטית": "bg-red-200"
@@ -154,14 +154,14 @@ export default function TaskCalendar({ tasks, selectedDate, onDateSelect, onTask
                 key={day.toISOString()}
                 className={`
                   min-h-28 p-2 border rounded-lg cursor-pointer transition-all
-                  ${isSelected ? 'border-blue-500 bg-blue-50 shadow-md' : 'border-gray-200 hover:bg-gray-50 hover:shadow-sm'}
+                  ${isSelected ? 'border-brand-500 bg-brand-50 shadow-md' : 'border-gray-200 hover:bg-gray-50 hover:shadow-sm'}
                   ${!isCurrentMonth ? 'bg-gray-50 opacity-50' : ''}
-                  ${isToday && !isSelected ? 'border-blue-300 bg-blue-50/50' : ''}
+                  ${isToday && !isSelected ? 'border-brand-300 bg-brand-50/50' : ''}
                 `}
                 onClick={() => onDateSelect(day)}
               >
                 {/* התאריך הלועזי */}
-                <div className={`font-semibold text-sm mb-1 ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+                <div className={`font-semibold text-sm mb-1 ${isToday ? 'text-brand-600' : 'text-gray-900'}`}>
                   {format(day, "d")}
                   {isToday && <span className="text-xs me-1">•</span>}
                 </div>
@@ -206,7 +206,7 @@ export default function TaskCalendar({ tasks, selectedDate, onDateSelect, onTask
         {/* מקרא */}
         <div className="flex justify-center gap-4 mt-6 pt-4 border-t flex-wrap">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-200 rounded"></div>
+            <div className="w-3 h-3 bg-brand-200 rounded"></div>
             <span className="text-sm">נמוכה</span>
           </div>
           <div className="flex items-center gap-2">

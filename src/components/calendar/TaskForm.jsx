@@ -38,7 +38,7 @@ export default function TaskForm({ task, customers, leads = [], onSubmit, onCanc
   };
 
   return (
-    <Card className="mb-6 border-blue-200 border-2 shadow-lg">
+    <Card className="mb-6 border-brand-200 border-2 shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{task ? "עריכת משימה" : "משימה חדשה"}</span>
@@ -179,7 +179,7 @@ export default function TaskForm({ task, customers, leads = [], onSubmit, onCanc
               <Button type="button" variant="outline" onClick={onCancel}>
                 ביטול
               </Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              <Button type="submit" className="bg-brand-600 hover:bg-brand-700">
                 <Save className="w-4 h-4 ms-2" />
                 שמירה
               </Button>

@@ -233,7 +233,7 @@ export default function QuoteEditModal({ quote, leadName, customerName, isNew, o
 
             <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
               <span>סה"כ לתשלום</span>
-              <span className="text-blue-700">{currencySymbol}{total.toLocaleString()}</span>
+              <span className="text-brand-700">{currencySymbol}{total.toLocaleString()}</span>
             </div>
           </div>
 
@@ -251,7 +251,7 @@ export default function QuoteEditModal({ quote, leadName, customerName, isNew, o
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>ביטול</Button>
-          <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSubmit}>
+          <Button className="bg-brand-600 hover:bg-brand-700" onClick={handleSubmit}>
             {isNew ? "צור מסמך" : "שמור מסמך"}
           </Button>
         </DialogFooter>

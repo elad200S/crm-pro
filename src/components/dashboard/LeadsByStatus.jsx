@@ -6,7 +6,7 @@ import { createPageUrl } from "@/utils";
 import { Link } from "react-router-dom";
 
 const STATUS_CONFIG = {
-  "התקבל":                { color: "bg-blue-100 text-blue-800",   dot: "bg-blue-500",   urgent: false },
+  "התקבל":                { color: "bg-brand-100 text-brand-800",   dot: "bg-brand-500",   urgent: false },
   "שיחה חוזרת":           { color: "bg-yellow-100 text-yellow-800", dot: "bg-yellow-500", urgent: false },
   "בוצע איפיון":          { color: "bg-purple-100 text-purple-800", dot: "bg-purple-500", urgent: false },
   "נשלחה הצעת מחיר":     { color: "bg-indigo-100 text-indigo-800", dot: "bg-indigo-500",  urgent: false },
@@ -49,7 +49,7 @@ export default function LeadsByStatus({ leads, isAdmin, currentUserId, statusCou
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-blue-600" />
+            <UserPlus className="w-5 h-5 text-brand-600" />
             {isAdmin ? "לידים לפי סטטוס" : "הלידים שלי"}
           </div>
           {urgentLeads.length > 0 && (
@@ -100,7 +100,7 @@ export default function LeadsByStatus({ leads, isAdmin, currentUserId, statusCou
         <div className="pt-2 border-t mt-2">
           <Link
             to={createPageUrl("Leads")}
-            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+            className="text-xs text-brand-600 hover:underline flex items-center gap-1"
           >
             לכל הלידים ←
           </Link>

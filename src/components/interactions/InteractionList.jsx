@@ -156,7 +156,7 @@ export default function InteractionList({ customerId }) {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleEdit(interaction)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-brand-600 hover:text-brand-800"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>

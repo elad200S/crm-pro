@@ -60,7 +60,7 @@ export default function PaymentChart({ payments, isPersonal }) {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
+            <TrendingUp className="w-5 h-5 text-brand-600" />
             {isPersonal ? "ההכנסות שלי" : "הכנסות חודשיות"}
           </CardTitle>
           <div className="flex items-center gap-2 text-sm">
@@ -151,7 +151,7 @@ export default function PaymentChart({ payments, isPersonal }) {
           </div>
           <div className="text-center">
             <p className="text-sm text-gray-600">סה"כ השנה</p>
-            <p className="text-lg font-bold text-blue-600">
+            <p className="text-lg font-bold text-brand-600">
               ₪{data.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
             </p>
           </div>

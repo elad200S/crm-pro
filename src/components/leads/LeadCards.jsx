@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
 const STATUS_CONFIG = {
-  "התקבל":                  { bg: "bg-blue-100",   text: "text-blue-700",   dot: "bg-blue-500" },
+  "התקבל":                  { bg: "bg-brand-100",   text: "text-brand-700",   dot: "bg-brand-500" },
   "שיחה חוזרת":             { bg: "bg-amber-100",  text: "text-amber-700",  dot: "bg-amber-500" },
   "בוצע איפיון":            { bg: "bg-purple-100", text: "text-purple-700", dot: "bg-purple-500" },
   "נשלחה הצעת מחיר":       { bg: "bg-orange-100", text: "text-orange-700", dot: "bg-orange-500" },
@@ -14,7 +14,7 @@ const STATUS_CONFIG = {
 };
 
 const AVATAR_COLORS = [
-  "bg-blue-500", "bg-violet-500", "bg-emerald-500",
+  "bg-brand-500", "bg-violet-500", "bg-emerald-500",
   "bg-rose-500", "bg-amber-500", "bg-cyan-500",
 ];
 
@@ -58,7 +58,7 @@ function QuoteDropdown({ lead, onQuote }) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(o => !o)}
-        className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+        className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-brand-600 hover:bg-brand-50 transition-colors font-medium"
       >
         <FileText className="w-3.5 h-3.5" />
         <span>מסמך</span>
@@ -72,7 +72,7 @@ function QuoteDropdown({ lead, onQuote }) {
             <button
               key={t.id}
               onClick={() => { onQuote(lead, t); setOpen(false); }}
-              className="w-full text-end px-3 py-2 text-xs text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+              className="w-full text-end px-3 py-2 text-xs text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
             >
               {t.title || "מסמך ללא כותרת"}
             </button>
@@ -96,7 +96,7 @@ export default function LeadCards({ leads, users, onEdit, onDelete, onWhatsApp, 
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 text-gray-400 gap-2">
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-600" />
       <span>טוען לידים...</span>
     </div>
   );
@@ -212,7 +212,7 @@ export default function LeadCards({ leads, users, onEdit, onDelete, onWhatsApp, 
               <div className="flex-1" />
               <button
                 onClick={() => onEdit(lead)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                className="p-1.5 rounded-lg text-gray-400 hover:text-brand-600 hover:bg-brand-50 transition-colors"
                 title="עריכה"
               >
                 <Edit className="w-3.5 h-3.5" />

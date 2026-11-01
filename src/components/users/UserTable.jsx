@@ -15,7 +15,7 @@ const statusColors = {
 
 const categoryColors = {
   "מנהל_ראשי": "bg-purple-100 text-purple-800",
-  "מנהל_מחלקה": "bg-blue-100 text-blue-800",
+  "מנהל_מחלקה": "bg-brand-100 text-brand-800",
   "איש_מכירות": "bg-green-100 text-green-800",
   "שירות_לקוחות": "bg-orange-100 text-orange-800",
   "מנהל_פרויקטים": "bg-indigo-100 text-indigo-800",
@@ -29,7 +29,7 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
           </div>
         </CardContent>
       </Card>
@@ -98,7 +98,7 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
                         variant="ghost"
                         size="icon"
                         onClick={() => onEdit(user)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-brand-600 hover:text-brand-800"
                       >
                         <Edit className="w-4 h-4" />
                       </Button>

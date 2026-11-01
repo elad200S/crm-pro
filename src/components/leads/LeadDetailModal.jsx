@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const STATUS_GRADIENT = {
-  "התקבל":                "from-blue-500 to-blue-700",
+  "התקבל":                "from-brand-500 to-brand-700",
   "שיחה חוזרת":           "from-yellow-500 to-amber-600",
   "בוצע איפיון":          "from-purple-500 to-purple-700",
   "נשלחה הצעת מחיר":     "from-indigo-500 to-indigo-700",
@@ -29,7 +29,7 @@ const STATUS_GRADIENT = {
 
 const QUOTE_STATUS_CONFIG = {
   "טיוטה": { label: "טיוטה", color: "bg-gray-100 text-gray-700", icon: FileText },
-  "נשלח":  { label: "נשלח",  color: "bg-blue-100 text-blue-800", icon: Clock },
+  "נשלח":  { label: "נשלח",  color: "bg-brand-100 text-brand-800", icon: Clock },
   "אושר":  { label: "אושר",  color: "bg-green-100 text-green-800", icon: CheckCircle },
   "בוטל":  { label: "בוטל",  color: "bg-red-100 text-red-700", icon: XCircle },
 };
@@ -371,7 +371,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                               type="button"
                               title="שלח לחתימה בוואטסאפ"
                               onClick={() => sendQuoteLink(q)}
-                              className="flex-shrink-0 p-2 me-1 rounded-lg text-blue-600 hover:bg-blue-100 transition-colors"
+                              className="flex-shrink-0 p-2 me-1 rounded-lg text-brand-600 hover:bg-brand-100 transition-colors"
                             >
                               <Send className="w-3.5 h-3.5" />
                             </button>

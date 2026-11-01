@@ -4,7 +4,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const COLOR_MAP = {
-  blue:   { blob: "bg-blue-400",   icon: "bg-blue-50 text-blue-600",   bar: "bg-blue-500" },
+  blue:   { blob: "bg-brand-400",   icon: "bg-brand-50 text-brand-600",   bar: "bg-brand-500" },
   green:  { blob: "bg-green-400",  icon: "bg-green-50 text-green-600", bar: "bg-green-500" },
   orange: { blob: "bg-orange-400", icon: "bg-orange-50 text-orange-500", bar: "bg-orange-500" },
   red:    { blob: "bg-red-400",    icon: "bg-red-50 text-red-500",     bar: "bg-red-500" },

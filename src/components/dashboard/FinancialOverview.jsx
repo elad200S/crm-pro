@@ -21,7 +21,7 @@ export default function FinancialOverview({ monthlyRevenue, monthlyExpenses, net
             </Link>
           )}
           <Link to={createPageUrl("Expenses")}
-            className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-0.5">
+            className="text-xs text-brand-600 hover:text-brand-700 flex items-center gap-0.5">
             ניהול הוצאות <ChevronLeft className="w-3.5 h-3.5" />
           </Link>
         </div>

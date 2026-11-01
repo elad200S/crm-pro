@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
 const statusConfig = {
-  "חדש":       { bg: "bg-blue-100",   text: "text-blue-800",   dot: "bg-blue-500" },
+  "חדש":       { bg: "bg-brand-100",   text: "text-brand-800",   dot: "bg-brand-500" },
   "פוטנציאלי": { bg: "bg-yellow-100", text: "text-yellow-800", dot: "bg-yellow-500" },
   "פעיל":      { bg: "bg-green-100",  text: "text-green-800",  dot: "bg-green-500" },
   "לא פעיל":   { bg: "bg-red-100",    text: "text-red-800",    dot: "bg-red-500" },
@@ -21,14 +21,14 @@ const statusConfig = {
 };
 
 const taskStatusIcon = { "פתוח": Clock, "בטיפול": AlertCircle, "הושלם": CheckCircle2, "דחוי": X };
-const taskStatusColor = { "פתוח": "text-blue-500", "בטיפול": "text-yellow-500", "הושלם": "text-green-500", "דחוי": "text-gray-400" };
-const paymentStatusColor = { "שולם": "bg-green-100 text-green-800", "נוצר": "bg-gray-100 text-gray-700", "נשלח": "bg-blue-100 text-blue-800", "מחכה לתשלום": "bg-yellow-100 text-yellow-800", "פג תוקף": "bg-red-100 text-red-800", "מבוטל": "bg-gray-100 text-gray-500" };
+const taskStatusColor = { "פתוח": "text-brand-500", "בטיפול": "text-yellow-500", "הושלם": "text-green-500", "דחוי": "text-gray-400" };
+const paymentStatusColor = { "שולם": "bg-green-100 text-green-800", "נוצר": "bg-gray-100 text-gray-700", "נשלח": "bg-brand-100 text-brand-800", "מחכה לתשלום": "bg-yellow-100 text-yellow-800", "פג תוקף": "bg-red-100 text-red-800", "מבוטל": "bg-gray-100 text-gray-500" };
 const interactionTypeLabel = { call: "שיחה", meeting: "פגישה", email: "אימייל", whatsapp: "WhatsApp", sms: "SMS", other: "אחר" };
-const interactionTypeColor = { call: "bg-blue-100 text-blue-700", meeting: "bg-purple-100 text-purple-700", email: "bg-gray-100 text-gray-700", whatsapp: "bg-green-100 text-green-700", sms: "bg-orange-100 text-orange-700", other: "bg-gray-100 text-gray-600" };
+const interactionTypeColor = { call: "bg-brand-100 text-brand-700", meeting: "bg-purple-100 text-purple-700", email: "bg-gray-100 text-gray-700", whatsapp: "bg-green-100 text-green-700", sms: "bg-orange-100 text-orange-700", other: "bg-gray-100 text-gray-600" };
 
 function Avatar({ name, size = "lg" }) {
   const initials = [name?.split(" ")[0]?.[0], name?.split(" ")[1]?.[0]].filter(Boolean).join("").toUpperCase() || "?";
-  const colors = ["from-blue-500 to-blue-600", "from-purple-500 to-purple-600", "from-green-500 to-green-600", "from-orange-500 to-orange-600", "from-pink-500 to-pink-600"];
+  const colors = ["from-brand-500 to-brand-600", "from-purple-500 to-purple-600", "from-green-500 to-green-600", "from-orange-500 to-orange-600", "from-pink-500 to-pink-600"];
   const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
   const sz = size === "lg" ? "w-16 h-16 text-xl" : "w-10 h-10 text-sm";
   return (
@@ -48,7 +48,7 @@ function InfoRow({ icon: Icon, label, value, href }) {
       <div className="flex-1 min-w-0">
         <p className="text-xs text-gray-400 mb-0.5">{label}</p>
         {href ? (
-          <a href={href} className="text-sm font-medium text-blue-600 hover:underline truncate block">{value}</a>
+          <a href={href} className="text-sm font-medium text-brand-600 hover:underline truncate block">{value}</a>
         ) : (
           <p className="text-sm font-medium text-gray-800 break-words">{value}</p>
         )}
@@ -109,7 +109,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
       <div className="fixed inset-0 sm:inset-y-0 sm:left-0 sm:w-full sm:max-w-2xl bg-white shadow-2xl z-50 flex flex-col overflow-hidden">
         
         {/* Header */}
-        <div className="bg-gradient-to-l from-blue-600 to-blue-700 px-6 py-5 flex-shrink-0">
+        <div className="bg-gradient-to-l from-brand-600 to-brand-700 px-6 py-5 flex-shrink-0">
           <div className="flex items-start justify-between mb-4">
             <button
               onClick={onClose}
@@ -140,7 +140,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-bold text-white mb-1">{fullName || "לקוח ללא שם"}</h2>
               {customer.company && (
-                <p className="text-blue-100 text-sm flex items-center gap-1.5">
+                <p className="text-brand-100 text-sm flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5" />
                   {customer.company}
                 </p>
@@ -163,15 +163,15 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
           <div className="grid grid-cols-3 gap-3 mt-4">
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <p className="text-2xl font-bold text-white">{tasks.length}</p>
-              <p className="text-xs text-blue-100">משימות</p>
+              <p className="text-xs text-brand-100">משימות</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <p className="text-2xl font-bold text-white">₪{totalPaid.toLocaleString()}</p>
-              <p className="text-xs text-blue-100">שולם</p>
+              <p className="text-xs text-brand-100">שולם</p>
             </div>
             <div className="bg-white/15 rounded-xl p-3 text-center">
               <p className="text-2xl font-bold text-white">{interactions.length}</p>
-              <p className="text-xs text-blue-100">אינטראקציות</p>
+              <p className="text-xs text-brand-100">אינטראקציות</p>
             </div>
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
           {customer.email && (
             <a
               href={`mailto:${customer.email}`}
-              className="flex-1 flex items-center justify-center gap-2 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-sm font-medium transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-2 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-sm font-medium transition-colors"
             >
               <Mail className="w-4 h-4" />
               אימייל
@@ -213,16 +213,16 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
         <div className="flex-1 overflow-hidden flex flex-col">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden" dir="rtl">
             <TabsList className="flex-shrink-0 w-full rounded-none border-b bg-white px-4 justify-start gap-1 h-12">
-              <TabsTrigger value="details" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
+              <TabsTrigger value="details" className="data-[state=active]:border-b-2 data-[state=active]:border-brand-600 rounded-none px-4">
                 <User className="w-4 h-4 ms-1.5" /> פרטים
               </TabsTrigger>
-              <TabsTrigger value="tasks" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
-                <Calendar className="w-4 h-4 ms-1.5" /> משימות {tasks.length > 0 && <span className="me-1 w-4 h-4 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center justify-center">{tasks.length}</span>}
+              <TabsTrigger value="tasks" className="data-[state=active]:border-b-2 data-[state=active]:border-brand-600 rounded-none px-4">
+                <Calendar className="w-4 h-4 ms-1.5" /> משימות {tasks.length > 0 && <span className="me-1 w-4 h-4 bg-brand-100 text-brand-700 text-xs rounded-full flex items-center justify-center">{tasks.length}</span>}
               </TabsTrigger>
-              <TabsTrigger value="payments" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
-                <CreditCard className="w-4 h-4 ms-1.5" /> תשלומים {payments.length > 0 && <span className="me-1 w-4 h-4 bg-blue-100 text-blue-700 text-xs rounded-full flex items-center justify-center">{payments.length}</span>}
+              <TabsTrigger value="payments" className="data-[state=active]:border-b-2 data-[state=active]:border-brand-600 rounded-none px-4">
+                <CreditCard className="w-4 h-4 ms-1.5" /> תשלומים {payments.length > 0 && <span className="me-1 w-4 h-4 bg-brand-100 text-brand-700 text-xs rounded-full flex items-center justify-center">{payments.length}</span>}
               </TabsTrigger>
-              <TabsTrigger value="interactions" className="data-[state=active]:border-b-2 data-[state=active]:border-blue-600 rounded-none px-4">
+              <TabsTrigger value="interactions" className="data-[state=active]:border-b-2 data-[state=active]:border-brand-600 rounded-none px-4">
                 <MessageSquare className="w-4 h-4 ms-1.5" /> היסטוריה
               </TabsTrigger>
             </TabsList>
@@ -277,13 +277,13 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
                         loadRelatedData();
                       } catch(e) { console.error(e); }
                     }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 text-white text-xs rounded-lg hover:bg-brand-700 transition-colors font-medium"
                   >
                     <Plus className="w-3.5 h-3.5" /> משימה חדשה
                   </button>
                 </div>
                 {loading ? (
-                  <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+                  <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" /></div>
                 ) : tasks.length === 0 ? (
                   <div className="text-center py-12 text-gray-400">
                     <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -324,7 +324,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
               {/* Payments Tab */}
               <TabsContent value="payments" className="m-0 p-6">
                 {loading ? (
-                  <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+                  <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" /></div>
                 ) : (
                   <>
                     {/* Payment summary */}
@@ -340,13 +340,13 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
                     </div>
 
                     {/* Payment link infrastructure */}
-                    <div className="border-2 border-dashed border-blue-200 rounded-xl p-4 bg-blue-50/50 text-center mb-4">
-                      <CreditCard className="w-7 h-7 mx-auto text-blue-400 mb-1.5" />
-                      <p className="text-sm font-medium text-blue-700 mb-0.5">קישור לסליקה עצמאית</p>
-                      <p className="text-xs text-blue-400 mb-3">שלח ללקוח קישור לתשלום ישיר (Grow / Cardcom / iCredit)</p>
+                    <div className="border-2 border-dashed border-brand-200 rounded-xl p-4 bg-brand-50/50 text-center mb-4">
+                      <CreditCard className="w-7 h-7 mx-auto text-brand-400 mb-1.5" />
+                      <p className="text-sm font-medium text-brand-700 mb-0.5">קישור לסליקה עצמאית</p>
+                      <p className="text-xs text-brand-400 mb-3">שלח ללקוח קישור לתשלום ישיר (Grow / Cardcom / iCredit)</p>
                       <button
                         onClick={() => alert("תשתית סליקה — תוטמע בקרוב")}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-blue-300 text-blue-600 text-xs rounded-lg hover:bg-blue-50 transition-colors font-medium"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-brand-300 text-brand-600 text-xs rounded-lg hover:bg-brand-50 transition-colors font-medium"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         שלח קישור תשלום
@@ -386,7 +386,7 @@ export default function CustomerCard({ customer, onClose, onEdit, onDelete, curr
               {/* Interactions Tab */}
               <TabsContent value="interactions" className="m-0 p-6">
                 {loading ? (
-                  <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
+                  <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" /></div>
                 ) : interactions.length === 0 ? (
                   <div className="text-center py-12 text-gray-400">
                     <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />

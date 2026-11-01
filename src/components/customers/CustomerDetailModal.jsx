@@ -19,7 +19,7 @@ const statusColors = {
 const paymentStatusConfig = {
   "שולם":           { color: "bg-green-100 text-green-800",  icon: CheckCircle2 },
   "מחכה לתשלום":   { color: "bg-yellow-100 text-yellow-800", icon: Clock },
-  "נשלח":           { color: "bg-blue-100 text-blue-800",    icon: Clock },
+  "נשלח":           { color: "bg-brand-100 text-brand-800",    icon: Clock },
   "נוצר":           { color: "bg-gray-100 text-gray-700",    icon: Clock },
   "פג תוקף":        { color: "bg-red-100 text-red-700",      icon: AlertCircle },
   "מבוטל":          { color: "bg-gray-100 text-gray-500",    icon: AlertCircle },
@@ -65,7 +65,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             {customer.first_name} {customer.last_name}
             {customer.customer_number && (
-              <span className="text-sm font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+              <span className="text-sm font-mono font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full">
                 #{customer.customer_number}
               </span>
             )}
@@ -88,7 +88,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
               <CreditCard className="w-3.5 h-3.5" />
               תשלומים
               {payments.length > 0 && (
-                <span className="me-1 bg-blue-100 text-blue-700 text-xs rounded-full px-1.5 py-0.5 font-semibold">
+                <span className="me-1 bg-brand-100 text-brand-700 text-xs rounded-full px-1.5 py-0.5 font-semibold">
                   {payments.length}
                 </span>
               )}
@@ -100,13 +100,13 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
             <div className="grid grid-cols-2 gap-3">
               {customer.phone && (
                 <a href={`tel:${customer.phone}`} className="flex items-center gap-2 text-sm p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                  <Phone className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <Phone className="w-4 h-4 text-brand-500 flex-shrink-0" />
                   <span>{customer.phone}</span>
                 </a>
               )}
               {customer.email && (
                 <a href={`mailto:${customer.email}`} className="flex items-center gap-2 text-sm p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                  <Mail className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                  <Mail className="w-4 h-4 text-brand-500 flex-shrink-0" />
                   <span className="truncate">{customer.email}</span>
                 </a>
               )}
@@ -147,14 +147,14 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
             </div>
 
             {/* Payment infrastructure placeholder */}
-            <div className="border-2 border-dashed border-blue-200 rounded-xl p-4 bg-blue-50/50 text-center">
-              <CreditCard className="w-8 h-8 mx-auto text-blue-400 mb-2" />
-              <p className="text-sm font-medium text-blue-700 mb-1">קישור לסליקה</p>
-              <p className="text-xs text-blue-500 mb-3">ניתן לשלוח ללקוח קישור לתשלום עצמאי</p>
+            <div className="border-2 border-dashed border-brand-200 rounded-xl p-4 bg-brand-50/50 text-center">
+              <CreditCard className="w-8 h-8 mx-auto text-brand-400 mb-2" />
+              <p className="text-sm font-medium text-brand-700 mb-1">קישור לסליקה</p>
+              <p className="text-xs text-brand-500 mb-3">ניתן לשלוח ללקוח קישור לתשלום עצמאי</p>
               <Button
                 size="sm"
                 variant="outline"
-                className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                className="text-brand-600 border-brand-300 hover:bg-brand-100"
                 onClick={() => alert("תשתית סליקה — יוטמע בקרוב (Grow, Cardcom, iCredit)")}
               >
                 <ExternalLink className="w-3.5 h-3.5 ms-1" />
@@ -165,7 +165,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
             {/* Payment history */}
             {loadingPayments ? (
               <div className="flex justify-center py-6">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-600" />
               </div>
             ) : payments.length === 0 ? (
               <div className="text-center py-8 text-gray-400 text-sm">
@@ -201,7 +201,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
                         </div>
                         {payment.payment_link && (
                           <a href={payment.payment_link} target="_blank" rel="noopener noreferrer">
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-600">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-brand-600">
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Button>
                           </a>
@@ -218,7 +218,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full border-dashed text-gray-500 hover:text-blue-600 hover:border-blue-400"
+                className="w-full border-dashed text-gray-500 hover:text-brand-600 hover:border-brand-400"
                 onClick={() => { onAddPayment(customer); onClose(); }}
               >
                 <Plus className="w-4 h-4 ms-1" /> הוסף תשלום
@@ -231,7 +231,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
           <Button variant="outline" size="sm" onClick={onClose}>סגור</Button>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => { onEdit(customer); onClose(); }}
-              className="text-blue-600 border-blue-200 hover:bg-blue-50">
+              className="text-brand-600 border-brand-200 hover:bg-brand-50">
               <Edit className="w-4 h-4 ms-1" /> עריכה
             </Button>
             <Button variant="outline" size="sm" onClick={() => { onDelete(customer); onClose(); }}

@@ -157,7 +157,7 @@ export default function Calendar() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-              <CalendarIcon className="w-8 h-8 text-blue-600" />
+              <CalendarIcon className="w-8 h-8 text-brand-600" />
               יומן ומשימות
             </h1>
             <p className="text-gray-600">
@@ -206,7 +206,7 @@ export default function Calendar() {
                 setEditingTask(null);
                 setShowForm(true);
               }}
-              className="bg-blue-600 hover:bg-blue-700 shadow-md"
+              className="bg-brand-600 hover:bg-brand-700 shadow-md"
             >
               <Plus className="w-5 h-5 ms-2" />
               משימה חדשה

@@ -41,8 +41,8 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
   };
 
   return (
-    <Card className="border-blue-200 border-2 shadow-lg">
-      <CardHeader className="bg-blue-50 flex flex-row items-center justify-between">
+    <Card className="border-brand-200 border-2 shadow-lg">
+      <CardHeader className="bg-brand-50 flex flex-row items-center justify-between">
         <CardTitle>{lead ? "עריכת ליד" : "ליד חדש"}</CardTitle>
         <Button variant="ghost" size="icon" onClick={onCancel}><X className="w-4 h-4" /></Button>
       </CardHeader>
@@ -103,7 +103,7 @@ export default function LeadForm({ lead, users, currentUser, onSubmit, onCancel 
           </div>
           <div className="flex justify-end gap-3 pt-2 border-t">
             <Button type="button" variant="outline" onClick={onCancel}>ביטול</Button>
-            <Button type="submit" disabled={!canSubmit} className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" disabled={!canSubmit} className="bg-brand-600 hover:bg-brand-700">
               {submitting ? "שומר..." : lead ? "עדכן" : "צור ליד"}
             </Button>
           </div>

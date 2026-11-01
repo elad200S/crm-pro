@@ -162,16 +162,16 @@ export default function OnboardingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-4xl shadow-2xl">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+        <CardHeader className="bg-gradient-to-r from-brand-600 to-indigo-600 text-white rounded-t-lg">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-              <Building2 className="w-10 h-10 text-blue-600" />
+              <Building2 className="w-10 h-10 text-brand-600" />
             </div>
             <div>
               <CardTitle className="text-3xl mb-2">ברוכים הבאים ל-CRM Pro! 🎉</CardTitle>
-              <p className="text-blue-100">
+              <p className="text-brand-100">
                 שלום {currentUser?.full_name || currentUser?.email}! בואו נשלים את הפרטים שלך כדי להתחיל
               </p>
             </div>
@@ -181,9 +181,9 @@ export default function OnboardingPage() {
         <CardContent className="pt-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* פרטים אישיים */}
-            <div className="bg-gray-50 p-6 rounded-lg border-r-4 border-blue-500">
+            <div className="bg-gray-50 p-6 rounded-lg border-r-4 border-brand-500">
               <h3 className="font-semibold text-xl mb-4 text-gray-900 flex items-center gap-2">
-                <UserCircle className="w-6 h-6 text-blue-600" />
+                <UserCircle className="w-6 h-6 text-brand-600" />
                 פרטים אישיים
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
@@ -341,7 +341,7 @@ export default function OnboardingPage() {
             <div className="flex justify-end gap-3 pt-4 border-t">
               <Button 
                 type="submit" 
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg px-8 py-6"
+                className="bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-lg px-8 py-6"
                 disabled={loading}
               >
                 {loading ? "שומר..." : "שמור והתחל לעבוד! 🚀"}

@@ -27,7 +27,7 @@ import {
 
 const STATUS_CONFIG = {
   "טיוטה":  { label: "טיוטה",  color: "bg-gray-100 text-gray-700",    icon: FileText },
-  "נשלח":   { label: "נשלח",   color: "bg-blue-100 text-blue-800",    icon: Clock },
+  "נשלח":   { label: "נשלח",   color: "bg-brand-100 text-brand-800",    icon: Clock },
   "אושר":   { label: "אושר",   color: "bg-green-100 text-green-800",  icon: CheckCircle2 },
   "בוטל":   { label: "בוטל",   color: "bg-red-100 text-red-700",      icon: XCircle }
 };
@@ -152,14 +152,14 @@ export default function Quotes() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <FileText className="w-8 h-8 text-blue-600" />
+              <FileText className="w-8 h-8 text-brand-600" />
               מסמכים
             </h1>
             <p className="text-gray-500 mt-1">{filtered.length} מסמכים מוצגים</p>
           </div>
           <Button
             onClick={() => setCreatingDoc(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+            className="bg-brand-600 hover:bg-brand-700 text-white flex items-center gap-2"
           >
             <Plus className="w-4 h-4" /> צור מסמך חדש
           </Button>
@@ -184,9 +184,9 @@ export default function Quotes() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-r-4 border-r-blue-400">
+        <Card className="border-r-4 border-r-brand-400">
           <CardContent className="pt-5 pb-4">
-            <div className="text-2xl font-bold text-blue-600">{stats.sent}</div>
+            <div className="text-2xl font-bold text-brand-600">{stats.sent}</div>
             <div className="text-sm text-gray-500 mt-1 flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" /> נשלחו
             </div>
@@ -238,7 +238,7 @@ export default function Quotes() {
       {/* Quote Cards */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border p-16 text-center shadow-sm">
@@ -332,7 +332,7 @@ export default function Quotes() {
                           variant="outline"
                           size="sm"
                           onClick={() => setEditingDoc(quote)}
-                          className="text-blue-600 hover:text-blue-800 border-blue-200"
+                          className="text-brand-600 hover:text-brand-800 border-brand-200"
                         >
                           <Edit className="w-3.5 h-3.5 ms-1" />
                           עריכה

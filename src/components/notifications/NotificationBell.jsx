@@ -33,7 +33,7 @@ const notificationIcons = {
 
 const priorityColors = {
   low: "bg-gray-100 text-gray-800",
-  medium: "bg-blue-100 text-blue-800",
+  medium: "bg-brand-100 text-brand-800",
   high: "bg-orange-100 text-orange-800", 
   urgent: "bg-red-100 text-red-800"
 };
@@ -289,7 +289,7 @@ export default function NotificationBell({ onOpenChange, isOpen: externalIsOpen 
                 <div
                   key={notification.id}
                   className={`p-3 rounded-lg border transition-colors cursor-pointer ${
-                    notification.is_read ? 'bg-gray-50' : 'bg-blue-50 border-blue-200'
+                    notification.is_read ? 'bg-gray-50' : 'bg-brand-50 border-brand-200'
                   }`}
                   onClick={() => !notification.is_read && markAsRead(notification.id)}
                 >

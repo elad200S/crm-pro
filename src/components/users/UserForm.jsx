@@ -64,10 +64,10 @@ export default function UserForm({ user, onSubmit, onCancel, permissionTemplates
   ];
 
   return (
-    <Card className="mb-6 border-blue-200 border-2 shadow-lg">
-      <CardHeader className="bg-blue-50">
+    <Card className="mb-6 border-brand-200 border-2 shadow-lg">
+      <CardHeader className="bg-brand-50">
         <CardTitle className="flex items-center justify-between">
-          <span className="text-blue-900">
+          <span className="text-brand-900">
             {user ? "עריכת משתמש" : "משתמש חדש"}
           </span>
           <Button variant="ghost" size="icon" onClick={onCancel}>
@@ -252,7 +252,7 @@ export default function UserForm({ user, onSubmit, onCancel, permissionTemplates
             <Button type="button" variant="outline" onClick={onCancel}>
               ביטול
             </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="bg-brand-600 hover:bg-brand-700">
               <Save className="w-4 h-4 ms-2" />
               {user ? "עדכן משתמש" : "צור משתמש חדש"}
             </Button>

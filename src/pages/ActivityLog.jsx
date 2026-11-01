@@ -12,7 +12,7 @@ import {
 const isAdmin = (user) => user?.role === "admin" || user?.user_category === "מנהל_ראשי";
 
 const ENTITY_CONFIG = {
-  lead:         { label: "ליד",     icon: UserPlus,  color: "bg-blue-100 text-blue-700" },
+  lead:         { label: "ליד",     icon: UserPlus,  color: "bg-brand-100 text-brand-700" },
   quote:        { label: "הסכם",    icon: FileText,  color: "bg-indigo-100 text-indigo-700" },
   payment:      { label: "תשלום",   icon: CreditCard, color: "bg-green-100 text-green-700" },
   customer:     { label: "לקוח",    icon: Users,     color: "bg-purple-100 text-purple-700" },
@@ -107,7 +107,7 @@ export default function ActivityLogPage() {
       <div className="bg-white rounded-lg border shadow-sm">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
           </div>
         ) : filtered.length === 0 ? (
           <p className="text-center py-12 text-gray-500">אין פעילות רשומה עדיין</p>

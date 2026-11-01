@@ -21,7 +21,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
           </div>
         </CardContent>
       </Card>
@@ -50,7 +50,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
                 <TableRow key={customer.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => onRowClick && onRowClick(customer)}>
                  <TableCell className="text-end">
                    {customer.customer_number ? (
-                     <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                     <span className="text-xs font-mono font-bold text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded">
                        #{customer.customer_number}
                      </span>
                    ) : (
@@ -113,7 +113,7 @@ export default function CustomerTable({ customers, loading, onEdit, onDelete, on
                        variant="ghost"
                        size="icon"
                        onClick={() => onEdit(customer)}
-                       className="text-blue-600 hover:text-blue-800"
+                       className="text-brand-600 hover:text-brand-800"
                      >
                        <Edit className="w-4 h-4" />
                      </Button>

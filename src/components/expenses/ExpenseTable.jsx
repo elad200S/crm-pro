@@ -9,7 +9,7 @@ import { he } from "date-fns/locale";
 
 const categoryColors = {
   "שכר":            "bg-purple-100 text-purple-800",
-  "שיווק ופרסום":   "bg-blue-100 text-blue-800",
+  "שיווק ופרסום":   "bg-brand-100 text-brand-800",
   "תוכנה ומנויים":  "bg-indigo-100 text-indigo-800",
   "ספקים וקבלנים":  "bg-amber-100 text-amber-800",
   "משרד ותשתית":    "bg-teal-100 text-teal-800",
@@ -23,7 +23,7 @@ export default function ExpenseTable({ expenses, loading, onEdit, onDelete }) {
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600" />
           </div>
         </CardContent>
       </Card>
@@ -52,7 +52,7 @@ export default function ExpenseTable({ expenses, loading, onEdit, onDelete }) {
                     <div className="flex items-center gap-1.5 font-medium text-gray-900">
                       {expense.description}
                       {expense.is_recurring && (
-                        <Repeat className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+                        <Repeat className="w-3.5 h-3.5 text-brand-500 flex-shrink-0" />
                       )}
                     </div>
                     {expense.notes && (
@@ -77,7 +77,7 @@ export default function ExpenseTable({ expenses, loading, onEdit, onDelete }) {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => onEdit(expense)} className="text-blue-600 hover:text-blue-800">
+                      <Button variant="ghost" size="icon" onClick={() => onEdit(expense)} className="text-brand-600 hover:text-brand-800">
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => onDelete(expense)} className="text-red-600 hover:text-red-800">

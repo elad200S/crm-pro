@@ -35,7 +35,7 @@ export default function RecentCustomers({ customers, onCustomerClick }) {
           לקוחות אחרונים
         </CardTitle>
         <Link to={createPageUrl("Customers")}>
-          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-800">
+          <Button variant="ghost" size="sm" className="text-brand-600 hover:text-brand-800">
             צפה בכל הלקוחות
             <ArrowLeft className="w-4 h-4 me-1" />
           </Button>

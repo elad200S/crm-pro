@@ -11,7 +11,7 @@ import { format, differenceInHours, isToday, isTomorrow } from "date-fns";
 import { he } from "date-fns/locale";
 
 const priorityColors = {
-  "נמוכה": "bg-blue-100 text-blue-800",
+  "נמוכה": "bg-brand-100 text-brand-800",
   "בינונית": "bg-yellow-100 text-yellow-800",
   "גבוהה": "bg-orange-100 text-orange-800",
   "קריטית": "bg-red-100 text-red-800"
@@ -19,7 +19,7 @@ const priorityColors = {
 
 const statusColors = {
   "פתוח": "bg-yellow-100 text-yellow-800",
-  "בטיפול": "bg-blue-100 text-blue-800",
+  "בטיפול": "bg-brand-100 text-brand-800",
   "הושלם": "bg-green-100 text-green-800",
   "דחוי": "bg-gray-100 text-gray-800"
 };
@@ -133,7 +133,7 @@ export default function TaskList({ tasks, title, getCustomerName, getLeadName, o
                     </Button>
                   )}
                   <label
-                    className="h-7 w-7 flex items-center justify-center cursor-pointer text-blue-600 hover:text-blue-800"
+                    className="h-7 w-7 flex items-center justify-center cursor-pointer text-brand-600 hover:text-brand-800"
                     title={uploadingTaskId === task.id ? "מעלה..." : "העלאת תמונה/וידאו"}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -153,7 +153,7 @@ export default function TaskList({ tasks, title, getCustomerName, getLeadName, o
                     variant="ghost"
                     size="icon"
                     onClick={(e) => { e.stopPropagation(); onEdit(task); }}
-                    className="h-7 w-7 text-blue-600 hover:text-blue-800"
+                    className="h-7 w-7 text-brand-600 hover:text-brand-800"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -190,8 +190,8 @@ export default function TaskList({ tasks, title, getCustomerName, getLeadName, o
 
                 {task.lead_id && getLeadName && getLeadName(task.lead_id) && (
                   <div className="flex items-center gap-1">
-                    <User className="w-3 h-3 text-blue-400" />
-                    <span className="text-blue-600">ליד: {getLeadName(task.lead_id)}</span>
+                    <User className="w-3 h-3 text-brand-400" />
+                    <span className="text-brand-600">ליד: {getLeadName(task.lead_id)}</span>
                   </div>
                 )}
 

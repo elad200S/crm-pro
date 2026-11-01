@@ -328,7 +328,7 @@ export default function Payments() {
           </div>
           <Button
             onClick={() => { setPrefill(null); setShowForm(true); }}
-            className="bg-blue-600 hover:bg-blue-700 shadow-md"
+            className="bg-brand-600 hover:bg-brand-700 shadow-md"
           >
             <Plus className="w-5 h-5 ms-2" />
             תשלום חדש

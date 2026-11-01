@@ -56,7 +56,7 @@ export default function PaymentForm({ payment, prefill, customers, onSubmit, onC
           <span className="flex items-center gap-2">
             {payment ? "עריכת חשבונית" : "חשבונית חדשה"}
             {formData.quote_id && (
-              <span className="text-xs font-normal bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-normal bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full">
                 מקושרת להסכם חתום
               </span>
             )}
@@ -157,9 +157,9 @@ export default function PaymentForm({ payment, prefill, customers, onSubmit, onC
 
             {/* סכום סופי */}
             <div className="flex justify-end mt-3">
-              <div className="bg-blue-50 rounded-xl px-5 py-3 flex items-center gap-4">
+              <div className="bg-brand-50 rounded-xl px-5 py-3 flex items-center gap-4">
                 <span className="text-sm text-gray-500">סה"כ לתשלום</span>
-                <span className="text-xl font-bold text-blue-700">₪{total.toLocaleString()}</span>
+                <span className="text-xl font-bold text-brand-700">₪{total.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function PaymentForm({ payment, prefill, customers, onSubmit, onC
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onCancel}>ביטול</Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="bg-brand-600 hover:bg-brand-700">
               <Save className="w-4 h-4 ms-2" /> שמירה
             </Button>
           </div>

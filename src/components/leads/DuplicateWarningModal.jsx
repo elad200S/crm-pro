@@ -23,7 +23,7 @@ export default function DuplicateWarningModal({ existingLead, onOpenExisting, on
         </div>
         <DialogFooter className="gap-2 flex-wrap">
           <Button variant="outline" onClick={onClose}>ביטול</Button>
-          <Button variant="outline" onClick={onOpenExisting} className="border-blue-500 text-blue-600">
+          <Button variant="outline" onClick={onOpenExisting} className="border-brand-500 text-brand-600">
             פתח ליד קיים
           </Button>
           <Button onClick={onAddAnyway} className="bg-orange-500 hover:bg-orange-600">

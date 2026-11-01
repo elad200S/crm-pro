@@ -305,7 +305,7 @@ ${user.manager_email ? `👤 מנהל ישיר: ${user.manager_email}` : ''}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-              <UsersIcon className="w-8 h-8 text-blue-600" />
+              <UsersIcon className="w-8 h-8 text-brand-600" />
               ניהול משתמשים והרשאות
             </h1>
             <p className="text-gray-600">
@@ -314,7 +314,7 @@ ${user.manager_email ? `👤 מנהל ישיר: ${user.manager_email}` : ''}
           </div>
           <Button 
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 shadow-md"
+            className="bg-brand-600 hover:bg-brand-700 shadow-md"
           >
             <Plus className="w-5 h-5 ms-2" />
             משתמש חדש

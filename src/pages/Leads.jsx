@@ -390,7 +390,7 @@ export default function Leads() {
                     <Icon className="w-3.5 h-3.5 text-gray-400" />
                     {label}
                   </span>
-                  {viewMode === id && <Check className="w-3.5 h-3.5 text-blue-600" />}
+                  {viewMode === id && <Check className="w-3.5 h-3.5 text-brand-600" />}
                 </button>
               ))}
             </div>
@@ -401,7 +401,7 @@ export default function Leads() {
           </Button>
           <Button
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-brand-600 hover:bg-brand-700"
             onClick={() => { setEditingLead(null); setShowForm(true); }}
           >
             <UserPlus className="w-4 h-4 ms-1.5" />

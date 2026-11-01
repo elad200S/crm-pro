@@ -120,8 +120,8 @@ export default function QuoteBuilderModal({ customer, onClose, onCreated }) {
 
         <div className="space-y-4 py-2">
           {/* פרטי הלקוח שמולאו אוטומטית */}
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
-            <p className="text-xs font-semibold text-blue-700 flex items-center gap-1.5 mb-2">
+          <div className="bg-brand-50 border border-brand-100 rounded-xl p-3">
+            <p className="text-xs font-semibold text-brand-700 flex items-center gap-1.5 mb-2">
               <User className="w-3.5 h-3.5" />
               פרטי הלקוח — מולאו אוטומטית, יופיעו בהצעה
             </p>
@@ -228,7 +228,7 @@ export default function QuoteBuilderModal({ customer, onClose, onCreated }) {
             </div>
             <div className="flex justify-between font-bold text-base border-t pt-2">
               <span>סה"כ</span>
-              <span className="text-blue-700">₪{total.toLocaleString()}</span>
+              <span className="text-brand-700">₪{total.toLocaleString()}</span>
             </div>
           </div>
 
@@ -241,7 +241,7 @@ export default function QuoteBuilderModal({ customer, onClose, onCreated }) {
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>ביטול</Button>
-          <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSubmit} disabled={!form.title.trim() || submitting}>
+          <Button className="bg-brand-600 hover:bg-brand-700" onClick={handleSubmit} disabled={!form.title.trim() || submitting}>
             {submitting ? "יוצר..." : "צור הצעה והצג תצוגה מקדימה"}
           </Button>
         </DialogFooter>

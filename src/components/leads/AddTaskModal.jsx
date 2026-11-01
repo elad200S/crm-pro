@@ -114,7 +114,7 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-blue-500" />
+            <Sparkles className="w-4 h-4 text-brand-500" />
             משימה חדשה
             {lead && <span className="text-sm font-normal text-gray-400">— {lead.full_name || lead.phone}</span>}
           </DialogTitle>
@@ -142,7 +142,7 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={onClose}>ביטול</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleParse} disabled={!text.trim()}>
+              <Button className="bg-brand-600 hover:bg-brand-700" onClick={handleParse} disabled={!text.trim()}>
                 <Sparkles className="w-3.5 h-3.5 ms-1.5" /> המשך
               </Button>
             </DialogFooter>
@@ -150,10 +150,10 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
         ) : (
           <>
             <div className="py-2 space-y-4">
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p className="text-xs text-blue-500 font-medium mb-2">הבנתי את המשימה:</p>
+              <div className="bg-brand-50 border border-brand-100 rounded-xl p-4">
+                <p className="text-xs text-brand-500 font-medium mb-2">הבנתי את המשימה:</p>
                 <p className="font-semibold text-gray-800 text-base mb-3">{parsed.title}</p>
-                <div className="flex items-center gap-4 text-sm text-blue-600">
+                <div className="flex items-center gap-4 text-sm text-brand-600">
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
                     {formatPreview(parsed)}
@@ -164,7 +164,7 @@ export default function AddTaskModal({ lead, users, currentUser, accountId, onSu
             </div>
             <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setStep("input")}>תיקון</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700" onClick={handleSubmit}>
+              <Button className="bg-brand-600 hover:bg-brand-700" onClick={handleSubmit}>
                 צור משימה
               </Button>
             </DialogFooter>

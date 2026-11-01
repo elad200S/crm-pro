@@ -255,7 +255,7 @@ export default function Layout({ children, currentPageName }) {
               <p className="text-sm font-medium text-gray-900">{currentUser?.full_name || "משתמש"}</p>
               <p className="text-xs text-gray-400">{currentUser?.job_title || ""}</p>
             </div>
-            <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 bg-brand-600 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white text-sm font-bold">{currentUser?.full_name?.charAt(0) || "מ"}</span>
             </div>
           </div>
@@ -283,13 +283,13 @@ export default function Layout({ children, currentPageName }) {
                     to={item.url}
                     title={item.title}
                     className={`flex flex-col items-center gap-0.5 w-full px-1 py-1.5 flex-shrink-0 transition-all duration-150 relative group
-                      ${active ? 'text-blue-600' : 'text-gray-400 hover:text-gray-700'}`}
+                      ${active ? 'text-brand-600' : 'text-gray-400 hover:text-gray-700'}`}
                   >
                     {active && (
-                      <span className="absolute right-0 top-1 bottom-1 w-0.5 bg-blue-600 rounded-l-full" />
+                      <span className="absolute right-0 top-1 bottom-1 w-0.5 bg-brand-600 rounded-l-full" />
                     )}
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors
-                      ${active ? 'bg-blue-50' : 'group-hover:bg-gray-50'}`}>
+                      ${active ? 'bg-brand-50' : 'group-hover:bg-gray-50'}`}>
                       <item.icon className="w-4.5 h-4.5 w-[18px] h-[18px]" />
                     </div>
                     <span className="text-[9px] font-medium leading-tight text-center line-clamp-1 w-full px-0.5">
@@ -302,7 +302,7 @@ export default function Layout({ children, currentPageName }) {
 
             {/* User avatar */}
             <div className="flex flex-col items-center py-3 border-t border-gray-100 flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">
                   {currentUser?.full_name?.charAt(0) || "מ"}
                 </span>

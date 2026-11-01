@@ -138,7 +138,7 @@ export default function Expenses() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">הוצאות</h1>
             <p className="text-gray-600">{filteredExpenses.length} הוצאות מתוך {expenses.length} סה"כ</p>
           </div>
-          <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-blue-600 hover:bg-blue-700 shadow-md">
+          <Button onClick={() => { setEditingExpense(null); setShowForm(true); }} className="bg-brand-600 hover:bg-brand-700 shadow-md">
             <Plus className="w-5 h-5 ms-2" /> הוצאה חדשה
           </Button>
         </div>
@@ -156,8 +156,8 @@ export default function Expenses() {
           </div>
         </div>
         <div className="bg-white rounded-lg border p-5 shadow-sm flex items-center gap-4">
-          <div className="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Repeat className="w-5 h-5 text-blue-600" />
+          <div className="w-11 h-11 bg-brand-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Repeat className="w-5 h-5 text-brand-600" />
           </div>
           <div>
             <p className="text-xs text-gray-400">הוצאות חוזרות (סה"כ לחודש)</p>

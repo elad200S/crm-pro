@@ -200,7 +200,7 @@ export default function JobDescriptionManagement() {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-              <FileText className="w-8 h-8 text-blue-600" />
+              <FileText className="w-8 h-8 text-brand-600" />
               ניהול קבצי תיאור תפקיד
             </h1>
             <p className="text-gray-600">
@@ -209,7 +209,7 @@ export default function JobDescriptionManagement() {
           </div>
           <Button 
             onClick={() => setShowForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 shadow-md"
+            className="bg-brand-600 hover:bg-brand-700 shadow-md"
           >
             <Plus className="w-5 h-5 ms-2" />
             תבנית חדשה
@@ -219,8 +219,8 @@ export default function JobDescriptionManagement() {
 
       {/* Form */}
       {showForm && (
-        <Card className="border-blue-200 border-2 shadow-lg">
-          <CardHeader className="bg-blue-50">
+        <Card className="border-brand-200 border-2 shadow-lg">
+          <CardHeader className="bg-brand-50">
             <CardTitle>
               {editingTemplate ? "עריכת תבנית" : "תבנית חדשה"}
             </CardTitle>
@@ -293,7 +293,7 @@ export default function JobDescriptionManagement() {
                         href={formData.file_url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm flex items-center gap-1"
+                        className="text-brand-600 hover:underline text-sm flex items-center gap-1"
                       >
                         <Download className="w-4 h-4" />
                         צפייה בקובץ
@@ -320,7 +320,7 @@ export default function JobDescriptionManagement() {
                 <Button type="button" variant="outline" onClick={handleCancel}>
                   ביטול
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" className="bg-brand-600 hover:bg-brand-700">
                   {editingTemplate ? "עדכן" : "צור תבנית"}
                 </Button>
               </div>

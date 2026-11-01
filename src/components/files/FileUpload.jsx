@@ -62,13 +62,13 @@ export default function FileUpload({ relatedId, relatedType, onFileUploaded }) {
         <div
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+            isDragActive ? 'border-brand-500 bg-brand-50' : 'border-gray-300 hover:border-brand-400'
           }`}
         >
           <input {...getInputProps()} />
           <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
           {isDragActive ? (
-            <p className="text-blue-600">שחרר את הקבצים כאן...</p>
+            <p className="text-brand-600">שחרר את הקבצים כאן...</p>
           ) : (
             <div>
               <p className="text-lg font-medium mb-2">גרור קבצים לכאן או לחץ לבחירה</p>
@@ -90,7 +90,7 @@ export default function FileUpload({ relatedId, relatedType, onFileUploaded }) {
 
         {uploading && (
           <div className="text-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600">מעלה קובץ...</p>
           </div>
         )}

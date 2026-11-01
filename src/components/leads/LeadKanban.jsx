@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { he } from "date-fns/locale";
 
 const COLUMNS = [
-  { id: "התקבל",                label: "התקבל",        dot: "bg-blue-500",   headerBg: "bg-blue-50",   border: "border-blue-200",  countBg: "bg-blue-100",   countText: "text-blue-700"   },
+  { id: "התקבל",                label: "התקבל",        dot: "bg-brand-500",   headerBg: "bg-brand-50",   border: "border-brand-200",  countBg: "bg-brand-100",   countText: "text-brand-700"   },
   { id: "שיחה חוזרת",           label: "שיחה חוזרת",   dot: "bg-amber-500",  headerBg: "bg-amber-50",  border: "border-amber-200", countBg: "bg-amber-100",  countText: "text-amber-700"  },
   { id: "בוצע איפיון",          label: "בוצע איפיון",  dot: "bg-purple-500", headerBg: "bg-purple-50", border: "border-purple-200",countBg: "bg-purple-100", countText: "text-purple-700" },
   { id: "נשלחה הצעת מחיר",      label: "הצעה נשלחה",   dot: "bg-orange-500", headerBg: "bg-orange-50", border: "border-orange-200",countBg: "bg-orange-100", countText: "text-orange-700" },
@@ -12,7 +12,7 @@ const COLUMNS = [
   { id: "לא רלוונטי",           label: "לא רלוונטי",   dot: "bg-gray-400",   headerBg: "bg-gray-50",   border: "border-gray-200",  countBg: "bg-gray-100",   countText: "text-gray-500"   },
 ];
 
-const AVATAR_COLORS = ["bg-blue-500", "bg-violet-500", "bg-emerald-500", "bg-rose-500", "bg-amber-500", "bg-cyan-500"];
+const AVATAR_COLORS = ["bg-brand-500", "bg-violet-500", "bg-emerald-500", "bg-rose-500", "bg-amber-500", "bg-cyan-500"];
 const getAvatarColor = (name = "") => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 
 const isUrgent = (lead) => {
@@ -37,7 +37,7 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
 
   if (loading) return (
     <div className="flex items-center justify-center py-20 text-gray-400 gap-2">
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-600" />
       <span>טוען לידים...</span>
     </div>
   );
@@ -65,7 +65,7 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className={`flex-1 rounded-b-xl border-x border-b p-2 space-y-2 min-h-48 transition-colors ${col.border} ${
-                      snapshot.isDraggingOver ? "bg-blue-50/70" : "bg-gray-50/60"
+                      snapshot.isDraggingOver ? "bg-brand-50/70" : "bg-gray-50/60"
                     }`}
                   >
                     {colLeads.map((lead, index) => {
@@ -82,7 +82,7 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
                               {...prov.dragHandleProps}
                               onClick={() => onRowClick(lead)}
                               className={`bg-white rounded-xl border cursor-pointer select-none transition-all duration-150
-                                ${snap.isDragging ? "shadow-xl rotate-1 scale-[1.03] border-blue-300" : "shadow-sm hover:shadow-md"}
+                                ${snap.isDragging ? "shadow-xl rotate-1 scale-[1.03] border-brand-300" : "shadow-sm hover:shadow-md"}
                                 ${urgent ? "border-red-200 ring-1 ring-red-100" : "border-gray-200"}`}
                             >
                               {urgent && (
@@ -126,7 +126,7 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
                                 <button onClick={() => onWhatsApp(lead)} className="p-1.5 rounded-lg text-green-500 hover:bg-green-50 transition-colors" title="WhatsApp">
                                   <MessageCircle className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => onQuote(lead)} className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 transition-colors" title="הצעת מחיר">
+                                <button onClick={() => onQuote(lead)} className="p-1.5 rounded-lg text-brand-500 hover:bg-brand-50 transition-colors" title="הצעת מחיר">
                                   <FileText className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => onTask(lead)} className="p-1.5 rounded-lg text-violet-500 hover:bg-violet-50 transition-colors" title="משימה">
@@ -136,7 +136,7 @@ export default function LeadKanban({ leads, users, onEdit, onDelete, onWhatsApp,
                                   <UserCheck className="w-3.5 h-3.5" />
                                 </button>
                                 <div className="flex-1" />
-                                <button onClick={() => onEdit(lead)} className="p-1.5 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors">
+                                <button onClick={() => onEdit(lead)} className="p-1.5 rounded-lg text-gray-400 hover:text-brand-500 hover:bg-brand-50 transition-colors">
                                   <Edit className="w-3.5 h-3.5" />
                                 </button>
                                 <button onClick={() => onDelete(lead)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">

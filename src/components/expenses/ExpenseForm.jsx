@@ -103,7 +103,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onCancel}>ביטול</Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <Button type="submit" className="bg-brand-600 hover:bg-brand-700">
               <Save className="w-4 h-4 ms-2" /> שמירה
             </Button>
           </div>
