@@ -31,8 +31,8 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
   );
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <table className="w-full text-sm" dir="rtl">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
+      <table className="w-full min-w-[920px] text-sm" dir="rtl">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50/80">
             <th className="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">שם</th>
