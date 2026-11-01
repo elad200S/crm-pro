@@ -32,16 +32,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
-      <table className="min-w-[1040px] table-fixed text-sm" dir="rtl">
-        <colgroup>
-          <col className="w-[240px]" />
-          <col className="w-[130px]" />
-          <col className="w-[170px]" />
-          <col className="w-[110px]" />
-          <col className="w-[110px]" />
-          <col className="w-[150px]" />
-          <col className="w-[130px]" />
-        </colgroup>
+      <table className="w-full min-w-[920px] text-sm" dir="rtl">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50/80">
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">שם</th>
@@ -50,7 +41,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">מקור</th>
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">סוכן</th>
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">זמן</th>
-            <th className="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">פעולות</th>
+            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">פעולות</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">
@@ -131,7 +122,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
 
                 {/* פעולות */}
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                  <div className="flex items-center justify-center gap-0.5">
+                  <div className="flex items-center gap-0.5">
                     <button onClick={() => onWhatsApp(lead)} className="p-1.5 rounded-lg text-green-500 hover:bg-green-50 transition-colors" title="WhatsApp">
                       <MessageCircle className="w-4 h-4" />
                     </button>
