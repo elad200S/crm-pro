@@ -173,13 +173,13 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
       </style>
     </head><body><div class="page">
       <div class="hdr">
-        <div class="brand"><img src="${window.location.origin}/logo-hey.png" style="height:38px;" /><p class="tag">AUTOMATE. GROW. SUCCEED.</p><p>eladauto66@gmail.com</p></div>
+        <div class="brand"><img src="${window.location.origin}/logo-hey.png?v=2" style="height:38px;" /><p class="tag">AUTOMATE. GROW. SUCCEED.</p><p>eladauto66@gmail.com</p></div>
         <div class="meta"><h2>${title || "הסכם עבודה"}</h2><p>תאריך: ${todayStr()}</p></div>
       </div>
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
       <div class="sig-row">
         <div class="sig-line">${signImg}<div class="line"><div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div></div>
-        <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
+        <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png?v=2" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
       </div>
       <div class="footer"><span>HEY Digital • eladauto66@gmail.com</span><span>הופק: ${todayStr()}</span></div>
     </div></body></html>
@@ -503,7 +503,7 @@ export default function ClientSign() {
           <div className="px-10 py-5 flex justify-between items-center"
             style={{ background: "linear-gradient(135deg,#0A8E7F,#0B1B1A)" }}>
             <div>
-              <img src="/logo-hey.png" alt="HEY Digital" className="h-8" />
+              <img src="/logo-hey.png?v=2" alt="HEY Digital" className="h-8" />
             </div>
             <div className="text-start text-white/80 text-sm">
               <p className="font-bold text-white text-base">{title || "הסכם עבודה"}</p>
@@ -571,7 +571,7 @@ export default function ClientSign() {
               </div>
               <div className="flex-1 text-center text-xs text-gray-400">
                 <div className="flex items-end justify-center gap-3">
-                  <img src="/stamp-hey.png" alt="" className="h-16" />
+                  <img src="/stamp-hey.png?v=2" alt="" className="h-16" />
                 </div>
                 <div className="border-t border-gray-300 pt-3">HEY Digital</div>
               </div>

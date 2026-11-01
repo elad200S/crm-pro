@@ -189,7 +189,7 @@ export default function Layout({ children, currentPageName }) {
             />
           </div>
           <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5">
-            <img src="/logo-hey.png" alt="HEY Digital" className="h-7 object-contain" />
+            <img src="/logo-hey.png?v=2" alt="HEY Digital" className="h-7 object-contain" />
           </Link>
         </div>
       </header>
@@ -219,7 +219,7 @@ export default function Layout({ children, currentPageName }) {
             <X className="w-5 h-5 text-gray-400" />
           </button>
           <Link to={createPageUrl("Dashboard")} className="flex items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
-            <img src="/logo-hey.png" alt="HEY Digital" className="h-6 object-contain" />
+            <img src="/logo-hey.png?v=2" alt="HEY Digital" className="h-6 object-contain" />
           </Link>
         </div>
 
@@ -268,7 +268,7 @@ export default function Layout({ children, currentPageName }) {
           <div className="flex flex-col h-full">
             {/* Logo */}
             <div className="flex flex-col items-center py-4 border-b border-gray-100 flex-shrink-0 gap-1">
-              <img src="/stamp-hey.png" alt="HEY Digital" className="w-10 h-10 object-contain" />
+              <img src="/stamp-hey.png?v=2" alt="HEY Digital" className="w-10 h-10 object-contain" />
               <NotificationBell />
             </div>
 

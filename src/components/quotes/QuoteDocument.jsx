@@ -99,7 +99,7 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
         <body><div class="page">
           <div class="head">
             <div class="brand">
-              <img src="${window.location.origin}/logo-hey.png" style="height:38px;" />
+              <img src="${window.location.origin}/logo-hey.png?v=2" style="height:38px;" />
               <p class="tag">AUTOMATE. GROW. SUCCEED.</p>
               <p>eladauto66@gmail.com</p>
             </div>
@@ -112,7 +112,7 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
           <div class="body-text">${esc(body).replace(/\n/g, "<br/>")}</div>
           <div class="sig-row">
             <div class="sig-line">${quote?.client_signature ? `<img src="${quote.client_signature}" style="max-height:52px;" />` : ""}<div class="line">${quote?.client_signature ? `${esc(quote?.signing_client_name || lead?.full_name)}${quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}` : "חתימת הלקוח ותאריך"}</div></div>
-            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
+            <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png?v=2" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
           </div>
           <div class="footer"><span>HEY Digital • eladauto66@gmail.com</span><span>הופק: ${todayStr()}</span></div>
         </div></body>
@@ -264,7 +264,7 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
           <div className="flex justify-between items-start mb-8 rounded-2xl px-6 py-5 text-white"
             style={{ background: "linear-gradient(135deg,#0A8E7F,#0B1B1A)" }}>
             <div>
-              <img src="/logo-hey.png" alt="HEY Digital" className="h-9" />
+              <img src="/logo-hey.png?v=2" alt="HEY Digital" className="h-9" />
               <p className="text-[10px] mt-2 tracking-widest" style={{ color: "#5DF5D1" }}>AUTOMATE. GROW. SUCCEED.</p>
               <p className="text-xs opacity-75 mt-1">אלעד חנינה • 054-710-8219</p>
             </div>
@@ -302,7 +302,7 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
             </div>
             <div className="flex-1 text-center text-xs text-gray-400">
               <div className="flex items-end justify-center gap-3">
-                <img src="/stamp-hey.png" alt="" className="h-16" />
+                <img src="/stamp-hey.png?v=2" alt="" className="h-16" />
               </div>
               <div className="border-t border-gray-300 pt-3">HEY Digital — אלעד חנינה</div>
             </div>

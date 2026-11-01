@@ -37,11 +37,11 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
   // ── HTML מעוצב של ההצעה — משמש גם להדפסה/PDF וגם למייל ──
   const buildQuoteHtml = (forEmail = false) => {
     const logoSrc = forEmail
-      ? "https://hey-digital-crm.base44.app/logo-hey.png"
-      : `${window.location.origin}/logo-hey.png`;
+      ? "https://hey-digital-crm.base44.app/logo-hey.png?v=2"
+      : `${window.location.origin}/logo-hey.png?v=2`;
     const stampSrc = forEmail
-      ? "https://hey-digital-crm.base44.app/stamp-hey.png"
-      : `${window.location.origin}/stamp-hey.png`;
+      ? "https://hey-digital-crm.base44.app/stamp-hey.png?v=2"
+      : `${window.location.origin}/stamp-hey.png?v=2`;
 
     return `
       <div style="max-width:760px;margin:0 auto;font-family:'Segoe UI',Arial,sans-serif;direction:rtl;color:#0e1b14;background:#ffffff;">
