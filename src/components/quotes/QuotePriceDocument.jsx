@@ -7,8 +7,6 @@ import { base44 } from "@/api/base44Client";
 
 const todayStr = () => format(new Date(), "dd/MM/yyyy", { locale: he });
 
-const curr = (n) => `₪${(parseFloat(n) || 0).toLocaleString()}`;
-
 // הגנה מפני XSS: שדות כמו שם/כתובת/חברה של הלקוח מגיעים מטופס החתימה
 // הציבורי (ClientSign) — כל אחד עם קישור יכול למלא שם משתמש זדוני, וזה
 // נשמר גולמי. בלי בריחה, קוד כזה היה רץ כש-HTML הזה מוצג/נפתח כאן בתוך
@@ -24,11 +22,6 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
   const [copied, setCopied] = useState(false);
 
   const items = (quote?.items || []).filter(i => (i.description || "").trim());
-  const subtotal = items.reduce((s, i) => s + (parseFloat(i.total) || 0), 0);
-  const discountAmount = subtotal * ((parseFloat(quote?.discount) || 0) / 100);
-  const afterDiscount = subtotal - discountAmount;
-  const vatAmount = quote?.vat_included ? afterDiscount * 0.17 : 0;
-  const total = parseFloat(quote?.amount) || afterDiscount + vatAmount;
 
   const clientName = quote?.signing_client_name || `${customer?.first_name || ""} ${customer?.last_name || ""}`.trim();
   const clientEmail = quote?.signing_client_email || customer?.email || "";
@@ -73,8 +66,6 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
               <tr style="background:#e8f7f4;">
                 <th style="text-align:right;padding:10px 12px;border-bottom:2px solid #0A8E7F;color:#0A8E7F;font-weight:700;">תיאור</th>
                 <th style="text-align:center;padding:10px 12px;border-bottom:2px solid #0A8E7F;color:#0A8E7F;font-weight:700;width:70px;">כמות</th>
-                <th style="text-align:left;padding:10px 12px;border-bottom:2px solid #0A8E7F;color:#0A8E7F;font-weight:700;width:100px;">מחיר יחידה</th>
-                <th style="text-align:left;padding:10px 12px;border-bottom:2px solid #0A8E7F;color:#0A8E7F;font-weight:700;width:100px;">סה"כ</th>
               </tr>
             </thead>
             <tbody>
@@ -82,18 +73,9 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
                 <tr>
                   <td style="padding:9px 12px;border-bottom:1px solid #e5efec;">${esc(i.description)}</td>
                   <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:center;">${esc(i.quantity)}</td>
-                  <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:left;">${curr(i.unit_price)}</td>
-                  <td style="padding:9px 12px;border-bottom:1px solid #e5efec;text-align:left;font-weight:600;">${curr(i.total)}</td>
                 </tr>`).join("")}
             </tbody>
           </table>
-
-          <div style="max-width:320px;margin-left:0;margin-right:auto;text-align:left;font-size:13px;margin-bottom:20px;">
-            <div style="display:flex;justify-content:space-between;padding:3px 0;"><span>סכום ביניים</span><span>${curr(subtotal)}</span></div>
-            ${discountAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:3px 0;color:#c0392b;"><span>הנחה (${quote.discount}%)</span><span>− ${curr(discountAmount)}</span></div>` : ""}
-            ${vatAmount > 0 ? `<div style="display:flex;justify-content:space-between;padding:3px 0;"><span>מע"מ 17%</span><span>${curr(vatAmount)}</span></div>` : ""}
-            <div style="display:flex;justify-content:space-between;padding:10px 14px;background:#e8f7f4;border-radius:10px;margin-top:8px;font-size:16px;font-weight:800;color:#0A8E7F;"><span>סה"כ לתשלום</span><span>${curr(total)}</span></div>
-          </div>
 
           ${quote?.notes ? `<div style="font-size:12.5px;line-height:1.9;color:#3a4a44;white-space:pre-wrap;background:#f7faf9;border-radius:10px;padding:12px 18px;margin-bottom:28px;">${esc(quote.notes)}</div>` : ""}
 
@@ -167,12 +149,9 @@ export default function QuotePriceDocument({ quote, customer, onClose, onSent })
   const handleWhatsApp = () => {
     const phone = (clientPhone || "").replace(/\D/g, "");
     const intl = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
-    const lines = items.map(i => `• ${i.description} — ${i.quantity} × ${curr(i.unit_price)} = ${curr(i.total)}`);
+    const lines = items.map(i => `• ${i.description} — ${i.quantity}`);
     const text = encodeURIComponent(
       `*${quote?.title || "הצעת מחיר"}* (${quote?.quote_number || ""})\n\n${lines.join("\n")}` +
-      (discountAmount > 0 ? `\nהנחה: ${curr(discountAmount)}` : "") +
-      (vatAmount > 0 ? `\nמע"מ: ${curr(vatAmount)}` : "") +
-      `\n\n*סה"כ לתשלום: ${curr(total)}*` +
       (quote?.valid_until ? `\nבתוקף עד: ${format(new Date(quote.valid_until), "dd/MM/yyyy", { locale: he })}` : "") +
       `\n\n_HEY Digital — אלעד חנינה_`
     );
