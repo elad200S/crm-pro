@@ -389,7 +389,13 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                     })}
                   </div>
                 ) : (
-                  <p className="text-xs text-gray-400 py-2">אין מסמכים לליד זה</p>
+                  <button
+                    type="button"
+                    onClick={() => onQuote && onQuote(lead, null)}
+                    className="w-full text-center text-xs text-gray-400 hover:text-brand-600 hover:bg-brand-50 border border-dashed border-gray-200 hover:border-brand-200 rounded-xl py-3 transition-colors"
+                  >
+                    אין מסמכים לליד זה — לחץ ליצירת מסמך חדש
+                  </button>
                 )}
               </div>
 

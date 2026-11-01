@@ -188,7 +188,13 @@ export default function CustomerProfile() {
             </div>
             <div className="p-4 space-y-2">
               {loading ? <Skeleton /> : quotes.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">אין מסמכים</p>
+                <button
+                  type="button"
+                  onClick={() => setShowQuoteBuilder(true)}
+                  className="w-full text-center text-sm text-gray-400 hover:text-brand-600 hover:bg-brand-50 border border-dashed border-gray-200 hover:border-brand-200 rounded-xl py-6 transition-colors"
+                >
+                  אין מסמכים — לחץ ליצירת מסמך חדש
+                </button>
               ) : quotes.map(q => {
                 const signed = !!q.client_signature;
                 return (
