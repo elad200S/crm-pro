@@ -32,7 +32,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
-      <table className="w-full min-w-[1040px] table-fixed text-sm" dir="rtl">
+      <table className="min-w-[1040px] table-fixed text-sm" dir="rtl">
         <colgroup>
           <col className="w-[240px]" />
           <col className="w-[130px]" />
@@ -44,7 +44,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
         </colgroup>
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50/80">
-            <th className="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">שם</th>
+            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">שם</th>
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">טלפון</th>
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">סטטוס</th>
             <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">מקור</th>
