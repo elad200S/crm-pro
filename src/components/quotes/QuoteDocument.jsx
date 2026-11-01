@@ -110,7 +110,6 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
             </div>
           </div>
           <div class="body-text">${esc(body).replace(/\n/g, "<br/>")}</div>
-          ${price > 0 ? `<div class="price-box"><span class="lbl">סכום הסכם</span><span class="amt">&#8362;${price.toLocaleString()}</span></div>` : ""}
           <div class="sig-row">
             <div class="sig-line">${quote?.client_signature ? `<img src="${quote.client_signature}" style="max-height:52px;" />` : ""}<div class="line">${quote?.client_signature ? `${esc(quote?.signing_client_name || lead?.full_name)}${quote?.signed_date ? ` — ${format(new Date(quote.signed_date), "dd/MM/yyyy", { locale: he })}` : ""}` : "חתימת הלקוח ותאריך"}</div></div>
             <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
@@ -128,7 +127,7 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
     const phone = (lead?.phone || "").replace(/[^0-9]/g, "");
     const intlPhone = phone.startsWith("0") ? "972" + phone.slice(1) : phone;
     const text = encodeURIComponent(
-      `*${quote?.title || "הסכם עבודה"}*\n\n${body}${price > 0 ? `\n\n*סכום הסכם: ₪${price.toLocaleString()}*` : ""}\n\n_HEY Digital_`
+      `*${quote?.title || "הסכם עבודה"}*\n\n${body}\n\n_HEY Digital_`
     );
     window.open(`https://wa.me/${intlPhone}?text=${text}`, "_blank");
   };
@@ -284,14 +283,6 @@ export default function QuoteDocument({ quote, lead, onClose, onDelete }) {
             <div className="text-sm text-gray-800 whitespace-pre-wrap mb-8"
               style={{ lineHeight: "2.1" }}>
               {body}
-            </div>
-          )}
-
-          {price > 0 && (
-            <div className="rounded-xl px-5 py-4 flex justify-between items-center mb-10"
-              style={{ background: "#e8f7f4", border: "1px solid #d8ebe7" }}>
-              <span className="text-sm font-bold" style={{ color: "#0A8E7F" }}>סכום הסכם</span>
-              <span className="text-2xl font-black" style={{ color: "#0A8E7F" }}>₪{price.toLocaleString()}</span>
             </div>
           )}
 

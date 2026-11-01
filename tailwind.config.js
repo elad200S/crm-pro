@@ -4,12 +4,56 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['Assistant', 'Segoe UI', 'Arial', 'sans-serif'],
+  			heading: ['Heebo', 'Segoe UI', 'Arial', 'sans-serif']
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			brand: {
+  				50: '#EAFBF8',
+  				100: '#D1F5EF',
+  				200: '#A3EBDF',
+  				300: '#70DDCC',
+  				400: '#3DD0BA',
+  				500: '#18C6B5',
+  				600: '#129E90',
+  				700: '#107F75',
+  				800: '#11645D',
+  				900: '#0F514C',
+  				950: '#072E2B'
+  			},
+  			forest: {
+  				50: '#E7EEEC',
+  				100: '#C7D8D3',
+  				200: '#93B0A7',
+  				300: '#5E8A7C',
+  				400: '#2F5C4E',
+  				500: '#0B3E33',
+  				600: '#07332A',
+  				700: '#052B23',
+  				800: '#042D26',
+  				900: '#032824',
+  				950: '#021C19'
+  			},
+  			cream: '#F6F4EF',
+  			flame: {
+  				50: '#FFF3E7',
+  				100: '#FFE4C7',
+  				200: '#FFC98F',
+  				300: '#FFAD57',
+  				400: '#FF9640',
+  				500: '#FF861F',
+  				600: '#E66F0C',
+  				700: '#BF590A',
+  				800: '#99470A',
+  				900: '#7A3908'
+  			},
+  			live: '#00DED9',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

@@ -177,7 +177,6 @@ function printDoc({ title, body, price, clientData, signatureDataUrl }) {
         <div class="meta"><h2>${title || "הסכם עבודה"}</h2><p>תאריך: ${todayStr()}</p></div>
       </div>
       <div class="body">${body.replace(/\n/g, "<br/>")}</div>
-      ${price > 0 ? `<div class="price"><span style="color:#0A8E7F;font-weight:700;font-size:13px">סכום הסכם</span><span style="font-size:24px;font-weight:800;color:#0A8E7F">&#8362;${parseFloat(price).toLocaleString()}</span></div>` : ""}
       <div class="sig-row">
         <div class="sig-line">${signImg}<div class="line"><div>חתימת הלקוח — ${clientData["{customer-name}"] || ""}</div><div style="font-size:10px;margin-top:2px">${todayStr()}</div></div></div>
         <div class="sig-line"><div class="sigwrap"><img src="${window.location.origin}/stamp-hey.png" style="max-height:66px;" /></div><div class="line">HEY Digital</div></div>
@@ -517,14 +516,6 @@ export default function ClientSign() {
             <div className="text-sm text-gray-800 whitespace-pre-wrap leading-loose mb-8">
               {body}
             </div>
-
-            {price > 0 && (
-              <div className="rounded-xl px-5 py-4 flex justify-between items-center mb-8"
-                style={{ background: "#e8f7f4", border: "1px solid #d8ebe7" }}>
-                <span className="text-sm font-bold" style={{ color: "#0A8E7F" }}>סכום הסכם</span>
-                <span className="text-2xl font-black" style={{ color: "#0A8E7F" }}>&#8362;{price.toLocaleString()}</span>
-              </div>
-            )}
 
             <div className="border-t-2 border-gray-100 pt-8">
               <h3 className="text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
