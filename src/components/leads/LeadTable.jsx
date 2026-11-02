@@ -32,16 +32,27 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-x-auto">
-      <table className="w-full min-w-[920px] text-sm" dir="rtl">
-        <thead>
-          <tr className="border-b border-gray-100 bg-gray-50/80">
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">שם</th>
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">טלפון</th>
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">סטטוס</th>
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">מקור</th>
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">סוכן</th>
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">זמן</th>
-            <th className="text-end text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">פעולות</th>
+      <table className="w-full min-w-[1040px] text-sm table-fixed" dir="rtl">
+        <colgroup>
+          <col className="w-[22%]" />
+          <col className="w-[16%]" />
+          <col className="w-[12%]" />
+          <col className="w-[14%]" />
+          <col className="w-[12%]" />
+          <col className="w-[12%]" />
+          <col className="w-[14%]" />
+          <col className="w-[8%]" />
+        </colgroup>
+        <thead className="sticky top-0 z-10">
+          <tr className="border-b border-gray-100 bg-gray-50/95 backdrop-blur-sm">
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">שם</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">חברה</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">טלפון</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">סטטוס</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">מקור</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">סוכן</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">תאריך ומעקב</th>
+            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">פעולות</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">
@@ -57,7 +68,7 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
                 onClick={() => onRowClick(lead)}
               >
-                {/* ליד */}
+                {/* שם */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${getAvatarColor(lead.full_name)}`}>
@@ -66,15 +77,19 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <p className="font-semibold text-gray-900 truncate">{lead.full_name || "—"}</p>
-                        {lead.lead_number && <span className="text-xs text-gray-400 font-mono flex-shrink-0">L-{lead.lead_number}</span>}
+                        {lead.lead_number && <span className="text-xs text-gray-400 font-mono flex-shrink-0">#{lead.lead_number}</span>}
                       </div>
-                      {lead.company_name && <p className="text-xs text-gray-400 truncate">{lead.company_name}</p>}
                     </div>
                   </div>
                 </td>
 
+                {/* חברה */}
+                <td className="px-4 py-3">
+                  <p className="text-gray-600 truncate">{lead.company_name || "—"}</p>
+                </td>
+
                 {/* טלפון */}
-                <td className="px-4 py-3 text-gray-600 font-mono">{lead.phone || "—"}</td>
+                <td className="px-4 py-3 text-gray-600 font-mono whitespace-nowrap" dir="ltr">{lead.phone || "—"}</td>
 
                 {/* סטטוס */}
                 <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
