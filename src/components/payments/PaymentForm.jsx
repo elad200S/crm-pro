@@ -113,10 +113,10 @@ export default function PaymentForm({ payment, prefill, customers, onSubmit, onC
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-end p-2.5 font-medium text-gray-500">תיאור</th>
-                    <th className="text-end p-2.5 font-medium text-gray-500 w-16">כמות</th>
-                    <th className="text-end p-2.5 font-medium text-gray-500 w-28">מחיר יחידה</th>
-                    <th className="text-end p-2.5 font-medium text-gray-500 w-24">סה"כ</th>
+                    <th className="text-start p-2.5 font-medium text-gray-500">תיאור</th>
+                    <th className="text-start p-2.5 font-medium text-gray-500 w-16">כמות</th>
+                    <th className="text-start p-2.5 font-medium text-gray-500 w-28">מחיר יחידה</th>
+                    <th className="text-start p-2.5 font-medium text-gray-500 w-24">סה"כ</th>
                     <th className="w-8" />
                   </tr>
                 </thead>
