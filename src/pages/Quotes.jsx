@@ -32,8 +32,6 @@ const STATUS_CONFIG = {
   "בוטל":   { label: "בוטל",   color: "bg-red-100 text-red-700",      icon: XCircle }
 };
 
-const CURRENCY_SYMBOL = { ILS: "₪", USD: "$", EUR: "€" };
-
 export default function Quotes() {
   const [quotes, setQuotes] = useState([]);
   const [leads, setLeads] = useState([]);
@@ -251,7 +249,6 @@ export default function Quotes() {
           {filtered.map(quote => {
             const entity = getEntityName(quote);
             const cfg = STATUS_CONFIG[quote.status] || STATUS_CONFIG["טיוטה"];
-            const currSymbol = CURRENCY_SYMBOL[quote.currency] || "₪";
             const expired = isExpired(quote);
             const renewal = renewalStatus(quote);
 
@@ -260,33 +257,33 @@ export default function Quotes() {
                 key={quote.id}
                 className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow ${expired || renewal ? "border-orange-200" : ""}`}
               >
-                <div className="p-5">
-                  <div className="flex flex-col gap-3">
+                <div className="p-3.5">
+                  <div className="flex flex-col gap-2">
                     {/* Left: info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="font-bold text-gray-900 text-lg">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <span className="font-bold text-gray-900 text-sm truncate">
                           {quote.title || "ללא כותרת"}
                         </span>
                         {expired && (
-                          <Badge className="bg-orange-100 text-orange-700 text-xs">פג תוקף</Badge>
+                          <Badge className="bg-orange-100 text-orange-700 text-[10px]">פג תוקף</Badge>
                         )}
                         {quote.client_signature && (
-                          <Badge className="bg-emerald-100 text-emerald-700 text-xs flex items-center gap-1">
-                            <PenLine className="w-3 h-3" /> נחתם דיגיטלית
+                          <Badge className="bg-emerald-100 text-emerald-700 text-[10px] flex items-center gap-1">
+                            <PenLine className="w-3 h-3" /> נחתם
                           </Badge>
                         )}
                         {renewal === "overdue" && (
-                          <Badge className="bg-red-100 text-red-700 text-xs">ההסכם פג — לחדש</Badge>
+                          <Badge className="bg-red-100 text-red-700 text-[10px]">פג — לחדש</Badge>
                         )}
                         {renewal === "soon" && (
-                          <Badge className="bg-amber-100 text-amber-700 text-xs">מתקרב לחידוש</Badge>
+                          <Badge className="bg-amber-100 text-amber-700 text-[10px]">מתקרב לחידוש</Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500 flex-wrap">
                         <span className="font-medium text-gray-700">{entity.name}</span>
                         {entity.type && (
-                          <Badge variant="outline" className="text-xs">{entity.type}</Badge>
+                          <Badge variant="outline" className="text-[10px]">{entity.type}</Badge>
                         )}
                         {quote.created_date && (
                           <span>• {format(new Date(quote.created_date), "dd/MM/yyyy", { locale: he })}</span>
@@ -297,7 +294,7 @@ export default function Quotes() {
                       </div>
                       {/* Items preview */}
                       {quote.items && quote.items.length > 0 && (
-                        <div className="mt-2 text-xs text-gray-400">
+                        <div className="mt-1.5 text-[11px] text-gray-400 truncate">
                           {quote.items.slice(0, 2).map((item, i) => (
                             <span key={i}>{item.description}{i < Math.min(quote.items.length, 2) - 1 ? " · " : ""}</span>
                           ))}
@@ -306,71 +303,46 @@ export default function Quotes() {
                       )}
                     </div>
 
-                    {/* Right: amount + actions */}
-                    <div className="flex items-center gap-3 flex-shrink-0 pt-3 border-t">
-                      <div className="text-end">
-                        <div className="text-2xl font-bold text-gray-900">
-                          {currSymbol}{(quote.amount || 0).toLocaleString()}
-                        </div>
-                        {quote.vat_included && (
-                          <div className="text-xs text-gray-400">כולל מע"מ</div>
-                        )}
-                      </div>
+                    {/* Right: status + actions */}
+                    <div className="flex items-center justify-between flex-wrap gap-1.5 pt-2 border-t">
+                      <Badge className={`${cfg.color} text-[10px]`}>{cfg.label}</Badge>
 
-                      <div className="flex flex-col gap-2 items-end">
-                        <Badge className={cfg.color}>{cfg.label}</Badge>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setPreviewQuote(quote)}
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          <Eye className="w-3.5 h-3.5 ms-1" />
-                          צפה
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingDoc(quote)}
-                          className="text-brand-600 hover:text-brand-800 border-brand-200"
-                        >
-                          <Edit className="w-3.5 h-3.5 ms-1" />
-                          עריכה
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setDeleteTarget(quote)}
-                          className="text-red-600 hover:text-red-800 border-red-200"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 ms-1" />
-                          מחיקה
-                        </Button>
+                      <div className="flex items-center gap-0.5">
+                        <button onClick={() => setPreviewQuote(quote)} title="צפה"
+                          className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setEditingDoc(quote)} title="עריכה"
+                          className="p-1.5 rounded-lg text-brand-600 hover:bg-brand-50 transition-colors">
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setDeleteTarget(quote)} title="מחיקה"
+                          className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                         {quote.status === "אושר" && (() => {
                           const linkedPayment = getLinkedPayment(quote.id);
                           if (linkedPayment) {
                             return (
-                              <Link to={createPageUrl("Payments")}>
-                                <Button variant="outline" size="sm" className="text-emerald-700 hover:text-emerald-800 border-emerald-200">
-                                  <Receipt className="w-3.5 h-3.5 ms-1" />
-                                  חשבונית: {linkedPayment.status}
-                                </Button>
+                              <Link to={createPageUrl("Payments")} title={`חשבונית: ${linkedPayment.status}`}>
+                                <span className="flex p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors">
+                                  <Receipt className="w-4 h-4" />
+                                </span>
                               </Link>
                             );
                           }
                           if (!quote.customer_id) {
                             return (
-                              <span className="text-[11px] text-gray-400 max-w-[120px] text-start">
-                                יש להמיר לליד ללקוח כדי להפיק חשבונית
+                              <span title="יש להמיר לליד ללקוח כדי להפיק חשבונית" className="p-1.5 text-gray-300">
+                                <Receipt className="w-4 h-4" />
                               </span>
                             );
                           }
                           return (
-                            <Link to={`${createPageUrl("Payments")}?quote=${quote.id}`}>
-                              <Button variant="outline" size="sm" className="text-emerald-700 hover:text-emerald-800 border-emerald-200">
-                                <Receipt className="w-3.5 h-3.5 ms-1" />
-                                צור חשבונית
-                              </Button>
+                            <Link to={`${createPageUrl("Payments")}?quote=${quote.id}`} title="צור חשבונית">
+                              <span className="flex p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors">
+                                <Receipt className="w-4 h-4" />
+                              </span>
                             </Link>
                           );
                         })()}
@@ -380,7 +352,7 @@ export default function Quotes() {
 
                   {/* Notes */}
                   {quote.notes && (
-                    <div className="mt-3 pt-3 border-t text-sm text-gray-500 line-clamp-1">
+                    <div className="mt-2 pt-2 border-t text-xs text-gray-500 line-clamp-1">
                       {quote.notes}
                     </div>
                   )}
