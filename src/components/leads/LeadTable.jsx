@@ -45,14 +45,14 @@ export default function LeadTable({ leads, users, onEdit, onDelete, onWhatsApp, 
         </colgroup>
         <thead className="sticky top-0 z-10">
           <tr className="border-b border-gray-100 bg-gray-50/95 backdrop-blur-sm">
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">שם</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">חברה</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">טלפון</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">סטטוס</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">מקור</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">סוכן</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">תאריך ומעקב</th>
-            <th className="text-end text-xs font-semibold text-gray-500 px-4 py-3">פעולות</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">שם</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">חברה</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">טלפון</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">סטטוס</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">מקור</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">סוכן</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">תאריך ומעקב</th>
+            <th className="text-start text-xs font-semibold text-gray-500 px-4 py-3">פעולות</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">
