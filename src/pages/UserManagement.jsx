@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { User, JobDescriptionTemplate } from "@/entities/all";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Plus, Users as UsersIcon } from "lucide-react";
@@ -114,7 +113,7 @@ export default function UserManagement() {
 
   const loadUsers = async () => {
     try {
-      const data = await User.list('-created_date', 2000);
+      const data = await base44.entities.User.list('-created_date', 2000);
       setUsers(data);
     } catch (error) {
       console.error("שגיאה בטעינת משתמשים:", error);
@@ -148,7 +147,7 @@ export default function UserManagement() {
       let fileName = "";
 
       try {
-        const templates = await JobDescriptionTemplate.filter({
+        const templates = await base44.entities.JobDescriptionTemplate.filter({
           user_category: user.user_category,
           is_active: true
         });
@@ -230,7 +229,7 @@ ${user.manager_email ? `👤 מנהל ישיר: ${user.manager_email}` : ''}
   const handleSubmit = async (userData) => {
     try {
       if (editingUser) {
-        await User.update(editingUser.id, userData);
+        await base44.entities.User.update(editingUser.id, userData);
       } else {
         // משתמש חדש - שליחת מייל אוטומטית עם קובץ תיאור תפקיד מ-FileAttachment
         const emailSent = await sendWelcomeEmail({ 
@@ -267,7 +266,7 @@ ${user.manager_email ? `👤 מנהל ישיר: ${user.manager_email}` : ''}
   const confirmDeactivate = async () => {
     if (userToDeactivate) {
       try {
-        await User.update(userToDeactivate.id, { status: "לא_פעיל" });
+        await base44.entities.User.update(userToDeactivate.id, { status: "לא_פעיל" });
         setUserToDeactivate(null);
         await loadUsers();
       } catch (error) {
@@ -278,7 +277,7 @@ ${user.manager_email ? `👤 מנהל ישיר: ${user.manager_email}` : ''}
 
   const handleActivate = async (user) => {
     try {
-      await User.update(user.id, { status: "פעיל" });
+      await base44.entities.User.update(user.id, { status: "פעיל" });
       await loadUsers();
     } catch (error) {
       console.error("שגיאה בהפעלת משתמש:", error);

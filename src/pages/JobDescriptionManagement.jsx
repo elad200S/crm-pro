@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { JobDescriptionTemplate } from "@/entities/all";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +72,7 @@ export default function JobDescriptionManagement() {
 
   const loadTemplates = async () => {
     try {
-      const data = await JobDescriptionTemplate.list('-created_date', 2000);
+      const data = await base44.entities.JobDescriptionTemplate.list('-created_date', 2000);
       setTemplates(data);
     } catch (error) {
       console.error("שגיאה בטעינת תבניות:", error);
@@ -121,9 +120,9 @@ export default function JobDescriptionManagement() {
 
     try {
       if (editingTemplate) {
-        await JobDescriptionTemplate.update(editingTemplate.id, formData);
+        await base44.entities.JobDescriptionTemplate.update(editingTemplate.id, formData);
       } else {
-        await JobDescriptionTemplate.create(formData);
+        await base44.entities.JobDescriptionTemplate.create(formData);
       }
       
       setShowForm(false);
@@ -155,7 +154,7 @@ export default function JobDescriptionManagement() {
   const confirmDelete = async () => {
     if (templateToDelete) {
       try {
-        await JobDescriptionTemplate.delete(templateToDelete.id);
+        await base44.entities.JobDescriptionTemplate.delete(templateToDelete.id);
         setTemplateToDelete(null);
         await loadTemplates();
       } catch (error) {
