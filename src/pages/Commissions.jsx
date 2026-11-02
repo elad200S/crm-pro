@@ -192,10 +192,10 @@ export default function Commissions() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-end p-3 font-medium text-gray-500">נציג</th>
-                  <th className="text-end p-3 font-medium text-gray-500">הכנסה מיוחסת</th>
-                  <th className="text-end p-3 font-medium text-gray-500">אחוז עמלה</th>
-                  <th className="text-end p-3 font-medium text-gray-500">עמלה</th>
+                  <th className="text-start p-3 font-medium text-gray-500">נציג</th>
+                  <th className="text-start p-3 font-medium text-gray-500">הכנסה מיוחסת</th>
+                  <th className="text-start p-3 font-medium text-gray-500">אחוז עמלה</th>
+                  <th className="text-start p-3 font-medium text-gray-500">עמלה</th>
                 </tr>
               </thead>
               <tbody>

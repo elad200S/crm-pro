@@ -135,10 +135,10 @@ export default function QuoteEditModal({ quote, leadName, customerName, isNew, o
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-end p-2 font-semibold text-gray-600 w-1/2">תיאור</th>
-                    <th className="text-end p-2 font-semibold text-gray-600 w-16">כמות</th>
-                    <th className="text-end p-2 font-semibold text-gray-600 w-28">מחיר יחידה</th>
-                    <th className="text-end p-2 font-semibold text-gray-600 w-28">סה"כ</th>
+                    <th className="text-start p-2 font-semibold text-gray-600 w-1/2">תיאור</th>
+                    <th className="text-start p-2 font-semibold text-gray-600 w-16">כמות</th>
+                    <th className="text-start p-2 font-semibold text-gray-600 w-28">מחיר יחידה</th>
+                    <th className="text-start p-2 font-semibold text-gray-600 w-28">סה"כ</th>
                     <th className="w-10" />
                   </tr>
                 </thead>

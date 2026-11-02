@@ -171,10 +171,10 @@ export default function QuoteBuilderModal({ customer, onClose, onCreated }) {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50 border-b">
                   <tr>
-                    <th className="text-end p-2 font-medium text-gray-500 w-1/2">תיאור</th>
-                    <th className="text-end p-2 font-medium text-gray-500 w-14">כמות</th>
-                    <th className="text-end p-2 font-medium text-gray-500 w-24">מחיר</th>
-                    <th className="text-end p-2 font-medium text-gray-500 w-24">סה"כ</th>
+                    <th className="text-start p-2 font-medium text-gray-500 w-1/2">תיאור</th>
+                    <th className="text-start p-2 font-medium text-gray-500 w-14">כמות</th>
+                    <th className="text-start p-2 font-medium text-gray-500 w-24">מחיר</th>
+                    <th className="text-start p-2 font-medium text-gray-500 w-24">סה"כ</th>
                     <th className="w-8" />
                   </tr>
                 </thead>
