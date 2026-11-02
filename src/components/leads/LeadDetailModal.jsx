@@ -116,18 +116,18 @@ function DocDropdown({ lead, onQuote, onClose: closeModal }) {
         <ChevronDown className="w-3 h-3" />
       </HeaderAction>
       {open && (
-        <div className="absolute top-full mt-1.5 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px] text-end">
+        <div className="absolute top-full mt-1.5 right-0 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 min-w-[180px] text-start">
           {templates.length === 0 ? (
             <p className="text-xs text-gray-400 px-3 py-2">אין תבניות</p>
           ) : templates.map(t => (
             <button key={t.id} onClick={() => pick(t)}
-              className="w-full text-end px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
+              className="w-full text-start px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors">
               {t.title || "מסמך ללא כותרת"}
             </button>
           ))}
           <div className="border-t border-gray-100 mt-1 pt-1">
             <button onClick={() => pick(null)}
-              className="w-full text-end px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
+              className="w-full text-start px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors">
               + מסמך חדש (ריק)
             </button>
           </div>
@@ -351,7 +351,7 @@ export default function LeadDetailModal({ lead, users, onClose, onEdit, onDelete
                           <button
                             type="button"
                             onClick={() => onViewQuote && onViewQuote(q)}
-                            className="flex-1 min-w-0 text-end p-2.5 flex items-center justify-between gap-2"
+                            className="flex-1 min-w-0 text-start p-2.5 flex items-center justify-between gap-2"
                           >
                             <div className="min-w-0">
                               <p className="text-sm text-gray-800 truncate">{q.title || "מסמך ללא כותרת"}</p>

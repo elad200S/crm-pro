@@ -251,7 +251,7 @@ export default function Layout({ children, currentPageName }) {
         {/* User info at bottom */}
         <div className="px-4 py-4 border-t border-gray-100">
           <div className="flex items-center justify-end gap-3">
-            <div className="text-end">
+            <div className="text-start">
               <p className="text-sm font-medium text-gray-900">{currentUser?.full_name || "משתמש"}</p>
               <p className="text-xs text-gray-400">{currentUser?.job_title || ""}</p>
             </div>

@@ -195,7 +195,7 @@ export default function CustomerDetailModal({ customer, onClose, onEdit, onDelet
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="text-end">
+                        <div className="text-start">
                           <div className="font-bold text-gray-900">₪{(payment.amount || 0).toLocaleString()}</div>
                           <Badge className={`text-xs ${cfg.color}`}>{payment.status}</Badge>
                         </div>

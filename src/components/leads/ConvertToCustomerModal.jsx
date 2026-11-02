@@ -17,7 +17,7 @@ export default function ConvertToCustomerModal({ lead, existingCustomer, onConfi
 
           <div className="py-3 text-sm text-gray-700 space-y-4 w-full">
             {existingCustomer && (
-              <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2 text-end">
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2 text-start">
                 <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-orange-700">לקוח עם אותו טלפון/אימייל כבר קיים!</p>
@@ -30,7 +30,7 @@ export default function ConvertToCustomerModal({ lead, existingCustomer, onConfi
               להמיר את <strong>{lead.full_name || lead.phone}</strong> מליד ללקוח?
             </p>
 
-            <ul className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-2 text-end text-gray-600">
+            <ul className="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-2 text-start text-gray-600">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                 יירשם לקוח חדש עם פרטי הליד

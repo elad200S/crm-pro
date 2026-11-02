@@ -43,34 +43,34 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
           <Table>
             <TableHeader>
               <TableRow className="bg-gray-50">
-                <TableHead className="text-end">שם מלא</TableHead>
-                <TableHead className="text-end">תפקיד</TableHead>
-                <TableHead className="text-end">מחלקה</TableHead>
-                <TableHead className="text-end">קטגוריה</TableHead>
-                <TableHead className="text-end">פרטי קשר</TableHead>
-                <TableHead className="text-end">תאריך התחלה</TableHead>
-                <TableHead className="text-end">סטטוס</TableHead>
-                <TableHead className="text-end">פעולות</TableHead>
+                <TableHead className="text-start">שם מלא</TableHead>
+                <TableHead className="text-start">תפקיד</TableHead>
+                <TableHead className="text-start">מחלקה</TableHead>
+                <TableHead className="text-start">קטגוריה</TableHead>
+                <TableHead className="text-start">פרטי קשר</TableHead>
+                <TableHead className="text-start">תאריך התחלה</TableHead>
+                <TableHead className="text-start">סטטוס</TableHead>
+                <TableHead className="text-start">פעולות</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id} className="hover:bg-gray-50">
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <div className="font-semibold text-gray-900">{user.full_name}</div>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <span className="text-sm">{user.job_title}</span>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <span className="text-sm">{user.department}</span>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <Badge className={categoryColors[user.user_category]}>
                       {user.user_category?.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-gray-400" />
@@ -82,17 +82,17 @@ export default function UserTable({ users, loading, onEdit, onDeactivate, onActi
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <span className="text-sm">
                       {user.start_date ? format(new Date(user.start_date), "dd/MM/yyyy", { locale: he }) : "-"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <Badge className={statusColors[user.status]}>
                       {user.status?.replace(/_/g, ' ')}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-end">
+                  <TableCell className="text-start">
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"

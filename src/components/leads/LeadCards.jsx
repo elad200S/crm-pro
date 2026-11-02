@@ -72,7 +72,7 @@ function QuoteDropdown({ lead, onQuote }) {
             <button
               key={t.id}
               onClick={() => { onQuote(lead, t); setOpen(false); }}
-              className="w-full text-end px-3 py-2 text-xs text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
+              className="w-full text-start px-3 py-2 text-xs text-gray-700 hover:bg-brand-50 hover:text-brand-700 transition-colors"
             >
               {t.title || "מסמך ללא כותרת"}
             </button>
@@ -80,7 +80,7 @@ function QuoteDropdown({ lead, onQuote }) {
           <div className="border-t border-gray-100 mt-1 pt-1">
             <button
               onClick={() => { onQuote(lead, null); setOpen(false); }}
-              className="w-full text-end px-3 py-2 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
+              className="w-full text-start px-3 py-2 text-xs text-gray-500 hover:bg-gray-50 transition-colors"
             >
               + מסמך חדש (ריק)
             </button>
