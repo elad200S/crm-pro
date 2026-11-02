@@ -121,7 +121,7 @@ function SignaturePad({ onSignConfirmed }) {
         )}
       </div>
       <div className="flex items-center gap-3">
-        <button onClick={clear} className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600">
+        <button onClick={clear} className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-600">
           <RotateCcw className="w-3 h-3" /> נקה
         </button>
         {signed && !confirmed && (
@@ -291,7 +291,7 @@ export default function ClientSign() {
         <div className="text-center p-8">
           <p className="text-4xl mb-3">❌</p>
           <h2 className="text-lg font-bold text-gray-700 mb-1">קישור לא תקין</h2>
-          <p className="text-gray-400 text-sm">פנה ל-HEY Digital לקבל קישור מחודש</p>
+          <p className="text-gray-500 text-sm">פנה ל-HEY Digital לקבל קישור מחודש</p>
         </div>
       </div>
     );
@@ -311,7 +311,7 @@ export default function ClientSign() {
         <div className="text-center p-8">
           <p className="text-4xl mb-3">❌</p>
           <h2 className="text-lg font-bold text-gray-700 mb-1">ההסכם לא נמצא</h2>
-          <p className="text-gray-400 text-sm">ייתכן שההסכם הוסר. פנה ל-HEY Digital לקבלת קישור מחודש</p>
+          <p className="text-gray-500 text-sm">ייתכן שההסכם הוסר. פנה ל-HEY Digital לקבלת קישור מחודש</p>
         </div>
       </div>
     );
@@ -339,7 +339,7 @@ export default function ClientSign() {
           </div>
           <h2 className="text-2xl font-black text-gray-800 mb-2">ההסכם כבר נחתם</h2>
           <p className="text-gray-500 text-sm mb-1">{title || liveQuote.title || "הסכם עבודה"}</p>
-          <p className="text-gray-400 text-xs">נחתם ב-{signedDateLabel}</p>
+          <p className="text-gray-500 text-xs">נחתם ב-{signedDateLabel}</p>
 
           <div className="mt-5 bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mb-6">
             ההסכם הזה כבר נחתם ונשמר במערכת.<br />
@@ -470,15 +470,18 @@ export default function ClientSign() {
           <div className="space-y-4">
             {formVars.map(v => (
               <div key={v.key} className="space-y-1.5">
-                <Label>{v.label} *</Label>
+                <Label htmlFor={v.key}>{v.label} <span aria-hidden="true">*</span><span className="sr-only"> (שדה חובה)</span></Label>
                 <Input
+                  id={v.key}
+                  required
+                  aria-required="true"
                   value={clientData[v.key] || ""}
                   onChange={e => setClientData(d => ({ ...d, [v.key]: e.target.value }))}
                   placeholder={`הזן ${v.label}`}
                 />
               </div>
             ))}
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-500 text-center">
               ודא שכל הפרטים נכונים — הם יופיעו בהסכם ולא ניתן יהיה לשנותם לאחר החתימה
             </p>
             <Button
@@ -521,7 +524,7 @@ export default function ClientSign() {
               <h3 className="text-sm font-bold text-gray-700 mb-1 flex items-center gap-2">
                 <PenLine className="w-4 h-4 text-teal-700" /> חתימה דיגיטלית
               </h3>
-              <p className="text-xs text-gray-400 mb-3">
+              <p className="text-xs text-gray-500 mb-3">
                 קראתי את ההסכם ואני מסכים/ה לכל תנאיו — לחץ/י למטה כדי לחתום
               </p>
               {signature ? (
@@ -563,13 +566,13 @@ export default function ClientSign() {
 
           <div className="px-10 pb-4">
             <div className="flex gap-16 items-end">
-              <div className="flex-1 text-center text-xs text-gray-400">
+              <div className="flex-1 text-center text-xs text-gray-500">
                 {signature && <img src={signature} alt="" className="h-12 mx-auto mb-1" />}
                 <div className="border-t border-gray-300 pt-3">
                   חתימת הלקוח — {clientData["{customer-name}"] || lead?.name || ""}
                 </div>
               </div>
-              <div className="flex-1 text-center text-xs text-gray-400">
+              <div className="flex-1 text-center text-xs text-gray-500">
                 <div className="flex items-end justify-center gap-3">
                   <img src="/stamp-hey.png?v=2" alt="" className="h-16" />
                 </div>
@@ -580,7 +583,7 @@ export default function ClientSign() {
 
           <div className="px-10 pb-8 pt-4">
             {signError && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5 text-center mb-3">
+              <p role="alert" className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5 text-center mb-3">
                 החתימה לא נשמרה בגלל תקלה זמנית. אנא נסה שוב — אם זה חוזר, פנה ל-HEY Digital.
               </p>
             )}
@@ -593,7 +596,7 @@ export default function ClientSign() {
               {signing ? "שומר..." : "אשר וחתום על ההסכם"}
             </Button>
             {!signature && (
-              <p className="text-xs text-gray-400 text-center mt-2">יש לחתום ולאשר את החתימה לפני הגשה</p>
+              <p className="text-xs text-gray-500 text-center mt-2">יש לחתום ולאשר את החתימה לפני הגשה</p>
             )}
           </div>
         </div>
@@ -610,7 +613,7 @@ export default function ClientSign() {
         </div>
         <h2 className="text-2xl font-black text-gray-800 mb-2">ההסכם נחתם!</h2>
         <p className="text-gray-500 text-sm mb-1">{title || "הסכם עבודה"}</p>
-        <p className="text-gray-400 text-xs">{todayStr()}</p>
+        <p className="text-gray-500 text-xs">{todayStr()}</p>
 
         <div className="mt-5 bg-green-50 border border-green-100 rounded-xl p-4 text-sm text-green-700 mb-6">
           תודה, {clientData["{customer-name}"] || lead?.name || ""}.<br />
