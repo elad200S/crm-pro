@@ -171,142 +171,7 @@ export default function CustomerProfile() {
       </button>
 
       {/* Two-column layout */}
-      <div className="grid lg:grid-cols-[1fr_300px] gap-6 items-start">
-
-        {/* ── Left: Docs / Tasks / Payments ── */}
-        <div className="space-y-5">
-
-          {/* Documents */}
-          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
-              <FileText className="w-4 h-4 text-brand-600" />
-              <h3 className="font-bold text-gray-800 text-sm">מסמכים</h3>
-              <span className="me-auto text-xs text-gray-400">{quotes.length} סה"כ</span>
-              <Button size="sm" onClick={() => setShowQuoteBuilder(true)} className="h-7 bg-brand-600 hover:bg-brand-700 text-xs">
-                <FilePlus2 className="w-3.5 h-3.5 ms-1" /> הצעת מחיר
-              </Button>
-            </div>
-            <div className="p-4 space-y-2">
-              {loading ? <Skeleton /> : quotes.length === 0 ? (
-                <button
-                  type="button"
-                  onClick={() => setShowQuoteBuilder(true)}
-                  className="w-full text-center text-sm text-gray-400 hover:text-brand-600 hover:bg-brand-50 border border-dashed border-gray-200 hover:border-brand-200 rounded-xl py-6 transition-colors"
-                >
-                  אין מסמכים — לחץ ליצירת מסמך חדש
-                </button>
-              ) : quotes.map(q => {
-                const signed = !!q.client_signature;
-                return (
-                  <div key={q.id} className="flex items-center gap-1 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors">
-                    <button
-                      type="button"
-                      onClick={() => setQuoteToView(q)}
-                      className="flex-1 min-w-0 text-end flex items-center justify-between p-3"
-                    >
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">{q.title || "מסמך ללא כותרת"}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">
-                          {q.created_date ? format(new Date(q.created_date), "dd MMM yyyy", { locale: he }) : ""}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {q.amount > 0 && <span className="text-sm font-bold text-gray-700">₪{q.amount.toLocaleString()}</span>}
-                        <Badge className={
-                          q.status === "אושר" ? "bg-green-100 text-green-700" :
-                          q.status === "בוטל" ? "bg-red-100 text-red-600" :
-                          q.status === "נשלח" ? "bg-brand-100 text-brand-700" :
-                          "bg-gray-100 text-gray-600"
-                        }>{q.status || "טיוטה"}</Badge>
-                      </div>
-                    </button>
-                    {!signed && customer.phone && (
-                      <button
-                        type="button"
-                        title="שלח לחתימה בוואטסאפ"
-                        onClick={() => sendQuoteLink(q)}
-                        className="flex-shrink-0 p-2 rounded-lg text-brand-600 hover:bg-brand-100 transition-colors"
-                      >
-                        <Send className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      title="מחיקת מסמך"
-                      onClick={() => setDeleteQuoteTarget(q)}
-                      className="flex-shrink-0 p-2 ms-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Tasks */}
-          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
-              <Clock className="w-4 h-4 text-purple-600" />
-              <h3 className="font-bold text-gray-800 text-sm">משימות</h3>
-              <span className="me-auto text-xs text-gray-400">{tasks.length} סה"כ · {openTasks} פתוחות</span>
-            </div>
-            <div className="p-4 space-y-2">
-              {loading ? <Skeleton /> : tasks.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">אין משימות</p>
-              ) : tasks.slice(0, 10).map(task => {
-                const overdue = task.status !== "הושלם" && task.due_date && new Date(task.due_date) < new Date();
-                return (
-                  <div key={task.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${overdue ? "border-red-200 bg-red-50" : "border-gray-100 hover:bg-gray-50"}`}>
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-0.5 ${task.status === "הושלם" ? "bg-green-400" : overdue ? "bg-red-400" : "bg-amber-400"}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-medium ${task.status === "הושלם" ? "line-through text-gray-400" : "text-gray-800"}`}>{task.title}</p>
-                      {task.due_date && (
-                        <p className={`text-xs mt-0.5 ${overdue ? "text-red-500 font-semibold" : "text-gray-400"}`}>
-                          {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}{overdue && " · באיחור"}
-                        </p>
-                      )}
-                    </div>
-                    <Badge className={task.status === "הושלם" ? "bg-green-100 text-green-700 text-xs" : "bg-yellow-100 text-yellow-700 text-xs"}>
-                      {task.status}
-                    </Badge>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Payments */}
-          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-            <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
-              <CreditCard className="w-4 h-4 text-green-600" />
-              <h3 className="font-bold text-gray-800 text-sm">תשלומים</h3>
-              <span className="me-auto text-xs text-gray-400">{payments.length} סה"כ</span>
-            </div>
-            <div className="p-4 space-y-2">
-              {loading ? <Skeleton /> : payments.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">אין תשלומים</p>
-              ) : payments.slice(0, 8).map(p => (
-                <div key={p.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">{p.invoice_number || "חשבונית"}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {p.created_date ? format(new Date(p.created_date), "dd MMM yyyy", { locale: he }) : ""}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-700">₪{(p.amount || 0).toLocaleString()}</span>
-                    <Badge className={
-                      p.status === "שולם" ? "bg-green-100 text-green-700" :
-                      p.status === "מבוטל" ? "bg-gray-100 text-gray-500" :
-                      "bg-amber-100 text-amber-700"
-                    }>{p.status}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="grid lg:grid-cols-[300px_1fr] gap-6 items-start">
 
         {/* ── Right: Customer card ── */}
         <div className="space-y-4">
@@ -446,6 +311,141 @@ export default function CustomerProfile() {
               <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{customer.notes}</p>
             </div>
           )}
+        </div>
+
+        {/* ── Left: Docs / Tasks / Payments ── */}
+        <div className="space-y-5">
+
+          {/* Documents */}
+          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
+              <FileText className="w-4 h-4 text-brand-600" />
+              <h3 className="font-bold text-gray-800 text-sm">מסמכים</h3>
+              <span className="me-auto text-xs text-gray-400">{quotes.length} סה"כ</span>
+              <Button size="sm" onClick={() => setShowQuoteBuilder(true)} className="h-7 bg-brand-600 hover:bg-brand-700 text-xs">
+                <FilePlus2 className="w-3.5 h-3.5 ms-1" /> הצעת מחיר
+              </Button>
+            </div>
+            <div className="p-4 space-y-2">
+              {loading ? <Skeleton /> : quotes.length === 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setShowQuoteBuilder(true)}
+                  className="w-full text-center text-sm text-gray-400 hover:text-brand-600 hover:bg-brand-50 border border-dashed border-gray-200 hover:border-brand-200 rounded-xl py-6 transition-colors"
+                >
+                  אין מסמכים — לחץ ליצירת מסמך חדש
+                </button>
+              ) : quotes.map(q => {
+                const signed = !!q.client_signature;
+                return (
+                  <div key={q.id} className="flex items-center gap-1 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => setQuoteToView(q)}
+                      className="flex-1 min-w-0 text-start flex items-center justify-between p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">{q.title || "מסמך ללא כותרת"}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {q.created_date ? format(new Date(q.created_date), "dd MMM yyyy", { locale: he }) : ""}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {q.amount > 0 && <span className="text-sm font-bold text-gray-700">₪{q.amount.toLocaleString()}</span>}
+                        <Badge className={
+                          q.status === "אושר" ? "bg-green-100 text-green-700" :
+                          q.status === "בוטל" ? "bg-red-100 text-red-600" :
+                          q.status === "נשלח" ? "bg-brand-100 text-brand-700" :
+                          "bg-gray-100 text-gray-600"
+                        }>{q.status || "טיוטה"}</Badge>
+                      </div>
+                    </button>
+                    {!signed && customer.phone && (
+                      <button
+                        type="button"
+                        title="שלח לחתימה בוואטסאפ"
+                        onClick={() => sendQuoteLink(q)}
+                        className="flex-shrink-0 p-2 rounded-lg text-brand-600 hover:bg-brand-100 transition-colors"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      title="מחיקת מסמך"
+                      onClick={() => setDeleteQuoteTarget(q)}
+                      className="flex-shrink-0 p-2 ms-1 rounded-lg text-red-500 hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tasks */}
+          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
+              <Clock className="w-4 h-4 text-purple-600" />
+              <h3 className="font-bold text-gray-800 text-sm">משימות</h3>
+              <span className="me-auto text-xs text-gray-400">{tasks.length} סה"כ · {openTasks} פתוחות</span>
+            </div>
+            <div className="p-4 space-y-2">
+              {loading ? <Skeleton /> : tasks.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-6">אין משימות</p>
+              ) : tasks.slice(0, 10).map(task => {
+                const overdue = task.status !== "הושלם" && task.due_date && new Date(task.due_date) < new Date();
+                return (
+                  <div key={task.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${overdue ? "border-red-200 bg-red-50" : "border-gray-100 hover:bg-gray-50"}`}>
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-0.5 ${task.status === "הושלם" ? "bg-green-400" : overdue ? "bg-red-400" : "bg-amber-400"}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium ${task.status === "הושלם" ? "line-through text-gray-400" : "text-gray-800"}`}>{task.title}</p>
+                      {task.due_date && (
+                        <p className={`text-xs mt-0.5 ${overdue ? "text-red-500 font-semibold" : "text-gray-400"}`}>
+                          {format(new Date(task.due_date), "dd/MM/yyyy", { locale: he })}{overdue && " · באיחור"}
+                        </p>
+                      )}
+                    </div>
+                    <Badge className={task.status === "הושלם" ? "bg-green-100 text-green-700 text-xs" : "bg-yellow-100 text-yellow-700 text-xs"}>
+                      {task.status}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Payments */}
+          <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 px-5 py-4 border-b bg-gray-50">
+              <CreditCard className="w-4 h-4 text-green-600" />
+              <h3 className="font-bold text-gray-800 text-sm">תשלומים</h3>
+              <span className="me-auto text-xs text-gray-400">{payments.length} סה"כ</span>
+            </div>
+            <div className="p-4 space-y-2">
+              {loading ? <Skeleton /> : payments.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-6">אין תשלומים</p>
+              ) : payments.slice(0, 8).map(p => (
+                <div key={p.id} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">{p.invoice_number || "חשבונית"}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {p.created_date ? format(new Date(p.created_date), "dd MMM yyyy", { locale: he }) : ""}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-700">₪{(p.amount || 0).toLocaleString()}</span>
+                    <Badge className={
+                      p.status === "שולם" ? "bg-green-100 text-green-700" :
+                      p.status === "מבוטל" ? "bg-gray-100 text-gray-500" :
+                      "bg-amber-100 text-amber-700"
+                    }>{p.status}</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
