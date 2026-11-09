@@ -313,10 +313,42 @@
     </section>
 
     <section id="cta" class="final-cta">
-      <div class="container">
-        <h2>מוכנים ל<span class="live">סדר</span> בעסק?</h2>
-        <p>היכנסו למערכת והתחילו לראות את כל העסק במקום אחד.</p>
-        <a class="btn btn-light btn-large" href="https://app.hey-digital-crm.co.il" rel="noopener">כניסה למערכת</a>
+      <div class="container final-cta-inner">
+        <div class="final-cta-copy">
+          <h2>מוכנים ל<span class="live">סדר</span> בעסק?</h2>
+          <p>כבר לקוחות שלנו? היכנסו למערכת. עדיין לא? השאירו פרטים ונחזור אליכם.</p>
+          <a class="btn btn-light btn-large" href="https://app.hey-digital-crm.co.il" rel="noopener">כניסה למערכת</a>
+        </div>
+
+        <div class="lead-card">
+          <h3>רוצים להתחיל?</h3>
+          <p>השאירו פרטים ונחזור אליכם באותו היום.</p>
+          <form id="lead-form" class="lead-form" novalidate>
+            <div class="lead-form-row">
+              <div class="lead-field">
+                <label for="lf-name">שם מלא</label>
+                <input id="lf-name" name="full_name" type="text" autocomplete="name" required />
+              </div>
+              <div class="lead-field">
+                <label for="lf-phone">טלפון</label>
+                <input id="lf-phone" name="phone" type="tel" autocomplete="tel" required />
+              </div>
+            </div>
+            <div class="lead-form-row">
+              <div class="lead-field">
+                <label for="lf-email">אימייל</label>
+                <input id="lf-email" name="email" type="email" autocomplete="email" />
+              </div>
+              <div class="lead-field">
+                <label for="lf-company">שם העסק</label>
+                <input id="lf-company" name="company_name" type="text" autocomplete="organization" />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large lead-submit">שליחת הפרטים</button>
+            <p class="lead-form-note">ללא התחייבות — נחזור אליכם בהקדם.</p>
+            <p class="lead-form-status" aria-live="polite"></p>
+          </form>
+        </div>
       </div>
     </section>
   </main>
